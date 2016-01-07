@@ -2,6 +2,7 @@
 Hardware Access Layer
 """
 from constants import *
+import util
 import tamproxy
 from tamproxy.devices import Motor
 
@@ -18,13 +19,13 @@ class Drive(HardwareDevice):
 		self.rMotor = tamproxy.devices.Motor(tamp, rMotorDirPin, rMotorPWMPin)
 		self.rMotor.write(1,0)
 		
-	def go(self, throttle, steer=0):
+	def go(self, throttle, steer=0, ):
 		"""both arguments measured in [-1 1], steer=-1 is CW"""
 		lPow = rPow = throttle
-		lPow -= steer
-		rPow += steer
-		self.lMotor.write(lPow>0, 255 * (lPow+2)/4)
-		self.rMotor.write(rPow>0, 255 * (rPow+2)/4)
+		lPow -= steer*tSensitivity
+		rPow += steer*tSensitivity
+		self.lMotor.write(lPow>0, util.clamp(abs(255 * lPow), 0, 255))
+		self.rMotor.write(rPow>0, util.clamp(abs(255 * rPow), 0, 255))
 
 	def stop(self):
 		self.go(throttle=0)
