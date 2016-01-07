@@ -19,14 +19,19 @@ class Drive(HardwareDevice):
 		self.rMotor = tamproxy.devices.Motor(tamp, rMotorDirPin, rMotorPWMPin)
 		self.rMotor.write(1,0)
 		
-	def go(self, throttle, steer=0, ):
+	def go(self, throttle, steer=0):
 		"""both arguments measured in [-1 1], steer=-1 is CW"""
 		lPow = rPow = throttle
 		lPow -= steer*tSensitivity
 		rPow += steer*tSensitivity
 		self.lMotor.write(lPow>0, util.clamp(abs(255 * lPow), 0, 255))
 		self.rMotor.write(rPow>0, util.clamp(abs(255 * rPow), 0, 255))
-
+		
+	def turnIP(self, throttle):
+		"""turn in place arg is in [-1 1] with -1 full speed CW"""
+		self.lMotor.write(-throttle>0, util.clamp(abs(255 * throttle), 0, 255))
+		self.rMotor.write(throttle>0, util.clamp(abs(255 * throttle), 0, 255))
+	
 	def stop(self):
 		self.go(throttle=0)
 
