@@ -2,8 +2,8 @@ import numpy as np
 import cv2
 
 cap = cv2.VideoCapture(1)
-cap.set(3, 480) #3=width
-cap.set(4, 360) #4=height
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 544) #3=width
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 288) #4=height
 
 try:
 	while True:
