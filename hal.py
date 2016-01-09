@@ -1,10 +1,11 @@
 """
 Hardware Access Layer
 """
-from constants import *
 import util
 import tamproxy
 from tamproxy.devices import Motor
+
+import pins
 
 class HardwareDevice:
 	"""a device needing a connection through the arduino"""
@@ -14,16 +15,16 @@ class HardwareDevice:
 
 class Drive(HardwareDevice):
 	def __init__(self, tamp):
-		self.lMotor = tamproxy.devices.Motor(tamp, lMotorDirPin, lMotorPWMPin)
+		self.lMotor = tamproxy.devices.Motor(tamp, pins.l_motor_dir, pins.l_motor_pwm)
 		self.lMotor.write(1,0)
-		self.rMotor = tamproxy.devices.Motor(tamp, rMotorDirPin, rMotorPWMPin)
+		self.rMotor = tamproxy.devices.Motor(tamp, pins.r_motor_dir, pins.r_motor_pwm)
 		self.rMotor.write(1,0)
 		
 	def go(self, throttle, steer=0):
 		"""both arguments measured in [-1 1], steer=-1 is CW"""
 		lPow = rPow = throttle
-		lPow -= steer*tSensitivity
-		rPow += steer*tSensitivity
+		lPow -= steer*0.1
+		rPow += steer*0.1
 		self.lMotor.write(lPow>0, util.clamp(abs(255 * lPow), 0, 255))
 		self.rMotor.write(rPow>0, util.clamp(abs(255 * rPow), 0, 255))
 		
