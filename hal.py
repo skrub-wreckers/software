@@ -17,9 +17,11 @@ class Drive(HardwareDevice):
 	def __init__(self, tamp):
 		self.lMotor = tamproxy.devices.Motor(tamp, pins.l_motor_dir, pins.l_motor_pwm)
 		self.rMotor = tamproxy.devices.Motor(tamp, pins.r_motor_dir, pins.r_motor_pwm)
+		self.currentThrottle = 0
+		self.currentSteer = 0
 		self.stop()
 
-		self.lEncoder = tamproxy.devices.Encoder(tamp, pins.r_encoder_a, pins.r_encoder_b)
+		self.lEncoder = tamproxy.devices.Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b)
 		self.prevEncoderVal = 0
 
 		self.speedPID = util.PID(kP=constants.motor_speed_p, kI=constants.motor_speed_i, kD=constants.motor_speed_d)
@@ -32,6 +34,8 @@ class Drive(HardwareDevice):
 		rPow += steer
 		self.lMotor.write(lPow>0, util.clamp(abs(255 * lPow), 0, 255))
 		self.rMotor.write(rPow>0, util.clamp(abs(255 * rPow), 0, 255))
+		self.currentThrottle = throttle
+		self.currentSteer = steer
 		
 	def turnIP(self, throttle):
 		"""turn in place arg is in [-1 1] with -1 full speed CW"""
@@ -46,14 +50,15 @@ class Drive(HardwareDevice):
 
 	def speedPIDIterate(self):
 		"""Adjusts the throttle value of the drive"""
-		# Do we need something for each individual motor?
 		val = self.lEncoder.val
 		print val
 		# speed = val - self.prevEncoderVal
-		# power = self.speedPID.iterate(speed)
-		# self.go(util.clamp(power, -1, 1))
+		# power = self.speedPID.iterate(speed) 	
 		# self.prevEncoderVal = val
-		# print speed
+
+		# # Do we need something for each individual motor?
+		# # Also does this even make sense?
+		# self.go(util.clamp(self.currentThrottle + power, -1, 1), self.currentSteer) 
 
 	def anglePIDIterate(self):
 		"""Adjusts the steer value of the drive"""
