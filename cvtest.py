@@ -49,6 +49,14 @@ def threshold(normal, frame):
 
 	return np.dot(frame, normal) > 0
 
+def filter_smaller_than(area, mask):
+	labelled, n_regions = scipy.ndimage.measurements.label(mask)
+	small = [i for i in range(n_regions) if np.sum(labelled == i) < 100]
+	for i in range(n_regions):
+		match = labelled == i
+		if np.sum(match) < 100:
+			mask[match] = False
+
 try:
 	while True:
 		# Capture frame-by-frame
@@ -65,6 +73,10 @@ try:
 			threshold([-1.3, 1,  0], frame) &
 			threshold( [0,   1, -1.3], frame)
 		)
+
+		# filter_smaller_than(100, is_red)
+		# filter_smaller_than(100, is_green)
+
 
 		diagnostic = np.zeros(frame.shape).astype(np.uint8)
 		diagnostic[...,R] = is_red * 255
