@@ -1,8 +1,8 @@
 import numpy as np
-import cv2, time, pickle
+import cv2, time
 
 cap = cv2.VideoCapture(1)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 544) 
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 544)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 288)
 
 cv2.namedWindow("raw")
@@ -56,18 +56,18 @@ try:
 			mod = np.where(mask[...,np.newaxis], 255-frame, frame)
 		else:
 			mod = frame
-			
+
 		cv2.imshow('raw', mod)
-		
+
 		if time.time() - lastCap > 1 and fRec > 0:
 			capData.append(frame[mask.astype(np.bool),:])
 			fRec -= 1
 			print fRec
 			lastCap = time.time()
-		
+
 		#if colDisp.shape
 		#cv2.imshow('Selected colors', colDisp)
-		
+
 		c = cv2.waitKey(1) & 0xFF
 		if c == ord('q'):
 			break
@@ -75,10 +75,9 @@ try:
 			fRec = 10
 			lastCap = time.time()
 		elif c == ord('s'):
-			f = open("out.dat", "w")
-			pickle.dump(np.concatenate(capData), f)
-			f.close()
-	
+			all_data = np.concatenate(capData)
+			np.save('out', all_data)
+
 finally:
 	# When everything done, release the capture
 	cap.release()
