@@ -23,8 +23,8 @@ class PID:
 	def iterate(self, val):
 		err = self.setpoint - val
 		self.integral += err
-		derivative = (err - prevErr)
+		derivative = (err - self.prevErr)
 		self.prevErr = err
-		return self.kP * err + self.kI * integral + self.kD * derivative
+		return self.kP * err + self.kI * self.integral + self.kD * derivative
 
 

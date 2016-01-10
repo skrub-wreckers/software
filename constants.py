@@ -8,9 +8,9 @@ lEncoderBPin = 6
 
 tSensitivity = 0.1
 
-motorDistP = 2
-motorDistI = 0
-motorDistD = 0
+motorSpeedP = 2
+motorSpeedI = 0
+motorSpeedD = 0
 
 motorAngleP = 2
 motorAngleI = 0

@@ -2,6 +2,6 @@ import hal, tamproxy
 
 if __name__ == '__main__':
 	robot = hal.Robot(tamproxy.TAMProxy())
-	robot.drive.setDistSetpoint(6400)
+	robot.drive.setSpeedSetpoint(500)
 	while(True):
-		robot.drive.distPID()
+		robot.drive.speedPIDIterate()
