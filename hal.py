@@ -49,10 +49,12 @@ class Drive(HardwareDevice):
 		"""Adjusts the throttle value of the drive"""
 		# Do we need something for each individual motor?
 		val = self.lEncoder.val
-		speed = val - self.prevEncoderVal
-		power = self.speedPID.iterate(speed)
-		self.go(util.clamp(power, -1, 1))
-		self.prevEncoderVal = val
+		print val
+		# speed = val - self.prevEncoderVal
+		# power = self.speedPID.iterate(speed)
+		# self.go(util.clamp(power, -1, 1))
+		# self.prevEncoderVal = val
+		# print speed
 
 	def anglePIDIterate(self):
 		"""Adjusts the steer value of the drive"""
