@@ -2,8 +2,8 @@ load('data-trunc.mat')
 figure()
 hold on
 axis equal
-scatter3(green(:,1), green(:,2), green(:,3), 'g')
-scatter3(red(:,1), red(:,2), red(:,3),'r')
+scatter3(green(:,3), green(:,2), green(:,1), 'g')
+scatter3(red(:,3), red(:,2), red(:,1),'r')
 xlim([0 255])
 ylim([0 255])
 zlim([0 255])
@@ -24,7 +24,7 @@ b = [0 0; 255 255];
 dirs = [
 	[-1 1.3 0];
 	[-1 0 1.3];
-	[-0.15 -0.5 0.6];
+	[-1 0.65 0.65];
 ]';
 for dir=dirs
 	r1 = -(dir(2)*g + dir(3)*b) / dir(1);
