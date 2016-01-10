@@ -1,7 +1,7 @@
-motorSpeedP = 2
-motorSpeedI = 0
-motorSpeedD = 0
+motor_speed_p = 2
+motor_speed_i = 0
+motor_speed_d = 0
 
-motorAngleP = 2
-motorAngleI = 0
-motorAngleD = 0
+motor_angle_p = 2
+motor_angle_i = 0
+motor_angle_d = 0

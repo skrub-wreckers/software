@@ -16,16 +16,14 @@ class HardwareDevice:
 class Drive(HardwareDevice):
 	def __init__(self, tamp):
 		self.lMotor = tamproxy.devices.Motor(tamp, pins.l_motor_dir, pins.l_motor_pwm)
-		self.lMotor.write(1,0)
 		self.rMotor = tamproxy.devices.Motor(tamp, pins.r_motor_dir, pins.r_motor_pwm)
-		self.rMotor.write(1,0)
 		self.stop()
 
-		self.lEncoder = tamproxy.devices.Encoder(tamp, rMotorDirPin, rMotorPWMPin)
+		self.lEncoder = tamproxy.devices.Encoder(tamp, pins.r_encoder_a, pins.r_encoder_b)
 		self.prevEncoderVal = 0
 
-		self.speedPID = util.PID(kP=constants.motorSpeedP, kI=constants.motorSpeedI, kD=constants.motorSpeedD)
-		self.anglePID = util.PID(kP=constants.motorAngleP, kI=constants.motorAngleI, kD=constants.motorAngleD)
+		self.speedPID = util.PID(kP=constants.motor_speed_p, kI=constants.motor_speed_i, kD=constants.motor_speed_d)
+		self.anglePID = util.PID(kP=constants.motor_angle_p, kI=constants.motor_angle_i, kD=constants.motor_angle_d)
 
 	def go(self, throttle, steer=0):
 		"""both arguments measured in [-1 1], steer=-1 is CW"""
