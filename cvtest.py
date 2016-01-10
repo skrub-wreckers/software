@@ -37,6 +37,18 @@ def on_click(event,x,y,flags,param):
 
 cv2.setMouseCallback("raw", on_click)
 
+R = 2
+G = 1
+B = 0
+
+def threshold(normal, frame):
+	""" returns true where the colors are above the plane defined by normal = [r, g, b] """
+	normal = np.array(normal) / np.linalg.norm(normal)
+	# bgr
+	normal = normal[::-1]
+
+	return np.dot(frame, normal) > 0
+
 try:
 	while True:
 		# Capture frame-by-frame
@@ -45,11 +57,20 @@ try:
 			print('No frame')
 			continue
 
-		is_red = (frame[...,2] > 1.3*frame[...,1]) & (frame[...,2] > 1.3*frame[...,0]);
+		is_red = (
+			threshold([1, -1.3,  0], frame) &
+			threshold([1,    0, -1.3], frame)
+		)
+		is_green = (
+			threshold([-1.3, 1,  0], frame) &
+			threshold( [0,   1, -1.3], frame)
+		)
 
-		red_im = (is_red * 255).astype(np.uint8)
+		diagnostic = np.zeros(frame.shape).astype(np.uint8)
+		diagnostic[...,R] = is_red * 255
+		diagnostic[...,G] = is_green * 255
 
-		cv2.imshow('filtered',red_im)
+		cv2.imshow('filtered',diagnostic)
 
 		# flash the mask on and off
 		if time.time() %0.5 < 0.25:
