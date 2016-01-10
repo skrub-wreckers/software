@@ -1,16 +1,17 @@
 import numpy as np
-import cv2
-import time
+import cv2, time
 
 cap = cv2.VideoCapture(1)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 544) #3=width
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 288) #4=height
-
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 544)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 288)
 
 cv2.namedWindow("raw")
 
 mask = np.zeros((288, 544))
 
+fRec = 0
+lastCap = 0
+capData = []
 
 # paint the mask with left and right click
 drawing = None
@@ -36,7 +37,6 @@ def on_click(event,x,y,flags,param):
 
 cv2.setMouseCallback("raw", on_click)
 
-
 try:
 	while True:
 		# Capture frame-by-frame
@@ -45,30 +45,39 @@ try:
 			print('No frame')
 			continue
 
-		#test = cv2.compare(frame[:,:,2], 13*(frame[:,:,1]/10), cv2.CMP_GT)
-		#test2 = cv2.compare(frame[:,:,2], 13*(frame[:,:,0]/10), cv2.CMP_GT)
-		#test3 = cv2.add(test/2, test2/2)
-		#test4 = cv2.compare(test3, 200, cv2.CMP_GT)
-
-		# test = cv2.compare(frame[:,:,1], 13*(frame[:,:,2]/10), cv2.CMP_GT)
-		# test2 = cv2.compare(frame[:,:,1], 11*(frame[:,:,0]/10), cv2.CMP_GT)
-		# test3 = cv2.add(test/2, test2/2)
-		# test4 = cv2.compare(test3, 200, cv2.CMP_GT)
-
-
 		is_red = (frame[...,2] > 1.3*frame[...,1]) & (frame[...,2] > 1.3*frame[...,0]);
 
 		red_im = (is_red * 255).astype(np.uint8)
 
-		cv2.imshow('frame',red_im)
+		cv2.imshow('filtered',red_im)
 
 		# flash the mask on and off
 		if time.time() %0.5 < 0.25:
-			frame = np.where(mask[...,np.newaxis], 255-frame, frame)
+			mod = np.where(mask[...,np.newaxis], 255-frame, frame)
+		else:
+			mod = frame
 
-		cv2.imshow('raw', frame)
-		if cv2.waitKey(1) & 0xFF == ord('q'):
+		cv2.imshow('raw', mod)
+
+		if time.time() - lastCap > 1 and fRec > 0:
+			capData.append(frame[mask.astype(np.bool),:])
+			fRec -= 1
+			print fRec
+			lastCap = time.time()
+
+		#if colDisp.shape
+		#cv2.imshow('Selected colors', colDisp)
+
+		c = cv2.waitKey(1) & 0xFF
+		if c == ord('q'):
 			break
+		elif c == ord('r'):
+			fRec = 10
+			lastCap = time.time()
+		elif c == ord('s'):
+			all_data = np.concatenate(capData)
+			np.save('out', all_data)
+
 finally:
 	# When everything done, release the capture
 	cap.release()
