@@ -34,7 +34,8 @@ dirs = [
     {[-0.5 -0.65 0.65]', 'b'};
 ]';
 for dir=dirs
-	[dir, col] = dir{:}
+	[dir, col] = dir{:};
+	dir = dir / norm(dir);
 	r1 = -(dir(2)*g + dir(3)*b) / dir(1);
 	s = surf(r1, g, b, 'FaceColor', col, 'FaceAlpha', 0.4);
 	center = [128 128 128]';
@@ -42,7 +43,7 @@ for dir=dirs
 	
 	q = quiver3(c_plane(1), c_plane(2), c_plane(3),...
 		    64*dir(1), 64*dir(2), 64*dir(3),...
-			col);
+			'Color', col);
 	q.LineWidth = 2;
 	q.MaxHeadSize = 8;
 	
