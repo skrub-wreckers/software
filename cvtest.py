@@ -109,6 +109,10 @@ try:
 			threshold([-1.3, 1,  0], frame) &
 			threshold( [0,   1, -1.3], frame)
 		)
+		
+		is_blue = (
+			threshold([-0.5, -0.65, 0.65], frame)
+		)
 
 		# filter_smaller_than(100, is_red)
 		# filter_smaller_than(100, is_green)
@@ -118,7 +122,8 @@ try:
 		diagnostic = np.zeros(frame.shape).astype(np.uint8)
 		diagnostic[...,R] = is_red * 255
 		diagnostic[...,G] = is_green * 255
-
+		diagnostic[...,B] = is_blue * 255
+		
 		cv2.imshow('filtered',diagnostic)
 
 		mod = frame
