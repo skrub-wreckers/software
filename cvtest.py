@@ -97,7 +97,8 @@ try:
 	while True:
 		# Capture frame-by-frame
 		ret, frame = cap.read()
-		if frame is None:
+		
+		if not ret:
 			print('No frame')
 			continue
 
@@ -107,7 +108,7 @@ try:
 		)
 		is_green = (
 			threshold([-1.3, 1,  0], frame) &
-			threshold( [0,   1, -1.3], frame)
+			threshold([0,   1, -1.3], frame)
 		)
 		
 		is_blue = (
@@ -116,8 +117,6 @@ try:
 
 		# filter_smaller_than(100, is_red)
 		# filter_smaller_than(100, is_green)
-
-
 
 		diagnostic = np.zeros(frame.shape).astype(np.uint8)
 		diagnostic[...,R] = is_red * 255

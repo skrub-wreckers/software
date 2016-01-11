@@ -4,8 +4,11 @@ Hardware Access Layer
 import util
 import tamproxy
 from tamproxy.devices import Motor
+import cv2
+import numpy as np
 
 import pins
+import constants
 
 class HardwareDevice:
 	"""a device needing a connection through the arduino"""
@@ -43,13 +46,36 @@ class Arm(HardwareDevice):
 	def down(self):
 		pass
 
-
 class Arms:
 	def __init__(self, conn):
 		self.green = Arm(conn)
 		self.red = Arm(conn)
-
-
+		
+class Camera:
+	def __init__(self):
+		self.cameraCon = cv2.VideoCapture(constants.cameraID)
+		self.cameraCon.set(cv2.CAP_PROP_FRAME_WIDTH, constants.cameraResolution[0])
+		self.cameraCon.set(cv2.CAP_PROP_FRAME_HEIGHT, constants.cameraResolution[1])
+		if constants.cameraDebug:
+			cv2.namedWindow("Raw")
+			
+	def getColorGroups(self):
+		ret, frame = cap.read()
+		if not ret:
+			print('No frame')
+			continue #Handle this better?
+		
+		colorGroups = {}
+		for color in constants.planes:
+			colorGroups[color] = np.ones(frame.shape)
+			for plane in constants.planes[color]:
+				colorGroups[color] = colorGroups[color] and util.threshold(plane, frame)
+		
+		return colorGroups
+		
+	def getBlobs(self, colorGroups):
+		pass
+		
 class Robot:
 	def __init__(self, tamp):
 		self.tamp = tamp
