@@ -77,13 +77,13 @@ def highlight_region(frame, mask, color):
 	return mod
 
 
-def threshold(normal, frame):
+def threshold(frame, normal, d=0):
 	""" returns true where the colors are above the plane defined by normal = [r, g, b] """
 	normal = np.array(normal) / np.linalg.norm(normal)
 	# bgr
 	normal = normal[::-1]
 
-	return np.dot(frame, normal) > 0
+	return np.dot(frame, normal) > d
 
 def filter_smaller_than(area, mask):
 	labelled, n_regions = scipy.ndimage.measurements.label(mask)
@@ -102,16 +102,20 @@ try:
 			continue
 
 		is_red = (
-			threshold([1, -1.3,  0], frame) &
-			threshold([1,    0, -1.3], frame)
+			threshold(frame, [1, -1.3,  0]) &
+			threshold(frame, [1,    0, -1.3])
 		)
 		is_green = (
-			threshold([-1.3, 1,  0], frame) &
-			threshold( [0,   1, -1.3], frame)
+			threshold(frame, [-1.3, 1,  0]) &
+			threshold(frame,  [0,   1, -1.3])
 		)
 		
 		is_blue = (
-			threshold([-0.5, -0.65, 0.65], frame)
+			threshold(frame, [-0.5, -0.65, 0.65])
+		)
+
+		is_white = ~is_blue & ~is_red & ~is_green & (
+			threshold(frame, [1, 1, 1], d=64*3)
 		)
 
 		# filter_smaller_than(100, is_red)
@@ -120,9 +124,9 @@ try:
 
 
 		diagnostic = np.zeros(frame.shape).astype(np.uint8)
-		diagnostic[...,R] = is_red * 255
-		diagnostic[...,G] = is_green * 255
-		diagnostic[...,B] = is_blue * 255
+		diagnostic[...,R] = (is_white | is_red) * 255
+		diagnostic[...,G] = (is_white | is_green) * 255
+		diagnostic[...,B] = (is_white | is_blue) * 255
 		
 		cv2.imshow('filtered',diagnostic)
 
