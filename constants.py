@@ -1,4 +1,4 @@
-motor_dist_p = 0.0001
+motor_dist_p = 0.0002
 motor_dist_i = 0
 motor_dist_d = 0
 

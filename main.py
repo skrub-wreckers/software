@@ -7,6 +7,6 @@ if __name__ == '__main__':
 		robot.drive.setDistSetpoint(3200)
 		currentTime = time.time()
 		while(True):    
-			if time.time() - currentTime > 0.001:
+			if time.time() - currentTime > 0.01:
 				currentTime = time.time()
 				robot.drive.distPIDIterate()
