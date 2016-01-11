@@ -1,5 +1,7 @@
 load('data-trunc.mat')
-figure()
+figure(10)
+[az, el] = view;
+cla;
 hold on
 axis equal
 scatter3(green(:,3), green(:,2), green(:,1), 'g')
@@ -45,6 +47,6 @@ for dir=dirs
 
 end
 
-view(60, 45)
+view(az, el)
 
 
