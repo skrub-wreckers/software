@@ -25,11 +25,9 @@ class Drive(HardwareDevice):
 		self.lEncoder = tamproxy.devices.Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b, False)
 		self.prevEncoderVal = 0
 
-		# self.speedPID = util.PID(kP=constants.motor_speed_p, kI=constants.motor_speed_i, kD=constants.motor_speed_d)
-		# self.anglePID = util.PID(kP=constants.motor_angle_p, kI=constants.motor_angle_i, kD=constants.motor_angle_d)
-
-	def startEncoder(self):
-		self.lEncoder.start_continuous(weight=0)
+		self.distPID = util.PID(kP=constants.motor_dist_p, kI=constants.motor_dist_i, kD=constants.motor_dist_d)
+		self.speedPID = util.PID(kP=constants.motor_speed_p, kI=constants.motor_speed_i, kD=constants.motor_speed_d)
+		self.anglePID = util.PID(kP=constants.motor_angle_p, kI=constants.motor_angle_i, kD=constants.motor_angle_d)
 
 	def go(self, throttle, steer=0):
 		"""both arguments measured in [-1 1], steer=-1 is CW"""
@@ -38,8 +36,8 @@ class Drive(HardwareDevice):
 		rPow += steer
 		self.lMotor.write(lPow>0, util.clamp(abs(255 * lPow), 0, 255))
 		self.rMotor.write(rPow>0, util.clamp(abs(255 * rPow), 0, 255))
-		# self.currentThrottle = throttle
-		# self.currentSteer = steer
+		self.currentThrottle = throttle
+		self.currentSteer = steer
 		
 	def turnIP(self, throttle):
 		"""turn in place arg is in [-1 1] with -1 full speed CW"""
@@ -49,6 +47,21 @@ class Drive(HardwareDevice):
 	def stop(self):
 		self.go(throttle=0)
 
+	def setDistSetpoint(self, val):
+		self.distPID.setSetpoint(val)
+
+	def distPIDIterate(self):
+		"""Adjusts the throttle value of the drive"""
+		self.lEncoder.update()
+		val = self.lEncoder.val
+		power = self.distPID.iterate(val) 	
+		self.prevEncoderVal = val
+
+		print "Val: " + str(val)
+		print "Power: " + str(util.clamp(power, -1, 1))
+
+		self.go(util.clamp(power, -1, 1), self.currentSteer) 
+
 	def setSpeedSetpoint(self, val):
 		self.speedPID.setSetpoint(val)
 
@@ -56,13 +69,16 @@ class Drive(HardwareDevice):
 		"""Adjusts the throttle value of the drive"""
 		self.lEncoder.update()
 		val = self.lEncoder.val
-		print val
-		# speed = val - self.prevEncoderVal
-		# power = self.speedPID.iterate(speed) 	
-		# self.prevEncoderVal = val
+		speed = val - self.prevEncoderVal
+		power = self.speedPID.iterate(speed) 	
+		self.prevEncoderVal = val
 
-		# # Do we need something for each individual motor?
-		# # Also does this even make sense?
+		print "Val: " + str(val)
+		print "Speed: " + str(speed)
+		print "Power: " + str(power)
+
+		# Do we need something for each individual motor?
+		# Also does this even make sense?
 		# self.go(util.clamp(self.currentThrottle + power, -1, 1), self.currentSteer) 
 
 	def anglePIDIterate(self):
