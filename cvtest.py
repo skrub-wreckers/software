@@ -20,7 +20,9 @@ class ColorData(object):
 colors = [
 	ColorData('red',   [0, 0, 255]),
 	ColorData('green', [0, 255, 0]),
-	ColorData('blue',  [255, 0, 0])
+	ColorData('blue',  [255, 0, 0]),
+	ColorData('black',  [32, 32, 32]),
+	ColorData('white',  [192, 192, 192])
 ]
 
 color_i = 0
