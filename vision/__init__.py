@@ -1,4 +1,5 @@
 import warnings
+from collections import namedtuple
 
 import numpy as np
 import cv2
@@ -46,13 +47,67 @@ class ColorDetectResult(object):
     def debug_frame(self):
         return Colors.to_rgb(self.im)
 
+
+Blob = namedtuple('Blob', 'pos color area')
+
+class BlobDetector(object):
+    def __init__(self, color_detect_result):
+        im = color_detect_result.im
+        labelled, n_regions = scipy.ndimage.measurements.label(im)
+
+        self.labelled = labelled
+        self.n_regions = n_regions
+        self.region_ids = range(n_regions)
+
+        # count pixesl in each region
+        self.areas = scipy.ndimage.measurements.sum(
+            np.ones(labelled.shape),
+            labels=labelled,
+            index=self.region_ids
+        ).astype(np.uint32)
+
+        # get the color of each region
+        self.colors = scipy.ndimage.measurements.labeled_comprehension(
+            im,
+            labels=labelled,
+            index=self.region_ids,
+            func=lambda x: x[0],
+            out_dtype=np.uint8, default=-1
+        )
+
+
+        ok_blobs = np.flatnonzero(
+            ((self.colors == Colors.RED  ) & (self.areas > 20)) |
+            ((self.colors == Colors.GREEN) & (self.areas > 20)) |
+            ((self.colors == Colors.BLUE ) & (self.areas > 20))
+        )
+        # ok_blobs = self.region_ids
+
+        coms = scipy.ndimage.measurements.center_of_mass(
+            np.ones(labelled.shape),
+            labels=labelled,
+            index=list(ok_blobs)
+        )
+
+        self.blobs = [
+            Blob(*x) for x in zip(
+                coms,
+                self.colors[ok_blobs],
+                self.areas[ok_blobs]
+            )
+        ]
+
     @property
-    def debug_frame2(self):
-        diagnostic = np.zeros(self.im.shape + (3,), dtype=np.uint8)
-        diagnostic[...,0] = (self.is_white | self.is_red) * 255
-        diagnostic[...,1] = (self.is_white | self.is_green) * 255
-        diagnostic[...,2] = (self.is_white | self.is_blue) * 255
-        return diagnostic
+    def debug_frame(self):
+        frame = np.dstack((
+            (self.labelled * 15) % 180,
+            np.ones(self.labelled.shape) * 128,
+            np.ones(self.labelled.shape) * 255
+        )).astype(np.uint8)
+        print(frame.shape)
+
+        frame = cv2.cvtColor(frame, cv2.COLOR_HLS2BGR)
+        return frame
 
 
 
