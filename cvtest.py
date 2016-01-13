@@ -106,13 +106,15 @@ def highlight_region(frame, mask, color):
 	return mod
 
 
-def threshold(frame, normal, d=0):
-	""" returns true where the colors are above the plane defined by normal = [r, g, b] """
-	normal = np.array(normal) / np.linalg.norm(normal)
-	# bgr
-	normal = normal[::-1]
+class Thresholder(object):
+	def __init__(self, normal, d):
+		normal = np.array(normal) / np.linalg.norm(normal)
+		# bgr
+		self.normal = normal[::-1]
+		self.d = d
 
-	return np.dot(frame, normal) > d
+	def apply(self, frame):
+		return np.dot(frame, self.normal) > self.d
 
 def filter_smaller_than(area, mask):
 	labelled, n_regions = scipy.ndimage.measurements.label(mask)
@@ -122,6 +124,11 @@ def filter_smaller_than(area, mask):
 		if np.sum(match) < 100:
 			mask[match] = False
 
+thresh_red   = Thresholder([1, -0.65,  -0.65], 16)
+thresh_green = Thresholder([-0.9, 1, -0.3], 4)
+thresh_blue  = Thresholder([-0.3, -0.9, 1], 8)
+thresh_black = Thresholder([-1, -1, -1], -130)
+
 try:
 	while True:
 		# Capture frame-by-frame
@@ -130,34 +137,27 @@ try:
 			print('No frame')
 			continue
 
-		is_red = (
-			threshold(frame, [1, -0.65,  -0.65])
-		)
-		is_green = (
-			threshold(frame, [-0.9, 1, -0.3])
-		)
-		is_blue = (
-			threshold(frame, [-0.5, -0.65, 0.65])
-		)
+		with Timer('all') as timer:
+			with timer('thresholding'):
+				is_red = (
+					thresh_red.apply(frame)
+				)
+				is_green = (
+					thresh_green.apply(frame)
+				)
+				is_blue = (
+					thresh_blue.apply(frame)
+				)
+				is_black = thresh_black.apply(frame)
 
-		if False:
-			# remove pixels in both regions, classing them as neither
-			multi = (is_red + is_green + is_blue) > 1
-			is_red   = is_red & ~multi
-			is_green = is_green & ~multi
-			is_blue  = is_blue & ~multi
-
-		is_black = threshold(frame, [-1, -1, -1], d=-64*1.71)
-
-		# is_red   = is_red & ~is_black
-		# is_green = is_green & ~is_black
-		# is_blue  = is_blue & ~is_black
+			with timer('logic'):
+				is_green = is_green & ~is_blue
+				is_white = ~is_blue & ~is_red & ~is_green & ~is_black
 
 
-		is_white = ~is_blue & ~is_red & ~is_green & ~is_black
-
-		# filter_smaller_than(100, is_red)
-		# filter_smaller_than(100, is_green)
+			with timer('blobs'):
+				filter_smaller_than(100, is_red)
+				filter_smaller_than(100, is_green)
 
 
 
