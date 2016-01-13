@@ -1,7 +1,34 @@
+from __future__ import print_function
+
 import numpy as np
 import cv2, time
 import scipy.ndimage
 import scipy.signal
+
+
+class Timer():
+	def __init__(self, name, indent=''):
+		self.name = name
+		self.indent = indent
+		self.has_children = False
+
+	def __enter__(self):
+		self.t = time.time()
+		print(self.indent +'Timing {}... '.format(self.name), end='')
+		return self
+
+	def __exit__(self, *args):
+		if self.has_children:
+			print()
+			print(self.indent + '  ' + str(time.time() - self.t))
+		else:
+			print(str(time.time() - self.t))
+
+	def __call__(self, name):
+		print()
+		self.has_children = True
+		return Timer(name, self.indent + '  ')
+
 
 
 cap = cv2.VideoCapture(1)
