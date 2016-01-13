@@ -168,8 +168,9 @@ try:
 			print("Editing {} mask".format(colors[color_i].name))
 		elif c == ord('s'):
 			for c in colors:
-				all_data = np.concatenate(capData[c])
-				np.save(c.name, all_data)
+				if capData[c]:
+					all_data = np.concatenate(capData[c])
+					np.save(c.name, all_data)
 
 finally:
 	# When everything done, release the capture
