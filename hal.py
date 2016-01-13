@@ -1,11 +1,15 @@
 """
 Hardware Access Layer
 """
+import warnings
 import util
 import tamproxy
 from tamproxy.devices import Motor
+import cv2
+import numpy as np
 
 import pins
+import constants
 
 class HardwareDevice:
 	"""a device needing a connection through the arduino"""
@@ -43,11 +47,52 @@ class Arm(HardwareDevice):
 	def down(self):
 		pass
 
-
 class Arms:
 	def __init__(self, conn):
 		self.green = Arm(conn)
 		self.red = Arm(conn)
+
+
+class Camera(object):
+	def __init__(self, w, h, id=constants.cameraID):
+		self.device = cv2.VideoCapture(id)
+
+		# Not all resolutions are possible - check it applied
+		self.device.set(cv2.CAP_PROP_FRAME_WIDTH, w)
+		self.device.set(cv2.CAP_PROP_FRAME_HEIGHT, h)
+		self.width = self.device.get(cv2.CAP_PROP_FRAME_WIDTH)
+		self.height = self.device.get(cv2.CAP_PROP_FRAME_HEIGHT)
+		if (w, h) != (self.width, self.height):
+			warnings.warn("Cannot use resolution of {}x{}, using {}x{} instead".format(w, h, self.width, self.h))
+
+		if constants.cameraDebug:
+			cv2.namedWindow("Raw")
+
+	def close(self):
+		self.device.release()
+
+	def read(self):
+		ok, frame = self.device.read()
+		if not ok:
+			raise IOError('No frame')
+		return frame
+
+	def getColorGroups(self):
+		ret, frame = cap.read()
+		if not ret:
+			print('No frame')
+			continue #Handle this better?
+
+		colorGroups = {}
+		for color in constants.planes:
+			colorGroups[color] = np.ones(frame.shape)
+			for plane in constants.planes[color]:
+				colorGroups[color] = colorGroups[color] and util.threshold(plane, frame)
+
+		return colorGroups
+
+	def getBlobs(self, colorGroups):
+		pass
 
 
 class Robot:
@@ -56,3 +101,5 @@ class Robot:
 		if not self.tamp.started: self.tamp.start()
 		self.arms = Arms(self.tamp)
 		self.drive = Drive(self.tamp)
+
+		self.camera = Camera(*constants.cameraResolution)
