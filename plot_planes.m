@@ -24,15 +24,16 @@ ax.YTick = 0:64:256;
 ax.ZTick = 0:64:256;
 
 dirs = [
-	{[1 -0.65 -0.65]', 0, 'r'};
-	{[-0.9 1 -0.3]', 0, 'g'};
-    {[-0.4 -1 1]', 0, 'b'};
+	{[1 -0.65 -0.65]', 16, 'r'};
+	{[-0.9 1 -0.3]', 8, 'g'};
+    {[-0.3 -0.9 1]', 8, 'b'};
+	{[-1 -1 -1]', -110, 'k'};
 ]';
 for dir=dirs
 	[dir, off, col] = dir{:};
 	dir = dir / norm(dir);
 	
-	[r, g, b] = plane_surf(dir, off, 256 * sqrt(3))
+	[r, g, b] = plane_surf(dir, off, 256 * sqrt(3));
 	
 	s = surf(r, g, b, 'FaceColor', col, 'FaceAlpha', 0.4);
 	center = [128 128 128]';
