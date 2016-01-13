@@ -23,20 +23,18 @@ ax.XTick = 0:64:256;
 ax.YTick = 0:64:256;
 ax.ZTick = 0:64:256;
 
-g = [0 255; 0 255];
-b = [0 0; 255 255];
-
-
 dirs = [
-	{[1 -0.65 -0.65]', 'r'};
-	{[-0.9 1 -0.3]', 'g'};
-    {[-0.5 -0.65 0.65]', 'b'};
+	{[1 -0.65 -0.65]', 0, 'r'};
+	{[-0.9 1 -0.3]', 0, 'g'};
+    {[-0.4 -1 1]', 0, 'b'};
 ]';
 for dir=dirs
-	[dir, col] = dir{:};
+	[dir, off, col] = dir{:};
 	dir = dir / norm(dir);
-	r1 = -(dir(2)*g + dir(3)*b) / dir(1);
-	s = surf(r1, g, b, 'FaceColor', col, 'FaceAlpha', 0.4);
+	
+	[r, g, b] = plane_surf(dir, off, 256 * sqrt(3))
+	
+	s = surf(r, g, b, 'FaceColor', col, 'FaceAlpha', 0.4);
 	center = [128 128 128]';
 	c_plane = center - dir*(dir'*center);
 	
