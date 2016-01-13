@@ -40,21 +40,11 @@ class ColorDetectResult(object):
         im[is_green] = Colors.GREEN
         im[is_blue] = Colors.BLUE
         im[is_red] = Colors.RED
-
         self.im = im
-        self.is_red = is_red
-        self.is_green = is_green
-        self.is_blue = is_blue
-        self.is_black = is_black
-        self.is_white = ~(is_red | is_green | is_blue | is_black)
 
     @property
     def debug_frame(self):
-        return np.dstack((
-            self.im & Colors.RED,
-            self.im & Colors.GREEN,
-            self.im & Colors.BLUE,
-        )) * np.uint8(255)
+        return Colors.to_rgb(self.im)
 
     @property
     def debug_frame2(self):
