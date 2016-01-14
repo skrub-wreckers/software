@@ -8,6 +8,7 @@ import scipy.signal
 import vision
 from vision.colorselector import ColorSelector
 from vision.window import Window
+from vision.colors import Colors
 
 
 from util import Timer
@@ -39,8 +40,21 @@ try:
 			print('No frame')
 			continue
 
-		with Timer('detect'):
-			res = vision.ColorDetectResult(frame)
+		with Timer('all') as timer:
+			with timer('detect') as timer:
+				res = vision.ColorDetectResult(frame)
+
+			with timer('fill'):
+				red_blobs = vision.BlobDetector(res,  Colors.RED, 1000)
+				green_blobs = vision.BlobDetector(res, Colors.GREEN, 1000)
+				blue_blobs = vision.BlobDetector(res, Colors.BLUE, 2000)
+
+		frame = np.copy(frame)
+		for blob in red_blobs.blobs + blue_blobs.blobs + green_blobs.blobs:
+			y, x = blob.pos
+			color = tuple(map(int, Colors.to_rgb(blob.color)))
+			cv2.circle(frame, (int(x), int(y)), 20, color, thickness=-1)
+
 
 		result_win.show(res.debug_frame)
 		selector.show(frame)

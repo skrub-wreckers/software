@@ -48,52 +48,37 @@ class ColorDetectResult(object):
         return Colors.to_rgb(self.im)
 
 
-Blob = namedtuple('Blob', 'pos color area')
+Blob = namedtuple('Blob', 'color pos area')
 
 class BlobDetector(object):
-    def __init__(self, color_detect_result):
-        im = color_detect_result.im
-        labelled, n_regions = scipy.ndimage.measurements.label(im)
+    def __init__(self, color_detect_result, color, min_area):
+        mask = color_detect_result.im == color
+        labelled, n_regions = scipy.ndimage.measurements.label(mask)
 
         self.labelled = labelled
         self.n_regions = n_regions
-        self.region_ids = range(n_regions)
+        self.region_ids = np.arange(1,n_regions+1)
 
-        # count pixesl in each region
-        self.areas = scipy.ndimage.measurements.sum(
+        # count pixels in each region
+        areas = scipy.ndimage.measurements.sum(
             np.ones(labelled.shape),
             labels=labelled,
             index=self.region_ids
         ).astype(np.uint32)
 
-        # get the color of each region
-        self.colors = scipy.ndimage.measurements.labeled_comprehension(
-            im,
-            labels=labelled,
-            index=self.region_ids,
-            func=lambda x: x[0],
-            out_dtype=np.uint8, default=-1
-        )
 
-
-        ok_blobs = np.flatnonzero(
-            ((self.colors == Colors.RED  ) & (self.areas > 20)) |
-            ((self.colors == Colors.GREEN) & (self.areas > 20)) |
-            ((self.colors == Colors.BLUE ) & (self.areas > 20))
-        )
-        # ok_blobs = self.region_ids
+        keep = areas > min_area
 
         coms = scipy.ndimage.measurements.center_of_mass(
             np.ones(labelled.shape),
             labels=labelled,
-            index=list(ok_blobs)
+            index=self.region_ids[keep]
         )
 
         self.blobs = [
-            Blob(*x) for x in zip(
+            Blob(color, *x) for x in zip(
                 coms,
-                self.colors[ok_blobs],
-                self.areas[ok_blobs]
+                areas[keep]
             )
         ]
 
