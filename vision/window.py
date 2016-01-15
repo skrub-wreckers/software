@@ -1,6 +1,10 @@
 import cv2
 
 class Window(object):
+    """
+    Wraps the opencv window functionality, making showing rgb images and taking
+    mouse input a little easier
+    """
     def __init__(self, name):
         self.name = name
 

@@ -5,8 +5,7 @@ from .colors import Colors
 class Thresholder(object):
     """ Threshold object, representing a plane """
     def __init__(self, normal, d):
-        normal = np.array(normal) / np.linalg.norm(normal)
-        self.normal = normal
+        self.normal = np.array(normal) / np.linalg.norm(normal)
         self.d = d
 
     def apply(self, frame):
@@ -19,6 +18,11 @@ thresh_blue  = Thresholder([-0.3, -0.9, 1], 8)
 thresh_black = Thresholder([-1, -1, -1], -130)
 
 class ColorDetectResult(object):
+    """
+    Processes an image into colored regions
+    .im is a 1-channel image, where each pixel is according to the values in
+    vision.Colors
+    """
     def __init__(self, frame):
         im = Colors.WHITE * np.ones(frame.shape[:2], dtype=np.uint8)
 
@@ -36,4 +40,5 @@ class ColorDetectResult(object):
 
     @property
     def debug_frame(self):
+        # convert color ids to rgb
         return Colors.to_rgb(self.im)

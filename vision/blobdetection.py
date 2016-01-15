@@ -7,6 +7,11 @@ Blob = namedtuple('Blob', 'color pos area')
 
 class BlobDetector(object):
     def __init__(self, color_detect_result, color, min_area):
+        """
+        Detect blobs from a ColorDetectResult object, of a given color and minimum area
+
+        self.blobs is a list of Blob objects, containing .pos == (x,y), .color, and .area
+        """
         mask = color_detect_result.im == color
         labelled, n_regions = scipy.ndimage.measurements.label(mask)
 
@@ -39,6 +44,7 @@ class BlobDetector(object):
 
     @property
     def debug_frame(self):
+        # draw each region of the labelled image in a different hue
         import cv2
 
         frame = np.dstack((

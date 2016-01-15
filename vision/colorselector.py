@@ -36,6 +36,10 @@ class ColorData(object):
 
 
 class ColorSelector(Window):
+    """
+    A ui for labelling colors of a camera stream manually, and recording all
+    colors that occur at the labelled locations
+    """
     def __init__(self, shape, name='Color selection'):
         super(ColorSelector, self).__init__(name)
 

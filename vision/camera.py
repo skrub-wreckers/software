@@ -28,9 +28,11 @@ class Camera(object):
 
     @property
     def shape(self):
+        """ The same value as self.read().shape, for prealloacting frames """
         return self.height, self.width
 
     def read(self):
+        """ return the RGB frame, or raise an exception if it could not be found """
         ok, frame = self.device.read()
         if not ok:
             raise IOError('No frame')
@@ -38,18 +40,3 @@ class Camera(object):
         if self.debug:
             cv2.imshow("Raw", frame)
         return frame[...,::-1]
-
-
-    def getColorGroups(self):
-        frame = self.read()
-
-        colorGroups = {}
-        for color in constants.planes:
-            colorGroups[color] = np.ones(frame.shape)
-            for plane in constants.planes[color]:
-                colorGroups[color] = colorGroups[color] and util.threshold(plane, frame)
-
-        return colorGroups
-
-    def getBlobs(self, colorGroups):
-        pass
