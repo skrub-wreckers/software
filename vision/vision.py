@@ -1,7 +1,7 @@
 import camera, constants, colors
 
 class Vision(object):
-	def __init__(self, cameraID):
+	def __init__(self):
 		"""Takes an image and returns the angle to blobs"""
 		self.cam = camera.Camera(544, 288)
 		self.angle_to = 0
