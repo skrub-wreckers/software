@@ -1,0 +1,66 @@
+Gyro:
+	3V3
+	GND
+	DOUT
+	DIN
+	SCK
+	CS
+
+Left encoder:
+	5V
+	GND
+	D
+	D
+
+Right encoder:
+	5V
+	GND
+	D
+	D
+
+Motor control:
+	GND
+	PWM
+	PWM
+	D
+	D
+
+Left arm servo:
+	GND
+	6VA
+	PWM
+
+Right arm servo:
+	GND
+	6VA
+	PWM
+
+Silo servo:
+	GND
+	6VB
+	PWM
+
+Dump servo:
+	GND
+	6VB
+	PWM
+
+Latch servo:
+	GND
+	6VB
+	PWM
+
+Left color sensor:
+	GND
+	3V3
+	D
+	D
+	Ain
+
+Right color sensor:
+	GND
+	3V3
+	D
+	D
+	Ain
+
