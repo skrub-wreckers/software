@@ -3,8 +3,7 @@ Hardware Access Layer
 """
 import util
 import tamproxy
-from tamproxy.devices import Motor, Servo
-import cv2
+from tamproxy.devices import Motor, Servo, Encoder
 import numpy as np
 import time
 
@@ -19,10 +18,13 @@ class HardwareDevice:
 
 class Drive(HardwareDevice):
 	def __init__(self, tamp):
-		self.lMotor = tamproxy.devices.Motor(tamp, pins.l_motor_dir, pins.l_motor_pwm)
+		self.lMotor = Motor(tamp, pins.l_motor_dir, pins.l_motor_pwm)
 		self.lMotor.write(1,0)
-		self.rMotor = tamproxy.devices.Motor(tamp, pins.r_motor_dir, pins.r_motor_pwm)
+		self.rMotor = Motor(tamp, pins.r_motor_dir, pins.r_motor_pwm)
 		self.rMotor.write(1,0)
+
+		self.r_enc = Encoder(tamp, pins.r_encoder_a, pins.r_encoder_b, continuous=False)
+		self.l_enc = Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b, continuous=False)
 
 	def go(self, throttle, steer=0):
 		"""both arguments measured in [-1 1], steer=-1 is full speed CW"""
@@ -40,32 +42,23 @@ class Drive(HardwareDevice):
 		self.go(throttle=0)
 
 class Arm(HardwareDevice):
-	def __init__(self, tamp, servo_pin, d):
-		self.servo = Servo(tamp, servo_pin)
-		self.d = d
+	def __init__(self, tamp, servo_pin, lower, upper):
+		self.servo = Servo(tamp, servo_pin, lower, upper)
 
 	def up(self):
-		if self.d:
-			for angle in range(620, 1020, 40):
-				self.servo.write(angle)
-				time.sleep(0.1)
-			self.servo.write(2350)
-		else:
-			for angle in range(2320, 1920, -40):
-				self.servo.write(angle)
-				time.sleep(0.1)
-			self.servo.write(500)
+		for angle in range(0, 40, 4):
+			self.servo.write(angle)
+			time.sleep(0.1)
+
+		self.servo.write(180)
 
 	def down(self):
-		if self.d:
-			self.servo.write(620)
-		else:
-			self.servo.write(2320)
+		self.servo.write(0)
 
 class Arms:
 	def __init__(self, conn):
-		self.green = Arm(conn, 9, True)
-		self.red = Arm(conn, 10, False)
+		self.green = Arm(conn, 9, lower=620, upper=2350)
+		self.red = Arm(conn, 10, lower=2320, upper=500)
 
 
 class Robot:

@@ -64,3 +64,8 @@ Right color sensor:
 	D
 	Ain
 
+IR cube breakbeams
+	GND
+	3V3
+	Ain
+	Ain

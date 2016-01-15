@@ -11,40 +11,43 @@ if __name__ == "__main__":
 		#arm = Arm(tamproxy, 10)
 		#arm2 = Arm(tamproxy, 9)
 		arms = Arms(tamproxy)
-		
+
 		w = Window("Eric")
 
 		while True:
-			
-			c = cv2.waitKey(1) & 0xFF
-			if c == ord('q'):
+
+			c = chr(cv2.waitKey(1) & 0xFF)
+			move_cmd = None
+
+
+			if c == 'q':
 				break
-			elif c == ord('w'):
-				drive.go(0.2)
-				time.sleep(0.25)
-				drive.go(0.0)
-				
-			elif c == ord('s'):
-				drive.go(-0.2)
-				time.sleep(0.25)
-				drive.go(0.0)
-				
-			elif c == ord('a'):
-				drive.turnIP(0.2)
-				time.sleep(0.25)
-				drive.turnIP(0.0)
-				
-			elif c == ord('d'):
-				drive.turnIP(-0.2)
-				time.sleep(0.25)
-				drive.turnIP(0.0)
-				
-			elif c == ord(' '):
+			elif c == 'w':
+				move_cmd = (0.2, 0)
+
+			elif c == 's':
+				move_cmd = (-0.2, 0)
+
+			elif c == 'a':
+				move_cmd = (0, 0.2)
+
+			elif c == 'd':
+				move_cmd = (0, -0.2)
+
+			elif c == ' ':
 				arms.green.up()
 				time.sleep(0.75)
 				arms.green.down()
-				
-			elif c == ord('c'):
+
+			elif c == 'c':
 				arms.red.up()
 				time.sleep(0.75)
 				arms.red.down()
+
+			if move_cmd:
+				drive.l_enc.update()
+				drive.r_enc.update()
+				drive.go(*move_cmd)
+				time.sleep(0.25)
+				drive.stop()
+				print drive.l_enc.val, drive.r_enc.val
