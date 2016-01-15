@@ -18,4 +18,4 @@ stack_flap = 4
 dump_door  = 5
 dump_latch = 6
 
-gyro_cs = 13
+gyro_cs = 24
