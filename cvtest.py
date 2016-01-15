@@ -2,8 +2,6 @@ from __future__ import print_function
 
 import numpy as np
 import cv2, time
-import scipy.ndimage
-import scipy.signal
 
 import vision
 from vision.colorselector import ColorSelector
@@ -22,14 +20,6 @@ result_win = Window('result')
 fRec = 0
 lastCap = 0
 
-
-def filter_smaller_than(area, mask):
-	labelled, n_regions = scipy.ndimage.measurements.label(mask)
-	small = [i for i in range(n_regions) if np.sum(labelled == i) < 100]
-	for i in range(n_regions):
-		match = labelled == i
-		if np.sum(match) < 100:
-			mask[match] = False
 
 try:
 	while True:
@@ -76,7 +66,7 @@ try:
 			selector.next_color()
 			print("Editing {} mask".format(selector.active_color.name))
 		elif c == ord('s'):
-			selector.save()
+			selector.save('color-data')
 
 finally:
 	# When everything done, release the capture
