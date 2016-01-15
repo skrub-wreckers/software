@@ -40,11 +40,17 @@ class Drive(HardwareDevice):
 		self.go(throttle=0)
 
 class Arm(HardwareDevice):
+	def __init__(self, tamp, servo_pin):
+		self.servo = Servo(tamp, servo_pin)
+
 	def up(self):
-		pass
+		for angle in range(620, 1020, 40):
+			self.servo.write(angle)
+			time.sleep(0.1)
+		self.servo.write(2400)
 
 	def down(self):
-		pass
+		self.servo.write(620)
 
 class Arms:
 	def __init__(self, conn):
