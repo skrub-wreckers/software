@@ -27,9 +27,13 @@ if __name__ == "__main__":
 			if c == 'q':
 				break
 			elif c == ' ':
-				if abs(angle) < np.radians(5):
+				if angle is None:
+					arms.green.up()
+					time.sleep(0.75)
+					arms.green.down()
+				elif abs(angle) < np.radians(5):
 					drive.go(0.25)
-					time.sleep(0.25)
+					time.sleep(0.75)
 					drive.stop()
 				else:
 					rtime = abs(angle)/(math.pi*2)*4.45
