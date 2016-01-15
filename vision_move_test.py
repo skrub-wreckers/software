@@ -1,7 +1,10 @@
 from hal import *
+import vision
 from vision.window import Window
 from vision import Camera, Vision
 import cv2
+import math
+import numpy as np
 
 from tamproxy import TAMProxy
 
@@ -16,13 +19,21 @@ if __name__ == "__main__":
 		v = vision.Vision()
 		while True:
 
+			v.update()
+			angle = v.angle_to
+			print angle
+
 			c = chr(cv2.waitKey(1) & 0xFF)
 			if c == 'q':
 				break
 			elif c == ' ':
-				angle = v.update()
-				print angle
-				rtime = angle/360.0*1.13
-				drive.turnIP(angle/abs(angle)*0.2)
-				time.sleep(rtime)
-				drive.turnIP(0.0)
+				if abs(angle) < np.radians(5):
+					drive.go(0.25)
+					time.sleep(0.25)
+					drive.stop()
+				else:
+					rtime = abs(angle)/(math.pi*2)*4.45
+
+					drive.turnIP(math.copysign(0.2, angle))
+					time.sleep(rtime)
+					drive.stop()

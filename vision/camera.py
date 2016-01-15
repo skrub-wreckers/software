@@ -45,8 +45,8 @@ class Camera(object):
 
 class Geometry(object):
     def __init__(self, w, h, wfov, hfov):
-        self.wfov = wfov
-        self.hfov = hfov
+        self.wfov = np.radians(wfov)
+        self.hfov = np.radians(hfov)
         self.w = w
         self.h = h
 
@@ -60,4 +60,18 @@ class Geometry(object):
             yrel * np.tan(self.hfov / 2),
             1
         ]
+
+    @property
+    def matrix(self):
+        """
+        the matrix such that m * [px py 1] = [x y z 0]
+        """
+        tw = np.tan(self.wfov/2)
+        th = np.tan(self.hfov/2)
+        return np.array([
+            [2*tw/self.w, 0, -tw],
+            [0, 2*th/self.h, -th],
+            [0, 0, 1],
+            [0, 0, 0]
+        ])
 
