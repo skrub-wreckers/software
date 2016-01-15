@@ -23,6 +23,8 @@ class Camera(object):
         if self.debug:
             cv2.namedWindow("Raw")
 
+        self.geom = Geometry(self.width, self.height, *constants.cameraFOV)
+
     def close(self):
         self.device.release()
 
@@ -40,3 +42,22 @@ class Camera(object):
         if self.debug:
             cv2.imshow("Raw", frame)
         return frame[...,::-1]
+
+class Geometry(object):
+    def __init__(self, w, h, wfov, hfov):
+        self.wfov = wfov
+        self.hfov = hfov
+        self.w = w
+        self.h = h
+
+    def ray_at(self, x, y):
+        # convert to [-1 1]
+        xrel = 2*x/self.w - 1
+        yrel = 2*y/self.h - 1
+
+        return [
+            xrel * np.tan(self.wfov / 2),
+            yrel * np.tan(self.hfov / 2),
+            1
+        ]
+
