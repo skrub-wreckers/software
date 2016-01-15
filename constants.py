@@ -1,5 +1,5 @@
 #Camera constants
-cameraID = 0
+cameraID = 1
 cameraResolution = (544, 288)
 cameraDebug = True
 cameraFOV = (54.4, 40.8)
