@@ -5,10 +5,10 @@ r_motor_dir = 22
 l_motor_pwm = 21
 l_motor_dir = 20
 
-l_encoder_a = 27
-l_encoder_b = 28
-r_encoder_a = 30
-r_encoder_b = 29
+r_encoder_a = 28
+r_encoder_b = 27
+l_encoder_a = 30
+l_encoder_b = 29
 
 l_arm = 9
 r_arm = 10
