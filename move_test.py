@@ -1,5 +1,6 @@
 from hal import *
 from vision.window import Window
+from vision import Camera
 import cv2
 
 from tamproxy import TAMProxy
@@ -7,11 +8,14 @@ from tamproxy import TAMProxy
 if __name__ == "__main__":
 	with TAMProxy() as tamproxy:
 		drive = Drive(tamproxy)
-		arm = Arm(tamproxy, 10)
+		#arm = Arm(tamproxy, 10)
+		#arm2 = Arm(tamproxy, 9)
+		arms = Arms(tamproxy)
 		
 		w = Window("Eric")
 
 		while True:
+			
 			c = cv2.waitKey(1) & 0xFF
 			if c == ord('q'):
 				break
@@ -36,6 +40,11 @@ if __name__ == "__main__":
 				drive.turnIP(0.0)
 				
 			elif c == ord(' '):
-				arm.up()
+				arms.green.up()
 				time.sleep(0.75)
-				arm.down()
+				arms.green.down()
+				
+			elif c == ord('c'):
+				arms.red.up()
+				time.sleep(0.75)
+				arms.red.down()

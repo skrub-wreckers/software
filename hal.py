@@ -3,9 +3,10 @@ Hardware Access Layer
 """
 import util
 import tamproxy
-from tamproxy.devices import Motor
+from tamproxy.devices import Motor, Servo
 import cv2
 import numpy as np
+import time
 
 import pins
 import constants
@@ -40,22 +41,32 @@ class Drive(HardwareDevice):
 		self.go(throttle=0)
 
 class Arm(HardwareDevice):
-	def __init__(self, tamp, servo_pin):
+	def __init__(self, tamp, servo_pin, d):
 		self.servo = Servo(tamp, servo_pin)
+		self.d = d
 
 	def up(self):
-		for angle in range(620, 1020, 40):
-			self.servo.write(angle)
-			time.sleep(0.1)
-		self.servo.write(2400)
+		if self.d:
+			for angle in range(620, 1020, 40):
+				self.servo.write(angle)
+				time.sleep(0.1)
+			self.servo.write(2350)
+		else:
+			for angle in range(2320, 1920, -40):
+				self.servo.write(angle)
+				time.sleep(0.1)
+			self.servo.write(500)
 
 	def down(self):
-		self.servo.write(620)
+		if self.d:
+			self.servo.write(620)
+		else:
+			self.servo.write(2320)
 
 class Arms:
 	def __init__(self, conn):
-		self.green = Arm(conn)
-		self.red = Arm(conn)
+		self.green = Arm(conn, 9, True)
+		self.red = Arm(conn, 10, False)
 
 
 class Robot:
