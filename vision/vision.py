@@ -18,14 +18,15 @@ class Vision(object):
 	def update(self):
 		self.frame = self.cam.read()
 		self.color_detect = ColorDetectResult(self.frame)
-		red_blobs = BlobDetector(self.color_detect,  Colors.RED, 1000).blobs
+		red_blobs = BlobDetector(self.color_detect, Colors.RED, 1000).blobs
+		green_blobs = vision.BlobDetector(res, Colors.GREEN, 1000).blobs
 
-		self.debug_win.show(self.color_detect.debug_frame)
-		#Terrible way to get real angle from screen coords
-		if red_blobs:
-			max_blob = max(red_blobs, key=lambda b: b.area)
+		all_blobs = red_blobs + green_blobs
+
+		self.debug_win.show(self.color_detect.debug_frame)\
+		if all_blobs:
+			max_blob = max(all_blobs, key=lambda b: b.area)
 			ray = self.cam.geom.ray_at(max_blob.pos[1], max_blob.pos[0])
-			print(ray)
 			self.angle_to = math.atan2(ray[0], ray[2])
 		else:
 			self.angle_to = 0
