@@ -3,7 +3,7 @@ Hardware Access Layer
 """
 import util
 import tamproxy
-from tamproxy.devices import Motor, Servo
+from tamproxy.devices import Motor, Servo, Encoder
 import numpy as np
 import time
 
@@ -18,10 +18,13 @@ class HardwareDevice:
 
 class Drive(HardwareDevice):
 	def __init__(self, tamp):
-		self.lMotor = tamproxy.devices.Motor(tamp, pins.l_motor_dir, pins.l_motor_pwm)
+		self.lMotor = Motor(tamp, pins.l_motor_dir, pins.l_motor_pwm)
 		self.lMotor.write(1,0)
-		self.rMotor = tamproxy.devices.Motor(tamp, pins.r_motor_dir, pins.r_motor_pwm)
+		self.rMotor = Motor(tamp, pins.r_motor_dir, pins.r_motor_pwm)
 		self.rMotor.write(1,0)
+
+		self.r_enc = Encoder(tamp, pins.r_encoder_a, pins.r_encoder_b, continuous=False)
+		self.l_enc = Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b, continuous=False)
 
 	def go(self, throttle, steer=0):
 		"""both arguments measured in [-1 1], steer=-1 is full speed CW"""
