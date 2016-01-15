@@ -41,7 +41,6 @@ class Drive(HardwareDevice):
 class Arm(HardwareDevice):
 	def __init__(self, tamp, servo_pin, lower, upper):
 		self.servo = Servo(tamp, servo_pin, lower, upper)
-		self.d = d
 
 	def up(self):
 		for angle in range(0, 40, 4):
