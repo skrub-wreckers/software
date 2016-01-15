@@ -40,32 +40,24 @@ class Drive(HardwareDevice):
 		self.go(throttle=0)
 
 class Arm(HardwareDevice):
-	def __init__(self, tamp, servo_pin, d):
-		self.servo = Servo(tamp, servo_pin)
+	def __init__(self, tamp, servo_pin, lower, upper):
+		self.servo = Servo(tamp, servo_pin, lower, upper)
 		self.d = d
 
 	def up(self):
-		if self.d:
-			for angle in range(620, 1020, 40):
-				self.servo.write(angle)
-				time.sleep(0.1)
-			self.servo.write(2350)
-		else:
-			for angle in range(2320, 1920, -40):
-				self.servo.write(angle)
-				time.sleep(0.1)
-			self.servo.write(500)
+		for angle in range(0, 40, 4):
+			self.servo.write(angle)
+			time.sleep(0.1)
+
+		self.servo.write(180)
 
 	def down(self):
-		if self.d:
-			self.servo.write(620)
-		else:
-			self.servo.write(2320)
+		self.servo.write(0)
 
 class Arms:
 	def __init__(self, conn):
-		self.green = Arm(conn, 9, True)
-		self.red = Arm(conn, 10, False)
+		self.green = Arm(conn, 9, lower=620, upper=2350)
+		self.red = Arm(conn, 10, lower=2320, upper=500)
 
 
 class Robot:
