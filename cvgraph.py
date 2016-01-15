@@ -12,10 +12,10 @@ import scipy.io
 colors = ['red', 'green', 'blue', 'black', 'white']
 
 color_data = {
-	c: np.load('{}.npy'.format(c)) for c in colors
+	c: np.load('color-data/{}.npy'.format(c)) for c in colors
 }
 
-with open('data.mat', 'wb') as f:
+with open('color-data/data.mat', 'wb') as f:
 	scipy.io.savemat(f, color_data)
 
 # discretize the image
@@ -35,7 +35,7 @@ else:
 		data = np.vstack({tuple(row) for row in data})
 		color_data[c] = data
 
-	with open('data-trunc.mat', 'wb') as f:
+	with open('color-data/data-trunc.mat', 'wb') as f:
 		scipy.io.savemat(f, color_data)
 
 	for c in colors:

@@ -66,7 +66,7 @@ try:
 			selector.next_color()
 			print("Editing {} mask".format(selector.active_color.name))
 		elif c == ord('s'):
-			selector.save()
+			selector.save('color-data')
 
 finally:
 	# When everything done, release the capture

@@ -1,4 +1,4 @@
-load('data-trunc.mat')
+load('color-data/data-trunc.mat')
 figure(10)
 [az, el] = view;
 cla;

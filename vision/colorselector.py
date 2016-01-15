@@ -1,3 +1,5 @@
+import os.path
+
 import scipy.signal
 import cv2
 import numpy as np
@@ -95,10 +97,12 @@ class ColorSelector(Window):
         for c in self.colors:
             c.matches.append(frame[c.mask,:])
 
-    def save(self):
+    def save(self, path='.'):
+        if not os.path.exists(path):
+            os.mkdir(path)
         for c in self.colors:
             all_data = np.concatenate(c.matches)
-            np.save(c.name, all_data)
+            np.save(os.path.join(path, c.name), all_data)
 
     def clear(self):
         for c in self.colors:
