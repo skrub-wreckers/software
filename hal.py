@@ -4,7 +4,6 @@ Hardware Access Layer
 import util
 import tamproxy
 from tamproxy.devices import Motor, Servo
-import cv2
 import numpy as np
 import time
 
