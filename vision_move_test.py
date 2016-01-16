@@ -23,19 +23,19 @@ if __name__ == "__main__":
 		while True:
 
 			v.update()
-			angle = v.angle_to
-			print angle, v.block_pos
+			cube = v.nearest_cube
+			print cube
 
 			c = chr(cv2.waitKey(1) & 0xFF)
 			if c == 'q':
 				break
 
-			if angle is None:
+			if cube is None:
 				drive.go(0, 0.05)
-			elif abs(angle) < np.radians(5):
-				dist = np.linalg.norm(v.block_pos)
+			elif abs(cube.angle_to) < np.radians(5):
+				# todo: steer while moving?
 				drive.go(0.2)
-				time.sleep(dist / 9)
+				time.sleep(cube.distance / 9)
 				drive.go(0.1)
 				time.sleep(0.1)
 				drive.stop()
@@ -45,8 +45,8 @@ if __name__ == "__main__":
 				time.sleep(0.75)
 				arms.green.down()
 			else:
-				rtime = abs(angle)/(math.pi*2)*4.45
+				rtime = abs(cube.angle_to)/(math.pi*2)*4.45
 
-				drive.turnIP(math.copysign(0.2, angle))
+				drive.turnIP(math.copysign(0.2, cube.angle_to))
 				time.sleep(rtime)
 				drive.stop()
