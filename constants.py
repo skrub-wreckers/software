@@ -17,10 +17,10 @@ def camera_geometry():
     fov = (54.4, 40.8)
     # camera is tilted such that upper plane of FOV is parallel with ground
     tilt_down = np.radians(fov[1] / 2)
-    z = 6.5  # 6.5 inches off the ground
+    z = 7  # 6.5 inches off the ground
 
     return Geometry(
-        w=544, h=288,
+        w=320, h=240,
         wfov=fov[0], hfov=fov[1],
         matrix=np.array([
             [ np.cos(tilt_down), 0, np.sin(tilt_down), 0],

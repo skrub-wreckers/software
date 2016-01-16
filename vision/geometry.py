@@ -41,7 +41,7 @@ class Geometry(_Geometry):
             0
         ]))
 
-    def projection_on(self, ray, normal, d):
+    def project_on(self, ray, normal, d):
         """
         Project the ray extending from (x,y) onto the plane of the equation
         dot(v, normal) = d
