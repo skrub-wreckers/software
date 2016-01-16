@@ -29,20 +29,24 @@ if __name__ == "__main__":
 			c = chr(cv2.waitKey(1) & 0xFF)
 			if c == 'q':
 				break
-			elif c == ' ':
-				if angle is None:
-					arms.green.up()
-					time.sleep(0.75)
-					arms.green.down()
-				elif abs(angle) < np.radians(5):
 
-					dist = np.linalg.norm(v.block_pos)
-					drive.go(0.25)
-					time.sleep(dist / 10)
-					drive.stop()
-				else:
-					rtime = abs(angle)/(math.pi*2)*4.45
+			if angle is None:
+				drive.go(0, 0.05)
+			elif abs(angle) < np.radians(5):
+				dist = np.linalg.norm(v.block_pos)
+				drive.go(0.2)
+				time.sleep(dist / 10)
+				drive.go(0.1)
+				time.sleep(0.1)
+				drive.stop()
 
-					drive.turnIP(math.copysign(0.2, angle))
-					time.sleep(rtime)
-					drive.stop()
+
+				arms.green.up()
+				time.sleep(0.75)
+				arms.green.down()
+			else:
+				rtime = abs(angle)/(math.pi*2)*4.45
+
+				drive.turnIP(math.copysign(0.2, angle))
+				time.sleep(rtime)
+				drive.stop()
