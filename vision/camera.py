@@ -21,6 +21,7 @@ class Camera(object):
         # Not all resolutions are possible - check it applied
         self.device.set(cv2.CAP_PROP_FRAME_WIDTH, geom.w)
         self.device.set(cv2.CAP_PROP_FRAME_HEIGHT, geom.h)
+        self.device.set(cv2.CAP_PROP_BUFFERSIZE, 2)
         w = self.device.get(cv2.CAP_PROP_FRAME_WIDTH)
         h = self.device.get(cv2.CAP_PROP_FRAME_HEIGHT)
         if w == 0 or h == 0:
