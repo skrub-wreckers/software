@@ -10,7 +10,7 @@ class BlobDetector(object):
         """
         Detect blobs from a ColorDetectResult object, of a given color and minimum area
 
-        self.blobs is a list of Blob objects, containing .pos == (x,y), .color, and .area
+        self.blobs is a list of Blob objects, containing .pos == (y, x), .color, and .area
         """
         mask = color_detect_result.im == color
         labelled, n_regions = scipy.ndimage.measurements.label(mask)
