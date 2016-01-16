@@ -18,7 +18,7 @@ if __name__ == "__main__":
 		arms = Arms(tamproxy)
 
 		w = Window("Vision test")
-		cam = Camera(geom=constants.camera_geometry)
+		cam = Camera(geom=constants.camera_geometry, id=2)
 		v = vision.Vision(cam)
 		while True:
 
