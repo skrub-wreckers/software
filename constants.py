@@ -14,10 +14,18 @@ planes = {"red":[[1, -1.3, 0], [1, 0, -1.3]],
 
 @_calculated
 def camera_geometry():
-    fov = (54.4, 40.8)
+    # from https://buntworthy.github.io/Wecam-field-of-views/
+    diag_fov = np.radians(68)
+
+    # aspect ratio, normalized
+    aspect = np.array([3, 4])
+    aspect /= np.linalg.norm(aspect)
+
+    fov = 2 * np.arctan(np.tan(diag_fov) * aspect)
+
     # camera is tilted such that upper plane of FOV is parallel with ground
     tilt_down = np.radians(fov[1] / 2)
-    z = 7  # 6.5 inches off the ground
+    z = 7  # inches off the ground
 
     return Geometry(
         w=320, h=240,

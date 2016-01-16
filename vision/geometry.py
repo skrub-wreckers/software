@@ -19,7 +19,7 @@ class Geometry(_Geometry):
         if not matrix.shape == (4, 4):
             raise ValueError('Matrix should be a homogenous 4x4')
 
-        return super(Geometry, cls).__new__(cls, w, h, np.radians(wfov), np.radians(hfov), matrix)
+        return super(Geometry, cls).__new__(cls, w, h, wfov, hfov, matrix)
 
     def ray_at(self, x, y):
         """
