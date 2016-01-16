@@ -19,13 +19,11 @@ class Geometry(_Geometry):
         if not matrix.shape == (4, 4):
             raise ValueError('Matrix should be a homogenous 4x4')
 
-        self = super(Geometry, cls).__new__(cls, w, h, np.radians(wfov), np.radians(hfov), matrix)
-        self.invmatrix = np.linalg.inv(self.matrix)
-        return self
+        return super(Geometry, cls).__new__(cls, w, h, np.radians(wfov), np.radians(hfov), matrix)
 
-    def camera_ray_at(self, x, y):
+    def ray_at(self, x, y):
         """
-        Returns the direction in camera space, with components
+        Returns the direction in world space, with components
         [forward, left, up], corresponding to a given pixel in the image.
         Uses homogenous coordinates
         """
@@ -36,28 +34,32 @@ class Geometry(_Geometry):
         xrel = 2*x/self.w - 1
         yrel = 2*y/self.h - 1
 
-        return np.array([
+        return self.matrix.dot(np.array([
             1,
             -xrel * np.tan(self.wfov / 2),
             -yrel * np.tan(self.hfov / 2),
             0
-        ])
+        ]))
 
-    def world_ray_at(self, x, y):
+    def projection_on(self, ray, normal, d):
         """
-        Like camera_ray_at, but in world space
+        Project the ray extending from (x,y) onto the plane of the equation
+        dot(v, normal) = d
+
+        Where v = c_origin + t*ray
         """
-        return self.matrix.dot(self.camera_ray_at(x, y))
+        normal = np.array(normal) / np.linalg.norm(normal)
 
-    # below is a WIP
+        # camera origin in world coordinates
+        origin = self.matrix.dot(np.array([0, 0, 0, 1]))
 
-    def projection_on(self, x, y, normal, d):
-        normal /= np.linalg.norm(normal)
-
-        ray = self.camera_ray_at(x, y)
         ray /= np.linalg.norm(ray)
 
-        ray_dot_n = np.dot(ray, normal)
+        t = (d - np.dot(origin, normal)) / (np.dot(ray, normal))
+
+        return origin + ray*t
+
+    # below is a WIP
 
 
 

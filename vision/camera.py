@@ -3,12 +3,11 @@ import warnings
 import cv2
 import numpy as np
 
-import constants
 import util
 from .geometry import Geometry
 
 class Camera(object):
-    def __init__(self, w=None, h=None, geom=None, id=constants.cameraID, debug=constants.cameraDebug):
+    def __init__(self, w=None, h=None, geom=None, id=1, debug=False):
         # deal with simple arguments
         if h is not None and w is not None:
             geom = Geometry(w, h)
@@ -31,8 +30,7 @@ class Camera(object):
         if (geom.w, geom.h) != (w, h):
             warnings.warn("Cannot use resolution of {}x{}, using {}x{} instead".format(
                 geom.w, geom.h, w, h))
-            geom.w = w
-            geom.h = h
+            geom = geom._replace(w=w, h=h)
 
         if self.debug:
             cv2.namedWindow("Raw")
