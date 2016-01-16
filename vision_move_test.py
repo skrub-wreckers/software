@@ -35,7 +35,7 @@ if __name__ == "__main__":
 			elif abs(angle) < np.radians(5):
 				dist = np.linalg.norm(v.block_pos)
 				drive.go(0.2)
-				time.sleep(dist / 10)
+				time.sleep(dist / 9)
 				drive.go(0.1)
 				time.sleep(0.1)
 				drive.stop()
