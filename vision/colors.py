@@ -16,3 +16,8 @@ class Colors(object):
             color & Colors.BLUE,
         ), axis=-1) != 0) * np.uint8(255)
 
+    @staticmethod
+    def name(color):
+        if color == Colors.RED:   return "red"
+        if color == Colors.GREEN: return "green"
+

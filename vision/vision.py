@@ -19,6 +19,9 @@ class Cube(namedtuple('Cube', 'pos color')):
         """ Planar distance """
         return np.linalg.norm(self.pos[:2])
 
+    def __str__(self):
+        return "<{} cube at {:.1f}, {:.1f}, {:.1f}>".format(Colors.name(c.color), c.pos[0], c.pos[1], c.pos[2])
+
 
 class Vision(object):
     """Takes an image and returns the angle to blobs"""
