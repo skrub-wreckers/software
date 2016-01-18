@@ -7,6 +7,7 @@ from .blobdetection import BlobDetector
 from .thresholding import ColorDetectResult
 from .window import Window
 
+import numpy as np
 class Cube(namedtuple('Cube', 'pos color')):
     @property
     def angle_to(self):
