@@ -39,6 +39,7 @@ class Camera(object):
 
         self.geom = geom
         
+		self.frame = None
         self.background_capture = threading.Thread(target=self._capture_frame)
         self.background_capture.daemon = True
         self.background_capture.start()
