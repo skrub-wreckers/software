@@ -12,7 +12,7 @@ class Cube(namedtuple('Cube', 'pos color')):
     @property
     def angle_to(self):
         """ Planar angle """
-        return math.atan2(self.pos[0], self.pos[1])
+        return math.atan2(self.pos[1], self.pos[0])
 
     @property
     def distance(self):
