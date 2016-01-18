@@ -21,8 +21,10 @@ if __name__ == "__main__":
         cam = Camera(geom=constants.camera_geometry, id=2)
         v = vision.Vision(cam)
         while True:
-
-            v.update()
+            try:
+                v.update()
+            except IOError:
+                continue
             cube = v.nearest_cube()
             #print cube
 
