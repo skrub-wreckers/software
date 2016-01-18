@@ -38,8 +38,8 @@ class Camera(object):
             cv2.namedWindow("Raw")
 
         self.geom = geom
-		
-		threading.Thread(target=self._capture_frame, daemon = True).start()
+        
+        threading.Thread(target=self._capture_frame, daemon = True).start()
 
     def close(self):
         self.device.release()
@@ -54,8 +54,8 @@ class Camera(object):
         if self.frame is None:
             raise IOError('No frame')
         if self.debug:
-			cv2.imshow("Raw", self.frame)
-		return self.frame[...,::-1]
+            cv2.imshow("Raw", self.frame)
+        return self.frame[...,::-1]
         
     def _capture_frame(self):
         self.frame = self.device.read()
