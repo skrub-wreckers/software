@@ -23,7 +23,7 @@ if __name__ == "__main__":
 		while True:
 
 			v.update()
-			cube = v.nearest_cube
+			cube = v.nearest_cube()
 			print cube
 
 			c = chr(cv2.waitKey(1) & 0xFF)
