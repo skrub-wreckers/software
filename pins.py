@@ -11,7 +11,7 @@ l_encoder_a = 30
 l_encoder_b = 29
 
 l_arm = 9
-r_arm = 10
+r_arm = 6
 
 stack_door = 3
 stack_flap = 4

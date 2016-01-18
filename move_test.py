@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
 			elif c == 'c':
 				arms.red.up()
-				time.sleep(0.75)
+				time.sleep(0.9)
 				arms.red.down()
 
 			if move_cmd:

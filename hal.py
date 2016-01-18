@@ -58,8 +58,8 @@ class Arm(HardwareDevice):
 
 class Arms:
 	def __init__(self, conn):
-		self.green = Arm(conn, 9, lower=620, upper=2350)
-		self.red = Arm(conn, 10, lower=2320, upper=500)
+		self.green = Arm(conn, pins.l_arm, lower=620, upper=2350)
+		self.red = Arm(conn, pins.r_arm, lower=2340, upper=800)
 
 
 class Robot:
