@@ -61,5 +61,6 @@ class Camera(object):
         return self.frame[...,::-1]
         
     def _capture_frame(self):
-        self.frame = self.device.read()
+        while True:
+            self.frame = self.device.read()
 

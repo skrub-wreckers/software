@@ -33,7 +33,10 @@ class Vision(object):
         self.debug_win = Window('vision debug')
 
     def update(self):
-        self.frame = self.cam.read()
+        try:
+            self.frame = self.cam.read()
+        except IOError:
+            return
         self.color_detect = ColorDetectResult(self.frame)
         red_blobs = BlobDetector(self.color_detect, Colors.RED, 100).blobs
         green_blobs = BlobDetector(self.color_detect, Colors.GREEN, 100).blobs
