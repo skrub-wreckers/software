@@ -20,7 +20,7 @@ class Cube(namedtuple('Cube', 'pos color')):
         return np.linalg.norm(self.pos[:2])
 
     def __str__(self):
-        return "<{} cube at {:.1f}, {:.1f}, {:.1f}>".format(Colors.name(c.color), c.pos[0], c.pos[1], c.pos[2])
+        return "<{} cube at {:.1f}, {:.1f}, {:.1f}>".format(Colors.name(self.color), self.pos[0], self.pos[1], self.pos[2])
 
 
 class Vision(object):
