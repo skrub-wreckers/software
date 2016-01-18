@@ -49,6 +49,7 @@ if __name__ == "__main__":
                 arms.green.down()
             else:
                 print "Turning to cube", cube
+                print cube.angle_to
                 rtime = abs(cube.angle_to)/(math.pi*2)*4.45
                 drive.turnIP(math.copysign(0.2, cube.angle_to))
                 time.sleep(rtime)
