@@ -24,7 +24,7 @@ def camera_geometry():
     fov = 2 * np.arctan(np.tan(diag_fov / 2) * aspect)
 
     # camera is tilted such that upper plane of FOV is parallel with ground
-    tilt_down = np.radians(fov[1] / 2)
+    tilt_down = fov[1] / 2
     z = 7  # inches off the ground
 
     return Geometry(
