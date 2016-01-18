@@ -44,7 +44,7 @@ class Vision(object):
         self.cubes = [
             Cube(
                 pos=self.cam.geom.project_on(
-                    ray=elf.cam.geom.ray_at(blob.pos[1], blob.pos[0]),
+                    ray=self.cam.geom.ray_at(blob.pos[1], blob.pos[0]),
                     normal=[0, 0, 1, 0],
                     d=1  # center of the cube is 1in off the ground
                 ),
