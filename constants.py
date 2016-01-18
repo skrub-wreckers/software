@@ -18,7 +18,7 @@ def camera_geometry():
     diag_fov = np.radians(68)
 
     # aspect ratio, normalized
-    aspect = np.array([3, 4])
+    aspect = np.array([3, 4], dtype=np.float)
     aspect /= np.linalg.norm(aspect)
 
     fov = 2 * np.arctan(np.tan(diag_fov) * aspect)
