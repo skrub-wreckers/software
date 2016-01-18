@@ -1,26 +1,25 @@
 import tamproxy, tamproxy.devices
-import pins
 import time
 
-sval = 1500
-step = 50
+import cv2
+
 
 if __name__ == '__main__':
 	with tamproxy.TAMProxy() as tamp:
-		print("init")
-		#servo = tamproxy.devices.Servo(tamp,10)
-		pin = tamproxy.devices.DigitalOutput(tamp,10)
-		print("inited")
-		pin.write(True)
-		raw_input()
-		pin.write(False)
+		# Make the trackbar used for HSV masking
 
-		#servo.write(sval)
-		#while True:
-		#	if raw_input() == "u":
-		#		sval-=step
-		#	else:
-		#		sval+=step
-		#	print sval
-		#	servo.write(sval)
-			
+		print("init")
+		servo = tamproxy.devices.Servo(tamp,6)
+		# pin = tamproxy.devices.DigitalOutput(tamp,10)
+		# print("inited")
+		# pin.write(True)
+		# raw_input()
+		# pin.write(False)
+
+		cv2.namedWindow('frame', cv2.WINDOW_AUTOSIZE)
+		cv2.createTrackbar('Position','frame', 1500,3000, servo.write_microseconds)
+
+		while True:
+			c = chr(cv2.waitKey(1) & 0xFF)
+			if c in ('q', '\x1b'):
+				break
