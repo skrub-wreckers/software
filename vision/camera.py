@@ -2,6 +2,7 @@ import warnings
 
 import cv2
 import numpy as np
+import threading
 
 import util
 from .geometry import Geometry
@@ -37,6 +38,8 @@ class Camera(object):
             cv2.namedWindow("Raw")
 
         self.geom = geom
+		
+		threading.Thread(target=self._capture_frame, daemon = True).start()
 
     def close(self):
         self.device.release()
@@ -48,11 +51,12 @@ class Camera(object):
 
     def read(self):
         """ return the RGB frame, or raise an exception if it could not be found """
-        ok, frame = self.device.read()
-        if not ok:
+        if self.frame is None:
             raise IOError('No frame')
-
         if self.debug:
-            cv2.imshow("Raw", frame)
-        return frame[...,::-1]
+			cv2.imshow("Raw", self.frame)
+		return self.frame[...,::-1]
+        
+    def _capture_frame(self):
+        self.frame = self.device.read()
 
