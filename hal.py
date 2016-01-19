@@ -3,7 +3,7 @@ Hardware Access Layer
 """
 import util
 import tamproxy
-from tamproxy.devices import Motor, Servo, Encoder
+from tamproxy.devices import Motor, Servo, Encoder, AnalogInput, DigitalOutput
 import numpy as np
 import time
 import math
@@ -72,12 +72,26 @@ class Arms:
 		self.green = Arm(conn, pins.l_arm, lower=620, upper=2350)
 		self.red = Arm(conn, pins.r_arm, lower=2320, upper=760)
 
-
+class ColorSensor(HardwareDevice):
+    def __init__(self, tamp):
+        self.photo_resistor = AnalogInput(tamp, pins.photo_resistor)
+        
+    def read(self):
+        self.photo_resistor.update()
+        v = self.photo_resistor.val
+        if v > constants.nothing_cutoff:
+            return 0 #0 = nothing
+        elif v > constants.green_cutoff:
+            return 2 #2 = green
+        else:
+            return 1 #1 = red
+        
 class Robot:
 	def __init__(self, tamp):
 		self.tamp = tamp
 		if not self.tamp.started: self.tamp.start()
 		self.arms = Arms(self.tamp)
 		self.drive = Drive(self.tamp)
+        self.color_sensor = ColorSensor()
 
 		self.camera = Camera(*constants.cameraResolution)

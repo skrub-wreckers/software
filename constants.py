@@ -37,3 +37,7 @@ def camera_geometry():
             [                 0, 0,                 0, 1]
         ])
     )
+
+#Color sensor thresholds
+nothing_cutoff = 220
+green_cutoff = 170
