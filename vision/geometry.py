@@ -9,8 +9,8 @@ class Geometry(_Geometry):
         """
         w:      image width in pixels
         h:      image height in pixels
-        wfov:   horizonal field of view in degrees
-        hfov:   vertical field of view in degrees
+        wfov:   horizontal field of view in radians
+        hfov:   vertical field of view in radians
         matrix: transformation from camera to world coordinates
         """
         if not (w > 0 and h > 0):
