@@ -43,7 +43,7 @@ class Drive(HardwareDevice):
 		self.go(throttle=0)
 
 	def go_distance(self, dist):
-		self.go(throttle=math.copysign(0.2, dist))
+		self.go(throttle= math.copysign(0.2, dist))
 		time.sleep(abs(dist) * 0.12)
 		self.stop()
 
@@ -70,7 +70,7 @@ class Arm(HardwareDevice):
 class Arms:
 	def __init__(self, conn):
 		self.green = Arm(conn, pins.l_arm, lower=620, upper=2350)
-		self.red = Arm(conn, pins.r_arm, lower=2300, upper=760)
+		self.red = Arm(conn, pins.r_arm, lower=2320, upper=760)
 
 
 class Robot:
