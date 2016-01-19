@@ -9,9 +9,11 @@ from vision.window import Window
 from vision.colors import Colors
 
 
+import scipy.ndimage as ndimage
+
 from util import Timer
 
-cam = vision.Camera(w=544, h=288, debug=False)
+cam = vision.Camera(w=544, h=288, debug=False, id=1)
 
 selector = ColorSelector(cam.shape)
 result_win = Window('result')
@@ -46,7 +48,22 @@ try:
 			cv2.circle(frame, (int(x), int(y)), 20, color, thickness=-1)
 
 
-		result_win.show(res.debug_frame)
+		is_blue = (res.im == Colors.BLUE)
+
+		gradx = ndimage.filters.sobel(is_blue, 0)
+		grady = ndimage.filters.sobel(is_blue, 1)
+		hyp = np.hypot(gradx, grady)
+		hyp = hyp / float(np.max(hyp))
+		hyp = hyp[...,np.newaxis]
+
+		debug = res.debug_frame
+		# for x1, y1, x2, y2 in lines:
+		# 	cv2.line(debug, (x1,y1), (x2,y2), [0, 0, 128], thickness=2)
+
+		debug = (1-hyp)*debug + hyp*np.array([0, 128, 128])[np.newaxis,np.newaxis,:]
+
+
+		result_win.show(debug)
 		selector.show(frame)
 
 		if time.time() - lastCap > 1 and fRec > 0:

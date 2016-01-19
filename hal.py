@@ -44,12 +44,12 @@ class Drive(HardwareDevice):
 
 	def go_distance(self, dist):
 		self.go(math.copysign(0.2, dist))
-		time.sleep(dist * 0.12)
+		time.sleep(abs(dist) * 0.12)
 		self.stop()
 
 	def turn_angle(self, angle):
 		self.go(math.copysign(0.2, angle))
-		time.sleep(angle / (math.pi*2)*4.45)
+		time.sleep(abs(angle) / (math.pi*2)*4.45)
 		self.stop()
 
 class Arm(HardwareDevice):
