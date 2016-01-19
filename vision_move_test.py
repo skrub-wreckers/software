@@ -49,5 +49,5 @@ if __name__ == "__main__":
                     time.sleep(0.75)
                     arms.red.down()
             else:
-                print "Turning {} to {}".format(cube.angle_to)
+                print "Turning {} to {}".format(cube.angle_to, cube)
                 drive.turn_angle(cube.angle_to)
