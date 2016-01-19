@@ -7,6 +7,7 @@ class Colors(object):
     GREEN = 2
     BLUE = 4
     WHITE = 7
+    NONE = 8
 
     @staticmethod
     def to_rgb(color):
