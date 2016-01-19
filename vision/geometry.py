@@ -9,8 +9,8 @@ class Geometry(_Geometry):
         """
         w:      image width in pixels
         h:      image height in pixels
-        wfov:   horizonal field of view in degrees
-        hfov:   vertical field of view in degrees
+        wfov:   horizontal field of view in radians
+        hfov:   vertical field of view in radians
         matrix: transformation from camera to world coordinates
         """
         if not (w > 0 and h > 0):
@@ -56,6 +56,9 @@ class Geometry(_Geometry):
         ray /= np.linalg.norm(ray)
 
         t = (d - np.dot(origin, normal)) / (np.dot(ray, normal))
+
+        if t < 0:
+            raise ValueError("Ray does not hit plane")
 
         return origin + ray*t
 

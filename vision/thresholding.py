@@ -38,7 +38,12 @@ class ColorDetectResult(object):
         im[is_red] = Colors.RED
         self.im = im
 
+    def mask_out(self, mask):
+        self.im[mask] |= Colors.NONE
+
     @property
     def debug_frame(self):
         # convert color ids to rgb
-        return Colors.to_rgb(self.im)
+        frame = Colors.to_rgb(self.im)
+        frame[self.im & Colors.NONE != 0] //= 8
+        return frame

@@ -6,6 +6,7 @@ import tamproxy
 from tamproxy.devices import Motor, Servo, Encoder
 import numpy as np
 import time
+import math
 
 import pins
 import constants
@@ -26,7 +27,7 @@ class Drive(HardwareDevice):
 		self.r_enc = Encoder(tamp, pins.r_encoder_a, pins.r_encoder_b, continuous=False)
 		self.l_enc = Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b, continuous=False)
 
-	def go(self, throttle, steer=0):
+	def go(self, throttle=0, steer=0):
 		"""both arguments measured in [-1 1], steer=-1 is full speed CW"""
 		lPow = rPow = throttle
 		lPow -= steer
@@ -40,6 +41,16 @@ class Drive(HardwareDevice):
 
 	def stop(self):
 		self.go(throttle=0)
+
+	def go_distance(self, dist):
+		self.go(throttle= math.copysign(0.2, dist))
+		time.sleep(abs(dist) * 0.12)
+		self.stop()
+
+	def turn_angle(self, angle):
+		self.go(steer=math.copysign(0.2, angle))
+		time.sleep(abs(angle) / (math.pi*2)*4.45)
+		self.stop()
 
 class Arm(HardwareDevice):
 	def __init__(self, tamp, servo_pin, lower, upper):
@@ -59,7 +70,7 @@ class Arm(HardwareDevice):
 class Arms:
 	def __init__(self, conn):
 		self.green = Arm(conn, pins.l_arm, lower=620, upper=2350)
-		self.red = Arm(conn, pins.r_arm, lower=2340, upper=800)
+		self.red = Arm(conn, pins.r_arm, lower=2320, upper=760)
 
 
 class Robot:

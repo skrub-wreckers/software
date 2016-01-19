@@ -45,17 +45,21 @@ class Vision(object):
         #   detect cubes in a stack
         #   look at cube area
 
-        self.cubes = [
-            Cube(
-                pos=self.cam.geom.project_on(
+        cubes = []
+        for blob in all_blobs:
+            try:
+                pos = self.cam.geom.project_on(
                     ray=self.cam.geom.ray_at(blob.pos[1], blob.pos[0]),
                     normal=[0, 0, 1, 0],
                     d=1  # center of the cube is 1in off the ground
-                ),
-                color=blob.color
-            )
-            for blob in all_blobs
-        ]
+                )
+            except ValueError:
+                # no projection onto the plane
+                pass
+            else:
+                cubes.append(Cube(pos=pos, color=blob.color))
+
+        self.cubes = cubes
 
         self.debug_win.show(self.color_detect.debug_frame)
 

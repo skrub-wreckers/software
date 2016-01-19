@@ -1,7 +1,7 @@
 from hal import *
 import vision
 from vision.window import Window
-from vision import Camera, Vision
+from vision import Camera, Vision, Colors
 import cv2
 import math
 import numpy as np
@@ -17,7 +17,6 @@ if __name__ == "__main__":
         #arm2 = Arm(tamproxy, 9)
         arms = Arms(tamproxy)
 
-        w = Window("Vision test")
         cam = Camera(geom=constants.camera_geometry, id=2)
         v = vision.Vision(cam)
         while True:
@@ -34,25 +33,24 @@ if __name__ == "__main__":
 
             if cube is None:
                 print "No cube"
-                drive.go(0, 0.05)
-                
-            elif abs(cube.angle_to) < np.radians(5):
-                print "Cube str8 ahead", cube
-                # todo: steer while moving?
-                drive.go(0.2)
-                time.sleep(cube.distance / 9)
-                drive.go(0.1)
-                time.sleep(0.1)
-                drive.stop()
+                drive.go(0, 0.1)
 
+            elif abs(cube.angle_to) < np.radians(3):
+                print "Going {}in to {}".format(cube.distance, cube)
+                if cube.distance > 60:
+                    drive.go_distance(60)
+                else:
+                    # todo: steer while moving?
+                    drive.go_distance(cube.distance + 1)
 
-                arms.green.up()
-                time.sleep(0.75)
-                arms.green.down()
+                    if cube.color == Colors.GREEN:
+                        arms.green.up()
+                        time.sleep(0.75)
+                        arms.green.down()
+                    elif cube.color == Colors.RED:
+                        arms.red.up()
+                        time.sleep(0.75)
+                        arms.red.down()
             else:
-                print "Turning to cube", cube
-                print cube.angle_to
-                rtime = abs(cube.angle_to)/(math.pi*2)*4.45
-                drive.turnIP(math.copysign(0.2, cube.angle_to))
-                time.sleep(rtime)
-                drive.stop()
+                print "Turning {} to {}".format(cube.angle_to, cube)
+                drive.turn_angle(cube.angle_to)
