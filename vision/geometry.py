@@ -57,6 +57,9 @@ class Geometry(_Geometry):
 
         t = (d - np.dot(origin, normal)) / (np.dot(ray, normal))
 
+        if t < 0:
+            raise ValueError("Ray does not hit plane")
+
         return origin + ray*t
 
     # below is a WIP
