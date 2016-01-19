@@ -36,7 +36,7 @@ if __name__ == "__main__":
                 drive.go(0, 0.05)
 
             elif abs(cube.angle_to) < np.radians(5):
-                print "Cube str8 ahead", cube
+                print "Going {}in to {}".format(cube.distance, cube)
                 # todo: steer while moving?
                 drive.go_distance(cube.distance + 1)
 
@@ -49,6 +49,5 @@ if __name__ == "__main__":
                     time.sleep(0.75)
                     arms.red.down()
             else:
-                print "Turning to cube", cube
-                print cube.angle_to
+                print "Turning {} to {}".format(cube.angle_to)
                 drive.turn_angle(cube.angle_to)
