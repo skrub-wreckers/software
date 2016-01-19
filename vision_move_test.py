@@ -1,7 +1,7 @@
 from hal import *
 import vision
 from vision.window import Window
-from vision import Camera, Vision
+from vision import Camera, Vision, Colors
 import cv2
 import math
 import numpy as np
@@ -40,15 +40,19 @@ if __name__ == "__main__":
                 print "Cube str8 ahead", cube
                 # todo: steer while moving?
                 drive.go(0.2)
-                time.sleep(cube.distance / 9)
+                time.sleep(cube.distance * 0.12 )
                 drive.go(0.1)
                 time.sleep(0.1)
                 drive.stop()
 
-
-                arms.green.up()
-                time.sleep(0.75)
-                arms.green.down()
+                if cube.color == Colors.GREEN:
+                    arms.green.up()
+                    time.sleep(0.75)
+                    arms.green.down()
+                elif cube.color == Colors.RED:
+                    arms.red.up()
+                    time.sleep(0.75)
+                    arms.red.down()
             else:
                 print "Turning to cube", cube
                 print cube.angle_to
