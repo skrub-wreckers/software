@@ -17,7 +17,6 @@ if __name__ == "__main__":
         #arm2 = Arm(tamproxy, 9)
         arms = Arms(tamproxy)
 
-        w = Window("Vision test")
         cam = Camera(geom=constants.camera_geometry, id=2)
         v = vision.Vision(cam)
         while True:
