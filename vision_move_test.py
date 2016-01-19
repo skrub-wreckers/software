@@ -35,15 +35,11 @@ if __name__ == "__main__":
             if cube is None:
                 print "No cube"
                 drive.go(0, 0.05)
-                
+
             elif abs(cube.angle_to) < np.radians(5):
                 print "Cube str8 ahead", cube
                 # todo: steer while moving?
-                drive.go(0.2)
-                time.sleep(cube.distance * 0.12 )
-                drive.go(0.1)
-                time.sleep(0.1)
-                drive.stop()
+                drive.go_distance(cube.distance + 1)
 
                 if cube.color == Colors.GREEN:
                     arms.green.up()
@@ -56,7 +52,4 @@ if __name__ == "__main__":
             else:
                 print "Turning to cube", cube
                 print cube.angle_to
-                rtime = abs(cube.angle_to)/(math.pi*2)*4.45
-                drive.turnIP(math.copysign(0.2, cube.angle_to))
-                time.sleep(rtime)
-                drive.stop()
+                drive.turn_angle(cube.angle_to)

@@ -6,6 +6,7 @@ import tamproxy
 from tamproxy.devices import Motor, Servo, Encoder
 import numpy as np
 import time
+import math
 
 import pins
 import constants
@@ -40,6 +41,16 @@ class Drive(HardwareDevice):
 
 	def stop(self):
 		self.go(throttle=0)
+
+	def go_distance(self, dist):
+		self.go(math.copysign(0.2, dist))
+		time.sleep(dist * 0.12)
+		self.stop()
+
+	def turn_angle(self, angle):
+		self.go(math.copysign(0.2, angle))
+		time.sleep(angle / (math.pi*2)*4.45)
+		self.stop()
 
 class Arm(HardwareDevice):
 	def __init__(self, tamp, servo_pin, lower, upper):
