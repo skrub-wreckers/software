@@ -25,6 +25,16 @@ class Mapper(object):
         t.daemon = True
         t.start()
 
+    @property
+    def robot_matrix(self):
+        data = self.odometer.val
+        return np.array([
+            [ np.cos(data.theta), np.sin(data.theta), data.x],
+            [-np.sin(data.theta), np.cos(data.theta), data.y],
+            [                 0,                  0,      1]
+        ])
+
+
     def redraw(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
