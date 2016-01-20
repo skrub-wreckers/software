@@ -1,14 +1,15 @@
-import pins
+import time
+import math
+import csv
+
 from tamproxy.devices import Odometer
 from tamproxy.devices import Gyro
 from tamproxy.devices import Encoder
 from tamproxy import TAMProxy
-
-import time
 import cv2
 import numpy as np
-import math
 
+import pins
 from mapping import Mapper
 
 def to_cv(val):
@@ -26,16 +27,21 @@ if __name__ == "__main__":
     gyro = Gyro(tamp, pins.gyro_cs, integrate=False)
     lEnc = Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b, continuous = False)
     rEnc = Encoder(tamp, pins.r_encoder_a, pins.r_encoder_b, continuous = False)
-    odo = Odometer(tamp, lEnc, rEnc, gyro, 1.0)
+    odo = Odometer(tamp, lEnc, rEnc, gyro, 0.2)
 
     mapper = Mapper(odo, size=500, ppi=250.0/20)
 
-    while True:
-        odo.update()
-        lEnc.update()
-        rEnc.update()
-        print time.time(), odo.val
+    with open('odo.csv', 'w') as logfile:
+        logwriter = csv.writer(logfile)
+        logwriter.writerow(('t',) + odo.Reading._fields)
 
-        c = chr(cv2.waitKey(1) & 0xFF)
-        if c == 'q':
-            break
+        while True:
+            odo.update()
+            lEnc.update()
+            rEnc.update()
+            print time.time(), odo.val
+            logwriter.writerow((time.time(),) + odo.val)
+
+            c = chr(cv2.waitKey(50) & 0xFF)
+            if c == 'q':
+                break
