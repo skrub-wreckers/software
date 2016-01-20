@@ -65,9 +65,12 @@ class Drive(HardwareDevice):
 
     def turn_angle(self, angle):
         self.anglePID.setSetpoint(angle)
-        while abs(self.odometer.val.theta - angle) > constants.angleTolerance:
+        while True: #abs(self.odometer.val.theta - angle) > np.radians(2):
+            print abs(self.odometer.val.theta - angle)
             pidVal = self.anglePID.iterate(self.odometer.val.theta)
-            self.go(steer=pidVal)
+            print pidVal
+            print
+            self.go(steer=util.clamp(pidVal, -0.4, 0.4))
             time.sleep(0.05)
         self.stop()
 
