@@ -41,3 +41,6 @@ def camera_geometry():
 #Color sensor thresholds
 nothing_cutoff = 220
 green_cutoff = 170
+
+
+odometer_alpha = 0.05  # favor encoders
