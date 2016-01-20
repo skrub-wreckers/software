@@ -56,8 +56,11 @@ class Drive(HardwareDevice):
         self.go(throttle=0)
 
     def go_distance(self, dist):
-        self.go(throttle= math.copysign(0.2, dist))
-        time.sleep(abs(dist) * 0.12)
+        self.distPID.setSetpoint(dist)
+        while abs(dist-np.hypot(self.odometer.val.x, self.odometer.val.y)) > constants.distanceTolerance:
+            pidVal = self.distPID.iterate(np.hypot(self.odometer.val.x, self.odometer.val.y))
+            self.go(throttle=pidVal)
+            time.sleep(0.05)
         self.stop()
 
     def turn_angle(self, angle):
@@ -65,7 +68,7 @@ class Drive(HardwareDevice):
         while abs(self.odometer.val.theta - angle) > constants.angleTolerance:
             pidVal = self.anglePID.iterate(self.odometer.val.theta)
             self.go(steer=pidVal)
-            time.sleep(abs(angle) / (math.pi*2)*4.45)
+            time.sleep(0.05)
         self.stop()
 
 class Arm(HardwareDevice):
