@@ -8,6 +8,7 @@ import numpy as np
 import time
 import math
 
+import util
 import pins
 import constants
 from vision import Colors
@@ -27,10 +28,13 @@ class Drive(HardwareDevice):
 
         self.r_enc = Encoder(tamp, pins.r_encoder_a, pins.r_encoder_b, continuous=False)
         self.l_enc = Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b, continuous=False)
-
+        
+        self.distPID = util.PID(constants.motorDistP, constants.motorDistI, constants.motorDistD)
+        self.anglePID = util.PID(constants.motorAngleP, constants.motorAngleI, constants.motorAngleD)
+        
         self.odometer = Odometer(
             self.tamp,
-            self.l_enc,
+            self.l_enc,        
             self.r_enc,
             Gyro(tamp, pins.gyro.cs, integrate=False),
             constants.odometer_alpha
@@ -57,8 +61,11 @@ class Drive(HardwareDevice):
         self.stop()
 
     def turn_angle(self, angle):
-        self.go(steer=math.copysign(0.2, angle))
-        time.sleep(abs(angle) / (math.pi*2)*4.45)
+        self.anglePID.setSetpoint(angle)
+        while abs(self.odometer.val.theta - angle) > constants.angleTolerance:
+            pidVal = self.anglePID.iterate(self.odometer.val.theta)
+            self.go(steer=pidVal)
+            time.sleep(abs(angle) / (math.pi*2)*4.45)
         self.stop()
 
 class Arm(HardwareDevice):

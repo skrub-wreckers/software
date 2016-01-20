@@ -42,5 +42,13 @@ def camera_geometry():
 nothing_cutoff = 220
 green_cutoff = 170
 
-
 odometer_alpha = 0.05  # favor encoders
+
+#PID tuning
+motorDistP = 1
+motorDistI = 1
+motorDistD = 1
+
+motorAngleP = 1
+motorAngleI = 1
+motorAngleD = 1
