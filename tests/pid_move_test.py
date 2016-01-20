@@ -9,7 +9,7 @@ from tamproxy import TAMProxy
 
 if __name__ == "__main__":
     with TAMProxy() as tamproxy:
-        drive = Drive(tamproxy)
+        drive = RegulatedDrive(tamproxy)
         arms = Arms(tamproxy)
 
         w = Window("Control here")

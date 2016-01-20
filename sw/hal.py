@@ -28,13 +28,10 @@ class Drive(HardwareDevice):
 
         self.r_enc = Encoder(tamp, pins.r_encoder_a, pins.r_encoder_b, continuous=False)
         self.l_enc = Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b, continuous=False)
-        
-        self.distPID = util.PID(constants.motorDistP, constants.motorDistI, constants.motorDistD)
-        self.anglePID = util.PID(constants.motorAngleP, constants.motorAngleI, constants.motorAngleD)
-        
+
         self.odometer = Odometer(
             tamp,
-            self.l_enc,        
+            self.l_enc,
             self.r_enc,
             Gyro(tamp, pins.gyro_cs, integrate=False),
             constants.odometer_alpha
@@ -56,12 +53,33 @@ class Drive(HardwareDevice):
         self.go(throttle=0)
 
     def go_distance(self, dist):
+        self.go(throttle= math.copysign(0.2, dist))
+        time.sleep(abs(dist) * 0.12)
+        self.stop()
+
+    def turn_angle(self, angle):
+        self.go(steer=math.copysign(0.2, angle))
+        time.sleep(abs(angle) / (math.pi*2)*4.45)
+        self.stop()
+
+
+class RegulatedDrive(Drive):
+    def __init__(self, tamp):
+        super(Drive, self).__init__(tamp)
+
+
+        self.distPID = util.PID(constants.motorDistP, constants.motorDistI, constants.motorDistD)
+        self.anglePID = util.PID(constants.motorAngleP, constants.motorAngleI, constants.motorAngleD)
+
+
+    def go_distance(self, dist):
         self.distPID.setpoint = dist
         while abs(dist-np.hypot(self.odometer.val.x, self.odometer.val.y)) > constants.distanceTolerance:
             pidVal = self.distPID.iterate(np.hypot(self.odometer.val.x, self.odometer.val.y))
             self.go(throttle=pidVal)
             time.sleep(0.05)
         self.stop()
+
 
     def turn_angle(self, angle):
         self.anglePID.setpoint = angle
@@ -75,6 +93,7 @@ class Drive(HardwareDevice):
                 angle-=np.pi/4.0
                 self.anglePID.setpoint = angle
         self.stop()
+
 
 class Arm(HardwareDevice):
     def __init__(self, tamp, servo_pin, lower, upper):
