@@ -47,12 +47,12 @@ odometer_alpha = 0.2
 
 #PID tuning
 motorDistP = 1
-motorDistI = 1
-motorDistD = 1
+motorDistI = 0
+motorDistD = 0
 
 motorAngleP = 1
-motorAngleI = 1
-motorAngleD = 1
+motorAngleI = 0
+motorAngleD = 0
 
 angleTolerance = 0.01
 distanceTolerance = 0.01
