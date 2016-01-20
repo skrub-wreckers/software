@@ -29,7 +29,7 @@ class Drive(HardwareDevice):
         self.l_enc = Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b, continuous=False)
 
         self.odometer = Odometer(
-            self.tamp,
+            tamp,
             self.l_enc,
             self.r_enc,
             Gyro(tamp, pins.gyro.cs, integrate=False),
