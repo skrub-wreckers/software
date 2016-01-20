@@ -33,8 +33,18 @@ try:
 			continue
 
 		with Timer('all') as timer:
-			with timer('detect') as timer:
+			with timer('detect') as t:
 				res = vision.ColorDetectResult(frame)
+
+			with timer('bluecut') as t:
+				is_blue = (res.im == Colors.BLUE)
+				is_blue = ndimage.binary_opening(is_blue, structure=np.ones((5,5)))
+				is_blue = ndimage.binary_closing(is_blue, structure=np.ones((5,5)))
+
+				x, y = np.meshgrid(np.arange(cam.shape[1]), np.arange(cam.shape[0]))
+
+				blue_above = np.cumsum(is_blue, axis=0)
+				res.mask_out(blue_above == 0)
 
 			with timer('fill'):
 				red_blobs = vision.BlobDetector(res,  Colors.RED, 1000)
@@ -48,19 +58,19 @@ try:
 			cv2.circle(frame, (int(x), int(y)), 20, color, thickness=-1)
 
 
-		is_blue = (res.im == Colors.BLUE)
 
-		gradx = ndimage.filters.sobel(is_blue, 0)
-		grady = ndimage.filters.sobel(is_blue, 1)
-		hyp = np.hypot(gradx, grady)
-		hyp = hyp / float(np.max(hyp))
-		hyp = hyp[...,np.newaxis]
+
+		# gradx = ndimage.filters.sobel(is_blue, 0)
+		# grady = ndimage.filters.sobel(is_blue, 1)
+		# hyp = np.hypot(gradx, grady)
+		# hyp = hyp / float(np.max(hyp))
+		# hyp = hyp[...,np.newaxis]
 
 		debug = res.debug_frame
 		# for x1, y1, x2, y2 in lines:
 		# 	cv2.line(debug, (x1,y1), (x2,y2), [0, 0, 128], thickness=2)
 
-		debug = (1-hyp)*debug + hyp*np.array([0, 128, 128])[np.newaxis,np.newaxis,:]
+		# debug[above_blue,:] = debug[above_blue,:] * 0.125
 
 
 		result_win.show(debug)
