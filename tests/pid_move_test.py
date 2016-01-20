@@ -1,7 +1,7 @@
-from hal import *
-from vision.window import Window
-from vision import Camera, Vision
-from mapping import Mapper
+from sw.hal import *
+from sw.vision.window import Window
+from sw.vision import Camera, Vision
+from sw.mapping import Mapper
 
 import cv2
 
