@@ -27,6 +27,14 @@ class Drive(HardwareDevice):
         self.r_enc = Encoder(tamp, pins.r_encoder_a, pins.r_encoder_b, continuous=False)
         self.l_enc = Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b, continuous=False)
 
+        self.odometer = Odometer(
+            self.tamp,
+            self.l_enc,
+            self.r_enc,
+            Gyro(tamp, pins.gyro.cs, integrate=False),
+            constants.odometer_alpha
+        )
+
     def go(self, throttle=0, steer=0):
         """both arguments measured in [-1 1], steer=-1 is full speed CW"""
         lPow = rPow = throttle
@@ -94,14 +102,6 @@ class Robot:
         self.drive = Drive(self.tamp)
         self.color_sensor = ColorSensor()
 
-        self.gyro = Gyro(tamp, pins.gyro.cs, integrate=False)
 
         self.camera = Camera(*constants.cameraResolution)
 
-        self.odometer = Odometer(
-            self.tamp,
-            self.drive.l_enc,
-            self.drive.r_enc,
-            self.gyro,
-            constants.odometer_alpha
-        )
