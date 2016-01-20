@@ -36,21 +36,27 @@ class PID:
         self.kP = kP
         self.kI = kI
         self.kD = kD
-        self.setSetpoint(setpoint)
+        self.setpoint = setpoint
         self.last_time = time.time()
 
-    def setSetpoint(self, setpoint):
-        self.setpoint = setpoint
-        self.prevErr = 0
-        self.integral = 0
+    @property
+    def setpoint(self):
+        return self._setpoint
+
+    @setpoint.setter
+    def setpoint(self, value):
+        self._setpoint = value
+        self._last_err = 0
+        self._integral = 0
 
     def iterate(self, val, dVal = None):
         err = self.setpoint - val
-        self.integral += err*(time.time()-self.last_time)
+        this_time = time.time()
+        self._integral += err*(this_time - self.last_time)
         if dVal is None:
-            derivative = (err - self.prevErr)/(time.time()-self.last_time)
+            derivative = (err - self.last_err)/(this_time - self.last_time)
         else:
             derivative = -dVal
-        self.last_time = time.time()
-        self.prevErr = err
+        self.last_time = this_time
+        self.last_err = err
         return self.kP * err + self.kI * self.integral + self.kD * derivative
