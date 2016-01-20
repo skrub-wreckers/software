@@ -31,13 +31,13 @@ class Profiler(object):
         self.has_children = True
         return Timer(name, self.indent + '  ')
 
-class PID:
+class PID(object):
     def __init__(self, kP, kI, kD, setpoint=0):
         self.kP = kP
         self.kI = kI
         self.kD = kD
         self.setpoint = setpoint
-        self.last_time = time.time()
+        self._last_time = None
 
     @property
     def setpoint(self):
@@ -52,11 +52,11 @@ class PID:
     def iterate(self, val, dVal = None):
         err = self.setpoint - val
         this_time = time.time()
-        self._integral += err*(this_time - self.last_time)
+        self._integral += err*(this_time - self._last_time)
         if dVal is None:
-            derivative = (err - self.last_err)/(this_time - self.last_time)
+            derivative = (err - self._last_err)/(this_time - self._last_time)
         else:
             derivative = -dVal
-        self.last_time = this_time
-        self.last_err = err
+        self._last_time = this_time
+        self._last_err = err
         return self.kP * err + self.kI * self.integral + self.kD * derivative
