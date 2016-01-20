@@ -101,7 +101,7 @@ class Robot:
         if not self.tamp.started: self.tamp.start()
         self.arms = Arms(self.tamp)
         self.drive = Drive(self.tamp)
-        self.color_sensor = ColorSensor()
+        self.color_sensor = ColorSensor(self.tamp)
 
 
         self.camera = Camera(*constants.cameraResolution)
