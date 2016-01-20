@@ -1,6 +1,6 @@
 from collections import namedtuple
 import csv
-from vision import Colors
+from ..vision import Colors
 
 Wall = namedtuple('Wall', 'x1 y1 x2 y2')
 Stack = namedtuple('Stack', 'x y cubes')

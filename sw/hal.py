@@ -1,17 +1,17 @@
 """
 Hardware Access Layer
 """
-import util
-import tamproxy
-from tamproxy.devices import *
-import numpy as np
 import time
 import math
 
-import util
-import pins
-import constants
-from vision import Colors
+import tamproxy
+from tamproxy.devices import *
+import numpy as np
+
+from . import util
+from . import pins
+from . import constants
+from .vision import Colors
 
 class HardwareDevice:
     """a device needing a connection through the arduino"""

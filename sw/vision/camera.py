@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import threading
 
-import util
+from .. import util
 from .geometry import Geometry
 
 class Camera(object):
