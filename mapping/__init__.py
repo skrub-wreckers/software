@@ -31,7 +31,7 @@ class Mapper(object):
         return np.array([
             [ np.cos(data.theta), np.sin(data.theta), 0, data.x],
             [-np.sin(data.theta), np.cos(data.theta), 0, data.y],
-            [                  0,                  0, 1,      0]
+            [                  0,                  0, 1,      0],
             [                  0,                  0, 0,      1]
         ])
 
