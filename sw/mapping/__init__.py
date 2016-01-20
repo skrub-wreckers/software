@@ -1,8 +1,9 @@
 import threading
 import time
-import vision
 import numpy as np
 import pygame
+
+from ..vision import Colors
 
 def to_cv(val):
     """ np array to integer tuple """
@@ -22,14 +23,14 @@ class Mapper(object):
         self.screen = None
 
         self.cubes = []
-        
+
         t = threading.Thread(target=self._run)
         t.daemon = True
         t.start()
-        
+
     def setCubePositions(self, cubes):
         self.cubes = cubes
-        
+
     @property
     def robot_matrix(self):
         data = self.odometer.val
@@ -67,7 +68,7 @@ class Mapper(object):
         for cube in self.cubes:
             pos = self.robot_matrix.dot(cube.pos)
             pygame.draw.rect(self.screen,
-                vision.Colors.to_rgb(cube.color),
+                Colors.to_rgb(cube.color),
                 pygame.rect.Rect(
                     ((cube.pos[0]*self.ppi)+(self.size/2.0), (cube.pos[1]*self.ppi)+(self.size/2.0)),
                     (2*self.ppi,2*self.ppi)

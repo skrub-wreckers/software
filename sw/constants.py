@@ -1,5 +1,5 @@
 import numpy as np
-from vision.geometry import Geometry
+from .vision.geometry import Geometry
 
 _calculated = lambda f: f()
 
