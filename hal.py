@@ -36,7 +36,7 @@ class Drive(HardwareDevice):
             tamp,
             self.l_enc,        
             self.r_enc,
-            Gyro(tamp, pins.gyro.cs, integrate=False),
+            Gyro(tamp, pins.gyro_cs, integrate=False),
             constants.odometer_alpha
         )
 
