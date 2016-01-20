@@ -1,14 +1,15 @@
 from __future__ import print_function
+import time
 
 import numpy as np
-import cv2, time
-
-import vision
-from vision.colorselector import ColorSelector
-from vision.window import Window
-from vision.colors import Colors
-from util import Profiler
+import cv2
 import scipy.ndimage as ndimage
+
+import sw.vision as vision
+from sw.vision.colorselector import ColorSelector
+from sw.vision.window import Window
+from sw.vision.colors import Colors
+from sw.util import Profiler
 
 cam = vision.Camera(w=544, h=288, debug=False, id=1)
 
