@@ -38,7 +38,7 @@ class Mapper(object):
         return np.array([
             [ np.cos(data.theta), np.sin(data.theta), 0, data.x],
             [-np.sin(data.theta), np.cos(data.theta), 0, data.y],
-            [                  0,                  0, 1,      0]
+            [                  0,                  0, 1,      0],
             [                  0,                  0, 0,      1]
         ])
 
@@ -55,7 +55,12 @@ class Mapper(object):
             pygame.draw.line(self.screen, (255,0,0), (0,(lpos*12*self.ppi)+(self.size/2.0)), (self.size,(lpos*12*self.ppi)+(self.size/2.0)), 1)
 
         for cube in self.cubes:
-            pygame.draw.rect(self.screen, vision.Colors.to_rgb(cube.color), pygame.rect.Rect(((cube.pos[0]*self.ppi)+(self.size/2.0), (cube.pos[1]*self.ppi)+(self.size/2.0)),(2*self.ppi,2*self.ppi)), 0)
+            pos = self.robot_matrix.dot(cube.pos)
+            print pos
+            print cube.pos
+            pygame.draw.rect(self.screen, vision.Colors.to_rgb(cube.color), pygame.rect.Rect(((pos[0]*self.ppi)+(self.size/2.0), 
+                                                                                                (-pos[1]*self.ppi)+(self.size/2.0)),
+                                                                                                   (2*self.ppi,2*self.ppi)), 0)
 
         data = self.odometer.val
 
