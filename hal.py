@@ -43,13 +43,13 @@ class Drive(HardwareDevice):
 		self.go(throttle=0)
 
 	def go_distance(self, dist):
-		self.go(math.copysign(0.2, dist))
-		time.sleep(dist * 0.12)
+		self.go(math.copysign(0.2, dist)) 
+		time.sleep(dist * 0.12) # Magic numbers converts from a dist in inches
 		self.stop()
 
 	def turn_angle(self, angle):
-		self.go(math.copysign(0.2, angle))
-		time.sleep(angle / (math.pi*2)*4.45)
+		self.go(math.copysign(0.2, angle)) 
+		time.sleep(angle / (math.pi*2)*4.45) # Magic numbers converts from a dist in randians
 		self.stop()
 
 class Arm(HardwareDevice):
@@ -58,18 +58,18 @@ class Arm(HardwareDevice):
 		self.servo.write(0)
 
 	def up(self):
-		for angle in range(0, 40, 4):
+		for angle in range(0, 40, 4): 
 			self.servo.write(angle)
 			time.sleep(0.1)
 
-		self.servo.write(180)
+		self.servo.write(180) # Is this ok that we don't dampen on the top?
 
 	def down(self):
-		self.servo.write(0)
+		self.servo.write(0) # Perhaps dampen this on the bottom?
 
 class Arms:
 	def __init__(self, conn):
-		self.green = Arm(conn, pins.l_arm, lower=620, upper=2350)
+		self.green = Arm(conn, pins.l_arm, lower=620, upper=2350) # Limits experiemntally found
 		self.red = Arm(conn, pins.r_arm, lower=2340, upper=800)
 
 

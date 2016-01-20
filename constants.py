@@ -21,7 +21,7 @@ def camera_geometry():
     aspect = np.array([4, 3], dtype=np.float)
     aspect /= np.linalg.norm(aspect)
 
-    fov = 2 * np.arctan(np.tan(diag_fov / 2) * aspect)
+    fov = 2 * np.arctan(np.tan(diag_fov / 2) * aspect) # Calculate the FOV given the diagonal FOV
 
     # camera is tilted such that upper plane of FOV is parallel with ground
     tilt_down = fov[1] / 2

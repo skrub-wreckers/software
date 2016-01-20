@@ -10,7 +10,7 @@ def clamp(value, min, max):
 		return value
 
 
-class Timer(object):
+class Profiler(object):
 	def __init__(self, name, indent=''):
 		self.name = name
 		self.indent = indent

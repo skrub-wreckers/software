@@ -9,7 +9,7 @@ from vision.window import Window
 from vision.colors import Colors
 
 
-from util import Timer
+from util import Profiler
 
 cam = vision.Camera(w=544, h=288, debug=False)
 
@@ -30,11 +30,11 @@ try:
 			print('No frame')
 			continue
 
-		with Timer('all') as timer:
-			with timer('detect') as timer:
+		with Profiler('all') as Profiler:
+			with Profiler('detect') as Profiler:
 				res = vision.ColorDetectResult(frame)
 
-			with timer('fill'):
+			with Profiler('fill'):
 				red_blobs = vision.BlobDetector(res,  Colors.RED, 1000)
 				green_blobs = vision.BlobDetector(res, Colors.GREEN, 1000)
 				blue_blobs = vision.BlobDetector(res, Colors.BLUE, 2000)

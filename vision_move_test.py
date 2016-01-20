@@ -35,7 +35,6 @@ if __name__ == "__main__":
             if cube is None:
                 print "No cube"
                 drive.go(0, 0.05)
-
             elif abs(cube.angle_to) < np.radians(5):
                 print "Cube str8 ahead", cube
                 # todo: steer while moving?
