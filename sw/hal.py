@@ -67,7 +67,7 @@ class Drive(HardwareDevice):
         self.anglePID.setSetpoint(angle)
         while True: #abs(self.odometer.val.theta - angle) > np.radians(2):
             print abs(self.odometer.val.theta - angle)
-            pidVal = self.anglePID.iterate(self.odometer.val.theta)
+            pidVal = self.anglePID.iterate(self.odometer.val.theta, dVal = self.odometer.val.omega)
             print pidVal
             print
             self.go(steer=util.clamp(pidVal, -0.4, 0.4))

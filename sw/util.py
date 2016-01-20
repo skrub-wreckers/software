@@ -44,10 +44,13 @@ class PID:
         self.prevErr = 0
         self.integral = 0
 
-    def iterate(self, val):
+    def iterate(self, val, dVal = None):
         err = self.setpoint - val
         self.integral += err*(time.time()-self.last_time)
+        if dVal is None:
+            derivative = (err - self.prevErr)/(time.time()-self.last_time)
+        else:
+            derivative = dVal
         self.last_time = time.time()
-        derivative = (err - self.prevErr)
         self.prevErr = err
         return self.kP * err + self.kI * self.integral + self.kD * derivative
