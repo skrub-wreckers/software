@@ -37,3 +37,22 @@ def camera_geometry():
             [                 0, 0,                 0, 1]
         ])
     )
+
+#Color sensor thresholds
+nothing_cutoff = 220
+green_cutoff = 170
+
+# favor gyro for disagreement (rad/s) above this
+odometer_alpha = 0.2
+
+#PID tuning
+motorDistP = 1
+motorDistI = 1
+motorDistD = 1
+
+motorAngleP = 1
+motorAngleI = 1
+motorAngleD = 1
+
+angleTolerance = 0.01
+distanceTolerance = 0.01
