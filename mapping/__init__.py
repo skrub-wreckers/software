@@ -50,17 +50,32 @@ class Mapper(object):
 
         self.screen.fill([255,255,255])
 
-        for lpos in range(-(self.size/self.ppi/12), (self.size/self.ppi/12), 1):
-            pygame.draw.line(self.screen, (255,0,0), ((lpos*12*self.ppi)+(self.size/2.0),0), ((lpos*12*self.ppi)+(self.size/2.0),self.size), 1)
-            pygame.draw.line(self.screen, (255,0,0), (0,(lpos*12*self.ppi)+(self.size/2.0)), (self.size,(lpos*12*self.ppi)+(self.size/2.0)), 1)
+        for lpos in range(-int(self.size/self.ppi/12), int(self.size/self.ppi/12)+1, 1):
+            pygame.draw.line(self.screen,
+                (255,0,0),
+                ((lpos*12*self.ppi)+(self.size/2.0),0),
+                ((lpos*12*self.ppi)+(self.size/2.0),self.size),
+                1
+            )
+            pygame.draw.line(self.screen,
+                (255,0,0),
+                (0,(lpos*12*self.ppi)+(self.size/2.0)),
+                (self.size,(lpos*12*self.ppi)+(self.size/2.0)),
+                1
+            )
 
         for cube in self.cubes:
             pos = self.robot_matrix.dot(cube.pos)
             print pos
             print cube.pos
-            pygame.draw.rect(self.screen, vision.Colors.to_rgb(cube.color), pygame.rect.Rect(((pos[0]*self.ppi)+(self.size/2.0), 
-                                                                                                (-pos[1]*self.ppi)+(self.size/2.0)),
-                                                                                                   (2*self.ppi,2*self.ppi)), 0)
+            pygame.draw.rect(self.screen,
+                vision.Colors.to_rgb(cube.color),
+                pygame.rect.Rect(
+                    ((cube.pos[0]*self.ppi)+(self.size/2.0), (cube.pos[1]*self.ppi)+(self.size/2.0)),
+                    (2*self.ppi,2*self.ppi)
+                ),
+                0
+            )
 
         data = self.odometer.val
 

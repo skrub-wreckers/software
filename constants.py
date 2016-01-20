@@ -42,7 +42,8 @@ def camera_geometry():
 nothing_cutoff = 220
 green_cutoff = 170
 
-odometer_alpha = 0.05  # favor encoders
+# favor gyro for disagreement (rad/s) above this
+odometer_alpha = 0.2
 
 #PID tuning
 motorDistP = 1
