@@ -1,6 +1,8 @@
 from hal import *
 from vision.window import Window
 from vision import Camera
+from mapping import Mapper
+
 import cv2
 
 from tamproxy import TAMProxy
@@ -13,6 +15,7 @@ if __name__ == "__main__":
 		arms = Arms(tamproxy)
 
 		w = Window("Eric")
+		m = Mapper(drive.odometer)
 
 		while True:
 

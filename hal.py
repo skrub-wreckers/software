@@ -33,7 +33,7 @@ class Drive(HardwareDevice):
         self.anglePID = util.PID(constants.motorAngleP, constants.motorAngleI, constants.motorAngleD)
         
         self.odometer = Odometer(
-            self.tamp,
+            tamp,
             self.l_enc,        
             self.r_enc,
             Gyro(tamp, pins.gyro.cs, integrate=False),
