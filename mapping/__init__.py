@@ -65,6 +65,9 @@ class Mapper(object):
             )
 
         for cube in self.cubes:
+            pos = self.robot_matrix.dot(cube.pos)
+            print pos
+            print cube.pos
             pygame.draw.rect(self.screen,
                 vision.Colors.to_rgb(cube.color),
                 pygame.rect.Rect(
