@@ -52,7 +52,7 @@ motorDistD = 0
 
 motorAngleP = 1
 motorAngleI = 0
-motorAngleD = 0.1
+motorAngleD = 0.05
 
 angleTolerance = 0.01
 distanceTolerance = 0.01

@@ -50,7 +50,7 @@ class PID:
         if dVal is None:
             derivative = (err - self.prevErr)/(time.time()-self.last_time)
         else:
-            derivative = dVal
+            derivative = -dVal
         self.last_time = time.time()
         self.prevErr = err
         return self.kP * err + self.kI * self.integral + self.kD * derivative
