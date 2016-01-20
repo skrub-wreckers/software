@@ -10,6 +10,7 @@ import math
 
 import pins
 import constants
+from vision import Colors
 
 class HardwareDevice:
     """a device needing a connection through the arduino"""
@@ -88,11 +89,11 @@ class ColorSensor(HardwareDevice):
         self.photo_resistor.update()
         v = self.photo_resistor.val
         if v > constants.nothing_cutoff:
-            return 0 #0 = nothing
+            return Colors.NONE
         elif v > constants.green_cutoff:
-            return 2 #2 = green
+            return Colors.GREEN
         else:
-            return 1 #1 = red
+            return Colors.RED
         
 class Robot:
     def __init__(self, tamp):
