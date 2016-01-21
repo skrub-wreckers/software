@@ -1,4 +1,4 @@
-import sw.pins
+from sw import pins
 from tamproxy.devices import Odometer
 from tamproxy.devices import Gyro
 from tamproxy.devices import Encoder

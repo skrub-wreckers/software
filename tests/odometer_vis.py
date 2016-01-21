@@ -9,7 +9,7 @@ from tamproxy import TAMProxy
 import cv2
 import numpy as np
 
-import sw.pins
+from sw import pins
 from sw.mapping import Mapper
 
 def to_cv(val):
