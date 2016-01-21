@@ -1,10 +1,9 @@
-import pygame
 import sys
 import threading
 import time
-from sw.mapping import Mapper
+import pygame
 
-class Window():
+class Window(object):
     def __init__(self, psize, panels):
         self.psize = psize
         self.panels = panels
@@ -15,7 +14,7 @@ class Window():
         self.loop_thread = threading.Thread(target=self.loop)
         self.loop_thread.daemon = True
         self.loop_thread.start()
-        
+
     def update(self):
         events = pygame.event.get()
         for event in events:
@@ -32,7 +31,7 @@ class Window():
                         pygame.display.set_caption("Stac-man")
         if self.active_panel is not None:
             self.panels[self.active_panel].update(events)
-        
+
     def draw(self):
         self.screen.fill([100,100,100])
         pygame.draw.circle(self.screen, (255,255,0), (self.psize/2,self.psize/2), 75)
@@ -46,7 +45,7 @@ class Window():
             pygame.draw.rect(self.screen, (255,255,255), pos)
             self.screen.blit(t_surf, [pos[0]+45-(t_surf.get_width()/2),pos[1]+20-(t_surf.get_height()/2),])
         pygame.display.flip()
-        
+
     def loop(self):
         pygame.init()
         self.screen = pygame.display.set_mode([self.psize, self.psize+50])
