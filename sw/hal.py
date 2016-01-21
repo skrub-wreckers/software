@@ -4,7 +4,6 @@ Hardware Access Layer
 import time
 import math
 import threading
-from enum import Enum
 import warnings
 from collections import namedtuple, deque
 import logging
@@ -36,6 +35,10 @@ class Drive(HardwareDevice):
         self.r_enc = Encoder(tamp, pins.r_encoder_a, pins.r_encoder_b, continuous=False)
         self.l_enc = Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b, continuous=False)
 
+        
+        self.distPID = util.PID(constants.motorDistP, constants.motorDistI, constants.motorDistD)
+        self.anglePID = util.PID(constants.motorAngleP, constants.motorAngleI, constants.motorAngleD)
+        
         self.odometer = Odometer(
             tamp,
             self.l_enc,
