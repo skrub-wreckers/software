@@ -1,4 +1,4 @@
 class HardwareDevice(object):
-    """a device needing a connection through the arduino"""
+    """ A base class for all HAL objects. Sort of unecessary. """
     def __init__(obj, tamp):
         pass

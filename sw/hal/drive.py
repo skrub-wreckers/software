@@ -1,5 +1,4 @@
 import math
-import threading
 import time
 import warnings
 
@@ -12,6 +11,9 @@ from .. import constants
 from .. import util
 
 class Drive(HardwareDevice):
+    """
+    Fully instrumented drive class, with dumb control implementation
+    """
     def __init__(self, tamp):
         self.lMotor = Motor(tamp, pins.l_motor_dir, pins.l_motor_pwm)
         self.lMotor.write(1,0)
@@ -49,12 +51,13 @@ class Drive(HardwareDevice):
         self.go(throttle=0)
 
     def go_distance(self, dist):
+        """ go a certain number of inches forwards, using timing """
         self.go(throttle= math.copysign(0.2, dist))
         time.sleep(abs(dist) * 0.12)
         self.stop()
 
     def turn_angle(self, angle):
+        """ go a certain number of radians CCW, using timing """
         self.go(steer=math.copysign(0.2, angle))
         time.sleep(abs(angle) / (math.pi*2)*4.45)
         self.stop()
-

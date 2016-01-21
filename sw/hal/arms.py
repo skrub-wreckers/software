@@ -6,9 +6,14 @@ from . import HardwareDevice
 from .. import pins
 
 class Arm(HardwareDevice):
+    """
+    A loose wrapper of a servo device, that deals with the up and down
+    trajectories we need
+    """
     def __init__(self, tamp, servo_pin, lower, upper):
         self.servo = Servo(tamp, servo_pin, lower, upper)
         self.servo.write(0)
+
     def up(self):
         for angle in range(0, 40, 4):
             self.servo.write(angle)
@@ -18,6 +23,7 @@ class Arm(HardwareDevice):
 
     def down(self):
         self.servo.write(0)
+
 
 class Arms(HardwareDevice):
     def __init__(self, tamp):
