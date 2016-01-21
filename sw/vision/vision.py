@@ -28,7 +28,7 @@ class CameraPanel():
     def __init__(self, size, vision):
         self.vision = vision
         self.size = size
-        self.name = "Camera Panel"
+        self.name = "Camera"
         
     def draw(self, surface):
         if self.vision.frame is not None:

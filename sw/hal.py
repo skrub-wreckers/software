@@ -4,7 +4,6 @@ Hardware Access Layer
 import time
 import math
 import threading
-from enum import Enum
 import warnings
 from collections import namedtuple, deque
 import logging
