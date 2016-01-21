@@ -31,26 +31,57 @@ class Profiler(object):
         self.has_children = True
         return Timer(name, self.indent + '  ')
 
-class PID:
+class PID(object):
     def __init__(self, kP, kI, kD, setpoint=0):
         self.kP = kP
         self.kI = kI
         self.kD = kD
-        self.setSetpoint(setpoint)
-        self.last_time = time.time()
-
-    def setSetpoint(self, setpoint):
         self.setpoint = setpoint
-        self.prevErr = 0
-        self.integral = 0
+        self.reset()
 
-    def iterate(self, val, dVal = None):
+    def reset(self):
+        self._last_err = 0
+        self._last_time = None
+        self._integral = 0
+        self._last_derror = 0
+
+    @property
+    def error(self):
+        return self._last_err
+
+    @property
+    def derror(self):
+        return self._last_derror
+
+
+    def at_goal(self, err_t, derr_t=None):
+        ok = abs(self.error) < err_t
+        if derr_t is not None:
+            ok = ok and abs(self.derror) < derr_t
+        return ok
+
+
+
+    def iterate(self, val, dval=None):
+        this_time = time.time()
+
+        # P
         err = self.setpoint - val
-        self.integral += err*(time.time()-self.last_time)
-        if dVal is None:
-            derivative = (err - self.prevErr)/(time.time()-self.last_time)
+
+        # I
+        if self._last_time is not None:
+            self._integral += err*(this_time - self._last_time)
+
+        # D
+        if dval is not None:
+            # TODO: include d/dt(setpoint)?
+            derr = -dval
+        elif self._last_time is not None:
+            derr = (err - self._last_err)/(this_time - self._last_time)
         else:
-            derivative = -dVal
-        self.last_time = time.time()
-        self.prevErr = err
-        return self.kP * err + self.kI * self.integral + self.kD * derivative
+            derr = 0
+
+        self._last_time = this_time
+        self._last_err = err
+        self._last_derror = derr
+        return self.kP * err + self.kI * self._integral + self.kD * derr
