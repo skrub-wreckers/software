@@ -1,6 +1,5 @@
 from sw.hal import *
 from sw.vision.window import Window
-from sw.vision import Camera, Vision
 from sw.mapping import Mapper
 
 import cv2
@@ -14,16 +13,8 @@ if __name__ == "__main__":
 
         w = Window("Control here")
         m = Mapper(drive.odometer)
-        cam = Camera(geom=constants.camera_geometry, id=0)
-        v = Vision(cam)
 
         while True:
-            try:
-                v.update()
-            except IOError:
-                continue
-            m.setCubePositions(v.cubes)
-
             c = chr(cv2.waitKey(1) & 0xFF)
             move_cmd = None
 
