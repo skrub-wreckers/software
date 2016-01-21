@@ -105,13 +105,25 @@ class RegulatedDrive(Drive):
 
                 if isinstance(op, self.TurnOp):
                     self._background_turn(op.angle)
-                elif isinstance(op, self.TurnOp):
+                elif isinstance(op, self.MoveOp):
                     self._background_move(op.pos)
 
                 with self.op_done:
                     self.op_done.notify_all()
                     self.op = None
 
+
+    def turn_to(self, angle, fix=True):
+        """ turn to the absolute angle specified"""
+        if fix:
+            angle = self._fix_angle(angle)
+
+        with self.busy_lock:
+            self.busy_lock.notify()
+            self.op = self.TurnOp(angle)
+
+        with self.op_done:
+            self.op_done.wait()
 
     def _background_turn(self, angle):
         pid = self._angle_pid
@@ -129,31 +141,10 @@ class RegulatedDrive(Drive):
 
         self.stop()
 
-    def _background_move(self, pos):
-        a_pid = self._angle_pid
-        d_pid = self._dist_pid
-
-        start_reading = self.odometer.val
-
-        start_pos = np.array([self.odometer.x, self.odometer.y])
-
-        while True:
-            sensor = self.odometer.val
-
-
-            a_pid.setpoint = 0
-
-            steer = a_pid.iterate(sensor.theta, dVal=sensor.omega)
-            self.go(steer=util.clamp(steer, -0.4, 0.4))
-            time.sleep(0.05)
-
-            if pid.at_goal(err_t=np.radians(2), derr_t=np.radians(5)):
-                break
-
-
-
-
     def go_to(self, pos):
+        """ go in a straight line to pos """
+        pos = np.array(pos)
+
         with self.busy_lock:
             self.busy_lock.notify()
             self.op = self.MoveOp(pos)
@@ -161,14 +152,59 @@ class RegulatedDrive(Drive):
         with self.op_done:
             self.op_done.wait()
 
+    def _background_move(self, goal_pos):
+        start_reading = self.odometer.val
+        start_pos = np.array([start_reading.x, start_reading.y])
 
-    def turn_to(self, angle):
-        with self.busy_lock:
-            self.busy_lock.notify()
-            self.op = self.TurnOp(angle)
+        # choose the angle that results in the least turn from the current angle
+        target_angle = self._fix_angle(np.arctan2(start_pos[1], start_pos[0]))
 
-        with self.op_done:
-            self.op_done.wait()
+        # find the parallele and perpendicular directions
+        dir = goal_pos - start_pos
+        dir = dir / np.linalg.norm(dir)
+        left_dir = np.array([[0, 1], [-1, 0]]).dot(dir)
+
+        a_pid = self._angle_pid
+        d_pid = self._dist_pid
+
+        a_pid.reset()
+        d_pid.reset()
+
+        d_pid.setpoint = 0
+
+        # go straight
+        while True:
+            sensor = self.odometer.val
+            curr_pos = np.array([sensor.x, sensor.y])
+
+            # error perpendicular to and along line
+            perp_err = (goal_pos - curr_pos).dot(left_dir)
+            dist_err = (goal_pos - curr_pos).dot(dir)
+
+            # correct target angle based on position deviation
+            # TODO: full PID here
+            angle_corr = dist_err
+            a_pid.setpoint = target_angle + np.clip(angle_corr, np.radians(-30), np.radians(+30))
+
+            #
+            steer = a_pid.iterate(sensor.theta, dval=sensor.omega)
+            throttle = d_pid.iterate(dist_err)
+
+
+            self.go(steer=np.clip(steer, -0.4, 0.4), throttle=np.clip(throttle, -0.4, 0.4))
+            time.sleep(0.05)
+
+            if dpid.at_goal(err_t=0.25, derr_t=0.5):
+                break
+
+    def _fix_angle(self, angle):
+        """ Adjusts the angle by 2n*pi to make it at most pi from the current angle """
+        theta = self.odometer.val.theta
+        while angle < theta - np.pi:
+            angle += 2*np.pi
+        while angle > theta + np.pi:
+            angle -= 2*np.pi
+        return angle
 
 
 

@@ -23,7 +23,7 @@ if __name__ == "__main__":
             except IOError:
                 continue
             m.setCubePositions(v.cubes)
-        
+
             c = chr(cv2.waitKey(1) & 0xFF)
             move_cmd = None
 
@@ -31,3 +31,9 @@ if __name__ == "__main__":
                 break
             elif c == 'w':
                 drive.turn_to(0)
+            elif c == 'e':
+                drive.go_to([10,0])
+            elif c == 'd':
+                drive.turn_to(np.pi)
+            elif c == 's':
+                drive.go_to([0,0])
