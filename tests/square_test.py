@@ -12,7 +12,11 @@ if __name__ == "__main__":
         m = Mapper(drive.odometer)
 
         while True:
+            print 'A'
             drive.go_to([24,0])
+            print 'B'
             drive.go_to([24,24])
+            print 'C'
             drive.go_to([0,24])
+            print 'D'
             drive.go_to([0,0])
