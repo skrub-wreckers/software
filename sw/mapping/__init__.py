@@ -20,13 +20,9 @@ class Mapper(object):
         self.ppi = ppi
         self.size = size
 
-        self.screen = None
-
+        self.name = "Mapper"
+        
         self.cubes = []
-
-        t = threading.Thread(target=self._run)
-        t.daemon = True
-        t.start()
 
     def setCubePositions(self, cubes):
         self.cubes = cubes
@@ -42,23 +38,22 @@ class Mapper(object):
             [                  0,                  0, 1,      0],
             [                  0,                  0, 0,      1]
         ])
-
-
-    def redraw(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pass
-
-        self.screen.fill([255,255,255])
+        
+    def update(self, events):
+        pass
+    
+    def draw(self, surface):
+        self.odometer.update()
+        surface.fill([255,255,255])
 
         for lpos in range(-int(self.size/self.ppi/12), int(self.size/self.ppi/12)+1, 1):
-            pygame.draw.line(self.screen,
+            pygame.draw.line(surface,
                 (255,0,0),
                 ((lpos*12*self.ppi)+(self.size/2.0),0),
                 ((lpos*12*self.ppi)+(self.size/2.0),self.size),
                 1
             )
-            pygame.draw.line(self.screen,
+            pygame.draw.line(surface,
                 (255,0,0),
                 (0,(lpos*12*self.ppi)+(self.size/2.0)),
                 (self.size,(lpos*12*self.ppi)+(self.size/2.0)),
@@ -67,7 +62,7 @@ class Mapper(object):
 
         for cube in self.cubes:
             pos = self.robot_matrix.dot(cube.pos)
-            pygame.draw.rect(self.screen,
+            pygame.draw.rect(surface,
                 Colors.to_rgb(cube.color),
                 pygame.rect.Rect(
                     ((cube.pos[0]*self.ppi)+(self.size/2.0), (cube.pos[1]*self.ppi)+(self.size/2.0)),
@@ -83,17 +78,5 @@ class Mapper(object):
 
         draw_pos = (self.ppi * pos + self.size/2)
 
-        pygame.draw.aaline(self.screen, (0,0,0), to_cv(draw_pos), to_cv(draw_pos + self.ppi * 10*dir))
-        pygame.draw.circle(self.screen, (0,0,0), to_cv(draw_pos), to_cv(self.ppi * 8), 1)
-
-        pygame.display.flip()
-
-    def _run(self):
-        pygame.init()
-        self.screen = pygame.display.set_mode([self.size,self.size])
-        pygame.display.set_caption("Mapper")
-        while True:
-            self.odometer.update()
-            time.sleep(0.05)
-            self.redraw()
-
+        pygame.draw.aaline(surface, (0,0,0), to_cv(draw_pos), to_cv(draw_pos + self.ppi * 10*dir))
+        pygame.draw.circle(surface, (0,0,0), to_cv(draw_pos), to_cv(self.ppi * 8), 1)

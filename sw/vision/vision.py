@@ -7,7 +7,9 @@ from .blobdetection import BlobDetector
 from .thresholding import ColorDetectResult
 from .window import Window
 
+import pygame
 import numpy as np
+
 class Cube(namedtuple('Cube', 'pos color')):
     @property
     def angle_to(self):
@@ -22,6 +24,19 @@ class Cube(namedtuple('Cube', 'pos color')):
     def __str__(self):
         return "<{} cube at {:.1f}, {:.1f}, {:.1f}>".format(Colors.name(self.color), self.pos[0], self.pos[1], self.pos[2])
 
+class CameraPanel():
+    def __init__(self, size, vision):
+        self.vision = vision
+        self.size = size
+        self.name = "Camera Panel"
+        
+    def draw(self, surface):
+        if self.vision.frame is not None:
+            pygame.surfarray.blit_array(surface.subsurface([10, 10, self.vision.frame.shape[1],self.vision.frame.shape[0]]), np.transpose(self.vision.frame,(1,0,2)))
+            pygame.surfarray.blit_array(surface.subsurface([10, 250, self.vision.frame.shape[1],self.vision.frame.shape[0]]), np.transpose(self.vision.color_detect.debug_frame,(1,0,2)))
+        
+    def update(self, events):
+        self.vision.update()
 
 class Vision(object):
     """Takes an image and returns the angle to blobs"""
@@ -30,7 +45,8 @@ class Vision(object):
         self.cam = cam
         self.ray = None
         self.angle_to = None
-        self.debug_win = Window('vision debug')
+        self.frame = None
+        #self.debug_win = Window('vision debug')
 
     def update(self):
         self.frame = self.cam.read()
@@ -61,7 +77,7 @@ class Vision(object):
 
         self.cubes = cubes
 
-        self.debug_win.show(self.color_detect.debug_frame)
+        #self.debug_win.show(self.color_detect.debug_frame)
 
     def nearest_cube(self, color=None):
         """ get the nearest cube, by cartesian distance, optionally of a specific color """
