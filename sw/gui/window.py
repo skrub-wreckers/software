@@ -26,10 +26,10 @@ class Window():
                     events.remove(event)
                     if event.pos[0]<100*len(self.panels):
                         self.active_panel = int(event.pos[0]/100.0)
-                        pygame.display.set_caption("Stackman: "+self.panels[self.active_panel].name)
+                        pygame.display.set_caption("Stac-man: "+self.panels[self.active_panel].name)
                     else:
                         self.active_panel = None
-                        pygame.display.set_caption("Stackman")
+                        pygame.display.set_caption("Stac-man")
         if self.active_panel is not None:
             self.panels[self.active_panel].update(events)
         
@@ -51,7 +51,7 @@ class Window():
         pygame.init()
         self.screen = pygame.display.set_mode([self.psize, self.psize+50])
         self.font = pygame.font.Font(None, 20)
-        pygame.display.set_caption("Stackman")
+        pygame.display.set_caption("Stac-man")
         #Setup icon
         icsurf = pygame.surface.Surface((32,32), pygame.SRCALPHA)
         icsurf.fill((0,0,0,0))
