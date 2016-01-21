@@ -5,6 +5,7 @@ import time
 import math
 import threading
 from enum import Enum
+import warnings
 from collections import namedtuple, deque
 
 import tamproxy
@@ -39,14 +40,21 @@ class Drive(HardwareDevice):
             Gyro(tamp, pins.gyro_cs, integrate=False),
             constants.odometer_alpha
         )
+    def _set_speeds(self, left, right):
+        if np.isnan(left) or np.isnan(right):
+            left = right = 0
+            warnings.warn("tried to use nan as a velocity!")
+
+        self.lMotor.write(left>0, util.clamp(abs(255 * left), 0, 255))
+        self.rMotor.write(right>0, util.clamp(abs(255 * right), 0, 255))
+
 
     def go(self, throttle=0, steer=0):
         """both arguments measured in [-1 1], steer=-1 is full speed CW"""
         lPow = rPow = throttle
         lPow -= steer
         rPow += steer
-        self.lMotor.write(lPow>0, util.clamp(abs(255 * lPow), 0, 255))
-        self.rMotor.write(rPow>0, util.clamp(abs(255 * rPow), 0, 255))
+        self._set_speeds(lPow, rPow)
 
     def turnIP(self, throttle):
         """turn in place arg is in [-1 1] with -1 full speed CW"""
