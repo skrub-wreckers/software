@@ -37,26 +37,51 @@ class PID(object):
         self.kI = kI
         self.kD = kD
         self.setpoint = setpoint
+        self.reset()
+
+    def reset(self):
+        self._last_err = 0
         self._last_time = None
+        self._integral = 0
+        self._last_derror = 0
 
     @property
-    def setpoint(self):
-        return self._setpoint
+    def error(self):
+        return self._last_err
 
-    @setpoint.setter
-    def setpoint(self, value):
-        self._setpoint = value
-        self._last_err = 0
-        self._integral = 0
+    @property
+    def derror(self):
+        return self._last_derror
 
-    def iterate(self, val, dVal = None):
-        err = self.setpoint - val
+
+    def at_goal(self, err_t, derr_t=None):
+        ok = abs(self.error) < err_t
+        if derr_t is not None:
+            ok = ok and abs(self.derror) < derr_t
+        return ok
+
+
+
+    def iterate(self, val, dval=None):
         this_time = time.time()
-        self._integral += err*(this_time - self._last_time)
-        if dVal is None:
-            derivative = (err - self._last_err)/(this_time - self._last_time)
+
+        # P
+        err = self.setpoint - val
+
+        # I
+        if self._last_time is not None:
+            self._integral += err*(this_time - self._last_time)
+
+        # D
+        if dval is not None:
+            # TODO: include d/dt(setpoint)?
+            derr = -dval
+        elif self._last_time is not None:
+            derr = (err - self._last_err)/(this_time - self._last_time)
         else:
-            derivative = -dVal
+            derr = 0
+
         self._last_time = this_time
         self._last_err = err
-        return self.kP * err + self.kI * self.integral + self.kD * derivative
+        self._last_derror = derr
+        return self.kP * err + self.kI * self._integral + self.kD * derr

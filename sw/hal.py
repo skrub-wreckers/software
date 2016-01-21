@@ -3,6 +3,9 @@ Hardware Access Layer
 """
 import time
 import math
+import threading
+from enum import Enum
+from collections import namedtuple, deque
 
 import tamproxy
 from tamproxy.devices import *
@@ -13,7 +16,7 @@ from . import pins
 from . import constants
 from .vision import Colors
 
-class HardwareDevice:
+class HardwareDevice(object):
     """a device needing a connection through the arduino"""
     def __init__(obj, tamp):
         pass
@@ -64,35 +67,101 @@ class Drive(HardwareDevice):
 
 
 class RegulatedDrive(Drive):
+    MoveOp = namedtuple('MoveOp', 'pos')
+    TurnOp = namedtuple('TurnOp', 'angle')
+
     def __init__(self, tamp):
-        super(Drive, self).__init__(tamp)
+        super(RegulatedDrive, self).__init__(tamp)
+
+        self._dist_pid = util.PID(constants.motorDistP, constants.motorDistI, constants.motorDistD)
+        self._angle_pid = util.PID(constants.motorAngleP, constants.motorAngleI, constants.motorAngleD)
 
 
-        self.distPID = util.PID(constants.motorDistP, constants.motorDistI, constants.motorDistD)
-        self.anglePID = util.PID(constants.motorAngleP, constants.motorAngleI, constants.motorAngleD)
+        self.busy_lock = threading.Condition()
+        self.op_done = threading.Condition()
+
+        self.op = None
+
+        self.bg_thread = threading.Thread(target=self._background)
+        self.bg_thread.daemon = True
+
+        self.bg_thread.start()
+
+    def _background(self):
+        while True:
+            # get the next operation, threadsafely
+            with self.busy_lock:
+                while self.op is None:
+                    self.busy_lock.wait()
+                op = self.op
+
+                if isinstance(op, self.TurnOp):
+                    self._background_turn(op.angle)
+                elif isinstance(op, self.TurnOp):
+                    self._background_move(op.pos)
+
+                with self.op_done:
+                    self.op_done.notify_all()
+                    self.op = None
 
 
-    def go_distance(self, dist):
-        self.distPID.setpoint = dist
-        while abs(dist-np.hypot(self.odometer.val.x, self.odometer.val.y)) > constants.distanceTolerance:
-            pidVal = self.distPID.iterate(np.hypot(self.odometer.val.x, self.odometer.val.y))
-            self.go(throttle=pidVal)
+    def _background_turn(self, angle):
+        pid = self._angle_pid
+        pid.reset()
+        pid.setpoint = angle
+
+        while True:
+            sensor = self.odometer.val
+            steer = pid.iterate(sensor.theta, dval=sensor.omega)
+            self.go(steer=util.clamp(steer, -0.4, 0.4))
             time.sleep(0.05)
+
+            if pid.at_goal(err_t=np.radians(2), derr_t=np.radians(5)):
+                break
+
         self.stop()
 
+    def _background_move(self, pos):
+        a_pid = self._angle_pid
+        d_pid = self._dist_pid
 
-    def turn_angle(self, angle):
-        self.anglePID.setpoint = angle
-        i = 0
-        while True: #abs(self.odometer.val.theta - angle) > np.radians(2):
-            pidVal = self.anglePID.iterate(self.odometer.val.theta, dVal = self.odometer.val.omega)
-            self.go(steer=util.clamp(pidVal, -0.4, 0.4))
+        start_reading = self.odometer.val
+
+        start_pos = np.array([self.odometer.x, self.odometer.y])
+
+        while True:
+            sensor = self.odometer.val
+
+
+            a_pid.setpoint = 0
+
+            steer = a_pid.iterate(sensor.theta, dVal=sensor.omega)
+            self.go(steer=util.clamp(steer, -0.4, 0.4))
             time.sleep(0.05)
-            i+=1
-            if i%20 == 0:
-                angle-=np.pi/4.0
-                self.anglePID.setpoint = angle
-        self.stop()
+
+            if pid.at_goal(err_t=np.radians(2), derr_t=np.radians(5)):
+                break
+
+
+
+
+    def go_to(self, pos):
+        with self.busy_lock:
+            self.busy_lock.notify()
+            self.op = self.MoveOp(pos)
+
+        with self.op_done:
+            self.op_done.wait()
+
+
+    def turn_to(self, angle):
+        with self.busy_lock:
+            self.busy_lock.notify()
+            self.op = self.TurnOp(angle)
+
+        with self.op_done:
+            self.op_done.wait()
+
 
 
 class Arm(HardwareDevice):
