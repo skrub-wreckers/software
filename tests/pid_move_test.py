@@ -1,6 +1,7 @@
 from sw.hal import *
-from sw.vision.window import Window
+from sw.vision.window import Window as OldWindow
 from sw.mapping import Mapper
+from sw.gui import Window
 
 import cv2
 
@@ -11,8 +12,9 @@ if __name__ == "__main__":
         drive = RegulatedDrive(tamproxy)
         arms = Arms(tamproxy)
 
-        w = Window("Control here")
+        w = OldWindow("Control here")
         m = Mapper(drive.odometer)
+        w = Window(500, [m])
 
         while True:
             c = chr(cv2.waitKey(1) & 0xFF)
