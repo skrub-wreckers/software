@@ -190,7 +190,7 @@ class RegulatedDrive(Drive):
 
             # correct target angle based on position deviation
             # TODO: full PID here
-            angle_corr = perp_err
+            angle_corr = 0.1*perp_err
             a_pid.setpoint = target_angle + np.clip(angle_corr, np.radians(-30), np.radians(+30))
 
             steer = a_pid.iterate(sensor.theta, dval=sensor.omega)
@@ -198,7 +198,7 @@ class RegulatedDrive(Drive):
 
 
             self.go(steer=np.clip(steer, -0.4, 0.4),
-                throttle=np.clip(throttle, -0.05, 0.05))
+                throttle=np.clip(throttle, -0.2, 0.2))
             time.sleep(0.05)
 
             if d_pid.at_goal(err_t=0.25, derr_t=0.5):

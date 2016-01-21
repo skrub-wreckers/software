@@ -46,7 +46,7 @@ green_cutoff = 170
 odometer_alpha = 0.2
 
 #PID tuning
-motorDistP = 1
+motorDistP = 0.25
 motorDistI = 0
 motorDistD = 0
 
