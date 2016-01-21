@@ -7,6 +7,7 @@ import threading
 from enum import Enum
 import warnings
 from collections import namedtuple, deque
+import logging
 
 import tamproxy
 from tamproxy.devices import *
@@ -16,6 +17,8 @@ from . import util
 from . import pins
 from . import constants
 from .vision import Colors
+
+logger = logging.getLogger('sw.hal')
 
 class HardwareDevice(object):
     """a device needing a connection through the arduino"""
