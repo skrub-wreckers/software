@@ -187,16 +187,17 @@ class RegulatedDrive(Drive):
 
             # error perpendicular to and along line
             perp_err = (curr_pos - goal_pos).dot(left_dir)
+            perp_err_dt = curr_vel.dot(left_dir)
             dist_left = (curr_pos - goal_pos).dot(dir)
+            dist_left_dt = curr_vel.dot(dir)
 
             # correct target angle based on position deviation
             # TODO: full PID here
             angle_corr = 0.1*perp_err
             a_pid.setpoint = target_angle + np.clip(angle_corr, np.radians(-30), np.radians(+30))
 
-            steer = a_pid.iterate(sensor.theta, dval=sensor.omega)
-            throttle = d_pid.iterate(dist_left, dval=curr_vel.dot(dir)) * dir.dot(facing)
-
+            steer    = a_pid.iterate(sensor.theta, dval=sensor.omega)
+            throttle = d_pid.iterate(dist_left, dval=dist_left_dt) * dir.dot(facing)
 
             self.go(steer=np.clip(steer, -0.4, 0.4),
                 throttle=np.clip(throttle, -0.2, 0.2))

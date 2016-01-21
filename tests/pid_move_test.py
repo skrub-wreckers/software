@@ -32,7 +32,7 @@ if __name__ == "__main__":
             elif c == 'w':
                 drive.turn_to(0)
             elif c == 'e':
-                drive.go_to([10,0])
+                drive.go_to([24,0])
             elif c == 'd':
                 drive.turn_to(np.pi)
             elif c == 's':
