@@ -159,13 +159,15 @@ class RegulatedDrive(Drive):
         start_reading = self.odometer.val
         start_pos = np.array([start_reading.x, start_reading.y])
 
-        # choose the angle that results in the least turn from the current angle
-        target_angle = self._fix_angle(np.arctan2(start_pos[1], start_pos[0]))
-
-        # find the parallele and perpendicular directions
+        # find the parallel and perpendicular directions
         dir = goal_pos - start_pos
         dir = dir / np.linalg.norm(dir)
         left_dir = np.array([[0, 1], [-1, 0]]).dot(dir)
+        if np.isnan(dir).any():
+            return
+
+        # choose the angle that results in the least turn from the current angle
+        target_angle = self._fix_angle(np.arctan2(dir[1], dir[0]))
 
         a_pid = self._angle_pid
         d_pid = self._dist_pid
@@ -175,30 +177,34 @@ class RegulatedDrive(Drive):
 
         d_pid.setpoint = 0
 
+
         # go straight
         while True:
             sensor = self.odometer.val
             curr_pos = np.array([sensor.x, sensor.y])
 
             # error perpendicular to and along line
-            perp_err = (goal_pos - curr_pos).dot(left_dir)
-            dist_err = (goal_pos - curr_pos).dot(dir)
+            perp_err = (curr_pos - goal_pos).dot(left_dir)
+            dist_left = (curr_pos - goal_pos).dot(dir)
 
             # correct target angle based on position deviation
             # TODO: full PID here
-            angle_corr = dist_err
+            angle_corr = perp_err
             a_pid.setpoint = target_angle + np.clip(angle_corr, np.radians(-30), np.radians(+30))
 
             #
             steer = a_pid.iterate(sensor.theta, dval=sensor.omega)
-            throttle = d_pid.iterate(dist_err)
+            throttle = d_pid.iterate(dist_left)
 
 
-            self.go(steer=np.clip(steer, -0.4, 0.4), throttle=np.clip(throttle, -0.4, 0.4))
+            self.go(steer=np.clip(steer, -0.4, 0.4),
+                throttle=np.clip(throttle, -0.05, 0.05))
             time.sleep(0.05)
 
-            if dpid.at_goal(err_t=0.25, derr_t=0.5):
+            if d_pid.at_goal(err_t=0.25, derr_t=0.5):
                 break
+
+        self.stop()
 
     def _fix_angle(self, angle):
         """ Adjusts the angle by 2n*pi to make it at most pi from the current angle """
