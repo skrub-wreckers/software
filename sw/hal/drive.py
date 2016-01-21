@@ -45,10 +45,6 @@ class Drive(HardwareDevice):
         rPow += steer
         self._set_speeds(lPow, rPow)
 
-    def turnIP(self, throttle):
-        """turn in place arg is in [-1 1] with -1 full speed CW"""
-        self.go(0, steer=throttle)
-
     def stop(self):
         self.go(throttle=0)
 

@@ -39,7 +39,7 @@ class SpinInPlace(State):
 		pass
 
 	def execute(self):
-		self.robot.drive.turnIP(0.05)
+		self.robot.drive.go(steer=0.05)
 
 class WallFollowing(State):
 	"""
