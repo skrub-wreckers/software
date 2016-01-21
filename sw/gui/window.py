@@ -11,6 +11,10 @@ class Window():
         self.font = None
         #for panel in self.panels:
         #    panel.set_size(self.psize)
+        
+        self.bite = 0
+        self.bite_dir = 10
+        
         self.active_panel = None
         self.loop_thread = threading.Thread(target=self.loop)
         self.loop_thread.daemon = True
@@ -35,8 +39,16 @@ class Window():
         
     def draw(self):
         self.screen.fill([100,100,100])
-        pygame.draw.circle(self.screen, (255,255,0), (self.psize/2,self.psize/2), 75)
-        pygame.draw.polygon(self.screen, (100,100,100), ((self.psize/2,self.psize/2),((self.psize/2)+100, (self.psize/2)-100),((self.psize/2)+100,(self.psize/2)+100)))
+        if self.active_panel is None:
+            pygame.draw.circle(self.screen, (255,255,0), (self.psize/2,self.psize/2), 75)
+            #<hehehe>
+            self.bite += self.bite_dir
+            if self.bite == 100:
+                self.bite_dir = -10
+            if self.bite == 0:
+                self.bite_dir = 10
+            #</hehehe>
+            pygame.draw.polygon(self.screen, (100,100,100), ((self.psize/2,self.psize/2),((self.psize/2)+100, (self.psize/2)-int(self.bite)),((self.psize/2)+100,(self.psize/2)+int(self.bite))))
         pygame.draw.line(self.screen, (0,0,0), (0, self.psize), (self.psize, self.psize))
         if self.active_panel is not None:
             self.panels[self.active_panel].draw(self.screen.subsurface([0,0,self.psize,self.psize]))

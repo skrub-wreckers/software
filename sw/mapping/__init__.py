@@ -21,6 +21,10 @@ class Mapper(object):
         self.size = size
 
         self.name = "Mapper"
+
+        self.path_surface = pygame.surface.Surface((self.size, self.size), pygame.SRCALPHA)
+        self.path_surface.fill([0,0,0,0])
+        self.last_pos = None
         
         self.cubes = []
 
@@ -78,5 +82,15 @@ class Mapper(object):
 
         draw_pos = (self.ppi * pos + self.size/2)
 
+        surface.blit(self.path_surface, [0,0])
+        
         pygame.draw.aaline(surface, (0,0,0), to_cv(draw_pos), to_cv(draw_pos + self.ppi * 10*dir))
         pygame.draw.circle(surface, (0,0,0), to_cv(draw_pos), to_cv(self.ppi * 8), 1)
+        
+        if self.last_pos is not None:
+            if (self.last_pos != draw_pos).any():
+                pygame.draw.line(self.path_surface, (100,100,100), self.last_pos, draw_pos, 2)
+        self.last_pos = draw_pos
+        
+            
+        
