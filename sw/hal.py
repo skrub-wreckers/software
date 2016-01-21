@@ -183,6 +183,7 @@ class RegulatedDrive(Drive):
             sensor = self.odometer.val
             curr_pos = np.array([sensor.x, sensor.y])
             facing = np.array([np.cos(sensor.theta), np.sin(sensor.theta)])
+            curr_vel = facing * sensor.v
 
             # error perpendicular to and along line
             perp_err = (curr_pos - goal_pos).dot(left_dir)
@@ -194,7 +195,7 @@ class RegulatedDrive(Drive):
             a_pid.setpoint = target_angle + np.clip(angle_corr, np.radians(-30), np.radians(+30))
 
             steer = a_pid.iterate(sensor.theta, dval=sensor.omega)
-            throttle = d_pid.iterate(dist_left) * dir.dot(facing)
+            throttle = d_pid.iterate(dist_left, dval=curr_vel.dot(dir)) * dir.dot(facing)
 
 
             self.go(steer=np.clip(steer, -0.4, 0.4),
