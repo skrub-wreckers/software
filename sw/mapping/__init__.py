@@ -25,7 +25,7 @@ class Mapper(object):
         self.path_surface = pygame.surface.Surface((self.size, self.size), pygame.SRCALPHA)
         self.path_surface.fill([0,0,0,0])
         self.last_pos = None
-        
+
         self.cubes = []
 
     def setCubePositions(self, cubes):
@@ -42,12 +42,11 @@ class Mapper(object):
             [                  0,                  0, 1,      0],
             [                  0,                  0, 0,      1]
         ])
-        
+
     def update(self, events):
         pass
-    
+
     def draw(self, surface):
-        self.odometer.update()
         surface.fill([255,255,255])
 
         for lpos in range(-int(self.size/self.ppi/12), int(self.size/self.ppi/12)+1, 1):
@@ -83,14 +82,13 @@ class Mapper(object):
         draw_pos = (self.ppi * pos + self.size/2)
 
         surface.blit(self.path_surface, [0,0])
-        
+
         pygame.draw.aaline(surface, (0,0,0), to_cv(draw_pos), to_cv(draw_pos + self.ppi * 10*dir))
         pygame.draw.circle(surface, (0,0,0), to_cv(draw_pos), to_cv(self.ppi * 8), 1)
-        
+
         if self.last_pos is not None:
             if (self.last_pos != draw_pos).any():
                 pygame.draw.line(self.path_surface, (100,100,100), self.last_pos, draw_pos, 2)
         self.last_pos = draw_pos
-        
-            
-        
+
+

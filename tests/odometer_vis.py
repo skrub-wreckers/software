@@ -2,15 +2,14 @@ import time
 import math
 import csv
 
-from tamproxy.devices import Odometer
-from tamproxy.devices import Gyro
-from tamproxy.devices import Encoder
 from tamproxy import TAMProxy
 import cv2
 import numpy as np
+from Queue import Empty
 
-from sw import pins
 from sw.mapping import Mapper
+from sw.hal import Drive
+from sw.gui import Window
 
 def to_cv(val):
     """ np array to integer tuple """
@@ -23,25 +22,27 @@ def to_cv(val):
 
 if __name__ == "__main__":
 
-    tamp = TAMProxy()
-    gyro = Gyro(tamp, pins.gyro_cs, integrate=False)
-    lEnc = Encoder(tamp, pins.l_encoder_a, pins.l_encoder_b, continuous = False)
-    rEnc = Encoder(tamp, pins.r_encoder_a, pins.r_encoder_b, continuous = False)
-    odo = Odometer(tamp, lEnc, rEnc, gyro, 0.2)
+    with TAMProxy() as tamp:
+        d = Drive(tamp)
+        odo = d.odometer
+        mapper = Mapper(odo, size=500, ppi=250.0/20)
 
-    mapper = Mapper(odo, size=500, ppi=250.0/20)
+        w = Window(500, [mapper])
 
-    with open('odo.csv', 'w') as logfile:
-        logwriter = csv.writer(logfile)
-        logwriter.writerow(('t',) + odo.Reading._fields)
+        with open('odo.csv', 'w') as logfile:
+            logwriter = csv.writer(logfile)
+            logwriter.writerow(('t',) + odo.Reading._fields)
 
-        while True:
-            odo.update()
-            lEnc.update()
-            rEnc.update()
-            print time.time(), odo.val
-            logwriter.writerow((time.time(),) + odo.val)
+            while True:
+                # print time.time(), odo.val
+                logwriter.writerow((time.time(),) + odo.val)
 
-            c = chr(cv2.waitKey(50) & 0xFF)
-            if c == 'q':
-                break
+                try:
+                    c = w.keys.get_nowait()
+                except Empty:
+                    pass
+                else:
+                    if c == 'r':
+                        odo.override_position(0, 0, 0)
+                    elif c == 'q':
+                        break
