@@ -39,8 +39,10 @@ def camera_geometry():
     )
 
 #Color sensor thresholds
-nothing_cutoff = 220
-green_cutoff = 170
+nothingRange = 30
+greenRange = 50
+redRange = 120
+colorRangeTolerance = 5
 
 # favor gyro for disagreement (rad/s) above this
 odometer_alpha = 0.2

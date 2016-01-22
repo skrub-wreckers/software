@@ -21,3 +21,4 @@ dump_latch = 6
 gyro_cs = 24
 
 photo_resistor = 0 #placeholder
+led = 0 #placeholder
