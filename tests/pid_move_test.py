@@ -4,6 +4,7 @@ from sw.mapping import Mapper
 from sw.gui import Window
 
 import cv2
+import numpy as np
 
 from tamproxy import TAMProxy
 
