@@ -5,6 +5,7 @@ import time
 
 import numpy as np
 
+from ..taskqueue import TaskQueue
 from . import Drive
 from .. import constants
 from .. import util
@@ -18,43 +19,8 @@ class RegulatedDrive(Drive):
 
         self._dist_pid = util.PID(constants.motorDistP, constants.motorDistI, constants.motorDistD)
         self._angle_pid = util.PID(constants.motorAngleP, constants.motorAngleI, constants.motorAngleD)
+        self._bg_queue = TaskQueue()
 
-        # contains the current operation. Setting this is locked through
-        # busy_lock. Upon completion, this is cleared locked on op_done.
-        self.op = None
-        self.busy_lock = threading.Condition()
-        self.op_done = threading.Condition()
-
-        # kick off the background thread
-        self.bg_thread = threading.Thread(target=self._background)
-        self.bg_thread.daemon = True
-        self.bg_thread.start()
-
-    # types for queuing commands
-    MoveOp = namedtuple('MoveOp', 'pos')
-    TurnOp = namedtuple('TurnOp', 'angle')
-
-    def _background(self):
-        """ run in the background """
-        while True:
-            # lock on busy_lock to prevent the main thread from changing the
-            # command without it being looked at
-            with self.busy_lock:
-                # get the next operation when notified by the main thread
-                while self.op is None:
-                    self.busy_lock.wait()
-                op = self.op
-
-                # delegate to the appropriate control method
-                if isinstance(op, self.TurnOp):
-                    self._background_turn(op.angle)
-                elif isinstance(op, self.MoveOp):
-                    self._background_move(op.pos)
-
-                # notify the main thread that we finished the command
-                with self.op_done:
-                    self.op_done.notify_all()
-                    self.op = None
 
     def turn_to(self, angle, fix=True):
         """
@@ -65,20 +31,13 @@ class RegulatedDrive(Drive):
 
             turn_to(odometer.angle + pi*1.5)
         """
+        self._bg_queue.enqueue(lambda: self._background_turn(angle, fix))
+
+    def _background_turn(self, angle, fix):
+        """ called in the background after turn_to """
         if fix:
             angle = self._fix_angle(angle)
 
-        # wait until the background thread is ready
-        with self.busy_lock:
-            self.busy_lock.notify()
-            self.op = self.TurnOp(angle)
-
-        # wait until the background thread is done
-        with self.op_done:
-            self.op_done.wait()
-
-    def _background_turn(self, angle):
-        """ called in the background after turn_to """
         pid = self._angle_pid
         pid.reset()
         pid.setpoint = angle
@@ -96,19 +55,12 @@ class RegulatedDrive(Drive):
 
     def go_to(self, pos):
         """ go in a straight line to pos """
-        pos = np.array(pos)
-
-        # wait until the background thread is ready
-        with self.busy_lock:
-            self.busy_lock.notify()
-            self.op = self.MoveOp(pos)
-
-        # wait until the background thread is done
-        with self.op_done:
-            self.op_done.wait()
+        self._bg_queue.enqueue(lambda: self._background_move(pos))
 
     def _background_move(self, goal_pos):
         """ called in the background after go_to """
+        pos = np.array(goal_pos)
+
         # read the odometer
         start_reading = self.odometer.val
         start_pos = start_reading.pos
