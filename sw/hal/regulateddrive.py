@@ -31,7 +31,7 @@ class RegulatedDrive(Drive):
 
             turn_to(odometer.angle + pi*1.5)
         """
-        self._bg_queue.enqueue(lambda: self._background_turn(angle, fix))
+        self._bg_queue.enqueue(lambda: self._background_turn(angle, fix)).wait()
 
     def _background_turn(self, angle, fix):
         """ called in the background after turn_to """
@@ -55,7 +55,7 @@ class RegulatedDrive(Drive):
 
     def go_to(self, pos):
         """ go in a straight line to pos """
-        self._bg_queue.enqueue(lambda: self._background_move(pos))
+        self._bg_queue.enqueue(lambda: self._background_move(pos)).wait()
 
     def _background_move(self, goal_pos):
         """ called in the background after go_to """

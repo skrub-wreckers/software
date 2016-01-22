@@ -1,4 +1,5 @@
 import threading
+import sys
 
 class TaskQueue(object):
     def __init__(self):
@@ -24,7 +25,7 @@ class TaskQueue(object):
                 op = self._op
 
                 # delegate to the appropriate control method
-                op()
+                op._run()
 
                 # notify the main thread that we finished the command
                 with self._op_done:
@@ -32,11 +33,35 @@ class TaskQueue(object):
                     self._op = None
 
     def enqueue(self, task):
+        task = Task(task)
+
         # wait until the background thread is ready
         with self._busy_lock:
             self._busy_lock.notify()
             self._op = task
 
-        # wait until the background thread is done
-        with self._op_done:
-            self._op_done.wait()
+        return task
+
+class Task(object):
+    _exc_info = None
+
+    def __init__(self, f):
+        self.f = f
+        self._done = threading.Event()
+
+    def wait(self, *args, **kwargs):
+        res = self._done.wait(*args, **kwargs)
+
+        if res and self._exc_info is not None:
+            raise self._exc_info[0], None, self._exc_info[2]
+
+        return res
+
+    def _run(self):
+        try:
+            self.f()
+        except Exception:
+            self._exc_info = sys.exc_info()
+
+        self._done.set()
+
