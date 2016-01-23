@@ -1,5 +1,6 @@
 import threading
 import sys
+import inspect
 
 class TaskQueue(object):
     def __init__(self):
@@ -42,12 +43,17 @@ class TaskQueue(object):
 
         return task
 
+class TaskCancelled(Exception):
+    pass
+
 class Task(object):
     _exc_info = None
+    _cancelled = False
 
     def __init__(self, f):
         self.f = f
         self._done = threading.Event()
+        self._cancel_pending = threading.Event()
 
     def wait(self, *args, **kwargs):
         res = self._done.wait(*args, **kwargs)
@@ -57,11 +63,34 @@ class Task(object):
 
         return res
 
+    def cancel(self):
+        self._cancel_pending.set()
+        self.wait()
+
     def _run(self):
         try:
-            self.f()
+            # call the function
+            gen = self.f()
+
+            # if it contained yields
+            if inspect.isgenerator(gen):
+                while True:
+                    try:
+                        # cancel the task if appropriate
+                        if self._cancel_pending.is_set():
+                            gen.throw(TaskCancelled())
+
+                        # otherwise continue on from the yield
+                        else:
+                            gen.next()
+
+                    except StopIteration:
+                        # task exited normally (possibly ignoring the cancel)
+                        break
+
+        except TaskCancelled:
+            self._cancelled = True
         except Exception:
             self._exc_info = sys.exc_info()
 
         self._done.set()
-
