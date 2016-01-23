@@ -9,7 +9,7 @@ if __name__ == "__main__":
         reading = DigitalInput(tamp, 15)
         w = Window(500, [])
 
-        led_on = False
+        led_on = True
 
         while True:
             print led_on, reading.val
@@ -19,6 +19,6 @@ if __name__ == "__main__":
                 c = w.keys.get_nowait()
                 if c == ' ':
                     led_on = not led_on
-                    led.write(led_on)
+                    led.write(not led_on)
             except:
                 pass
