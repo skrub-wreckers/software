@@ -1,5 +1,21 @@
 """ pin configuration on the teensy """
 
+# analog pins, for readability
+A = range(21)
+
+
+l_ir_long = A[3]
+r_ir_long = A[2]
+l_ir_short = 15
+r_ir_short = 14
+back_ir_short = 33
+
+# breakbeams
+l_bb_recv = A[13]
+r_bb_recv = A[14]
+l_bb_send = 0
+r_bb_send = 3
+
 r_motor_pwm = 23
 r_motor_dir = 22
 l_motor_pwm = 21
