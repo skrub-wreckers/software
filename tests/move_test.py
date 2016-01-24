@@ -1,5 +1,5 @@
 from sw.hal import *
-from sw.vision.window import Window
+from sw.gui import Window
 from sw.vision import Camera, Vision
 from sw.mapping import Mapper
 
@@ -55,8 +55,6 @@ if __name__ == "__main__":
                 arms.red.down()
 
             if move_cmd:
-                drive.l_enc.update()
-                drive.r_enc.update()
                 drive.go(*move_cmd)
                 time.sleep(0.25)
                 drive.stop()
