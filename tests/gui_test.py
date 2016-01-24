@@ -1,4 +1,5 @@
 from sw.mapping import Mapper
+from sw.mapping.arena import Arena
 from sw.vision import Vision, CameraPanel, Camera
 from sw.gui import window
 from sw.hal import *
@@ -12,7 +13,7 @@ if __name__ == "__main__":
     #v = Vision(cam)
     #with TAMProxy() as tamproxy:
         #drive = Drive(tamproxy)
-        w = window.Window(500, [])#[Mapper(drive.odometer), CameraPanel(500, v)])
+        w = window.Window(500, [Mapper(map=Arena.load('../sw/mapping/red_map.txt'))])#[Mapper(drive.odometer), CameraPanel(500, v)])
         while True:
             pass
         #pygame.event.pump()

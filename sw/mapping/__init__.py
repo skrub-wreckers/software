@@ -15,7 +15,7 @@ def to_cv(val):
         return tuple(val.astype(int))
 
 class Mapper(object):
-    def __init__(self, odometer, size=500, ppi=5):
+    def __init__(self, odometer=None, size=500, ppi=3, map=None):
         self.odometer = odometer
         self.ppi = ppi
         self.size = size
@@ -26,6 +26,7 @@ class Mapper(object):
         self.path_surface.fill([0,0,0,0])
         self.last_pos = None
         
+        self.map = map
         self.cubes = []
 
     def setCubePositions(self, cubes):
@@ -33,21 +34,24 @@ class Mapper(object):
 
     @property
     def robot_matrix(self):
-        data = self.odometer.val
+        if self.odometer is not None:
+            data = self.odometer.val
 
-
-        return np.array([
-            [ np.cos(data.theta), np.sin(data.theta), 0, data.x],
-            [-np.sin(data.theta), np.cos(data.theta), 0, data.y],
-            [                  0,                  0, 1,      0],
-            [                  0,                  0, 0,      1]
-        ])
+            return np.array([
+                [ np.cos(data.theta), np.sin(data.theta), 0, data.x],
+                [-np.sin(data.theta), np.cos(data.theta), 0, data.y],
+                [                  0,                  0, 1,      0],
+                [                  0,                  0, 0,      1]
+            ])
+        
+        else:
+            return np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
         
     def update(self, events):
         pass
     
     def draw(self, surface):
-        self.odometer.update()
+        #self.odometer.update()
         surface.fill([255,255,255])
 
         for lpos in range(-int(self.size/self.ppi/12), int(self.size/self.ppi/12)+1, 1):
@@ -75,22 +79,28 @@ class Mapper(object):
                 0
             )
 
-        data = self.odometer.val
+        if self.odometer is not None:
+            data = self.odometer.val
 
-        pos = np.array([data.x, -data.y])
-        dir = np.array([np.cos(data.theta), -np.sin(data.theta)])
+            pos = np.array([data.x, -data.y])
+            dir = np.array([np.cos(data.theta), -np.sin(data.theta)])
 
-        draw_pos = (self.ppi * pos + self.size/2)
+            draw_pos = (self.ppi * pos + self.size/2)
 
-        surface.blit(self.path_surface, [0,0])
-        
-        pygame.draw.aaline(surface, (0,0,0), to_cv(draw_pos), to_cv(draw_pos + self.ppi * 10*dir))
-        pygame.draw.circle(surface, (0,0,0), to_cv(draw_pos), to_cv(self.ppi * 8), 1)
-        
-        if self.last_pos is not None:
-            if (self.last_pos != draw_pos).any():
-                pygame.draw.line(self.path_surface, (100,100,100), self.last_pos, draw_pos, 2)
-        self.last_pos = draw_pos
-        
+            surface.blit(self.path_surface, [0,0])
             
+            pygame.draw.aaline(surface, (0,0,0), to_cv(draw_pos), to_cv(draw_pos + self.ppi * 10*dir))
+            pygame.draw.circle(surface, (0,0,0), to_cv(draw_pos), to_cv(self.ppi * 8), 1)
+            
+            if self.last_pos is not None:
+                if (self.last_pos != draw_pos).any():
+                    pygame.draw.line(self.path_surface, (100,100,100), self.last_pos, draw_pos, 2)
+            self.last_pos = draw_pos
         
+        if self.map is not None:
+            for wall in self.map.walls:
+                pygame.draw.line(surface, (0,0,255), (wall.x1 * 24 * self.ppi - (self.size/2) - self.ppi, wall.y1 * 24 * self.ppi - (self.size/2)- self.ppi),
+                                                    (wall.x2 * 24 * self.ppi - (self.size/2)- self.ppi, wall.y2 * 24 * self.ppi - (self.size/2)- self.ppi), 2)
+                                                    
+            for stack in self.map.stacks:
+                pass
