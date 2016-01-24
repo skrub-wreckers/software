@@ -111,7 +111,7 @@ class RegulatedDrive(Drive):
         """ called in the background after go_to """
         # read the odometer
         start_reading = self.odometer.val
-        start_pos = np.array([start_reading.x, start_reading.y])
+        start_pos = start_reading.pos
 
         # find the parallel and perpendicular directions
         dir = goal_pos - start_pos
@@ -135,9 +135,9 @@ class RegulatedDrive(Drive):
         while True:
             # promote sensor data to vectors
             sensor = self.odometer.val
-            curr_pos = np.array([sensor.x, sensor.y])
-            facing = np.array([np.cos(sensor.theta), np.sin(sensor.theta)])
-            curr_vel = facing * sensor.v
+            curr_pos = sensor.pos
+            facing = sensor.dir
+            curr_vel = sensor.vel
 
             # find error perpendicular to and along line
             perp_err = (curr_pos - goal_pos).dot(left_dir)

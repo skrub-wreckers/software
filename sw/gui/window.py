@@ -2,6 +2,7 @@ import sys
 import threading
 import time
 import pygame
+from Queue import Queue
 
 class Window(object):
     def __init__(self, psize, panels):
@@ -19,11 +20,15 @@ class Window(object):
         self.loop_thread.daemon = True
         self.loop_thread.start()
 
+        self.keys = Queue()
+
     def update(self):
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                self.keys.put(event.unicode)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.pos[1] > self.psize:
                     events.remove(event)
