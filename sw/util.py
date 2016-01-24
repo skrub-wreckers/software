@@ -32,7 +32,7 @@ class Profiler(object):
         return Timer(name, self.indent + '  ')
 
 class PID(object):
-    def __init__(self, kP, kI, kD, setpoint=0):
+    def __init__(self, kP, kI=0, kD=0, setpoint=0):
         self.kP = kP
         self.kI = kI
         self.kD = kD
