@@ -1,7 +1,9 @@
 from sw.hal import *
 from sw.gui import Window
-from sw.vision import Camera, Vision
+from sw.vision import Camera, Vision, CameraPanel
 from sw.mapping import Mapper
+from sw import constants
+import time
 
 import cv2
 
@@ -15,7 +17,7 @@ if __name__ == "__main__":
         arms = Arms(tamproxy)
 
         m = Mapper(drive.odometer)
-        cam = Camera(geom=constants.camera_geometry, id=1)
+        cam = Camera(geom=constants.camera_geometry, id=0)
         v = Vision(cam)
         w = Window(500, [m, CameraPanel(500, v)])
         
@@ -46,7 +48,7 @@ if __name__ == "__main__":
 
             elif c == ' ':
                 arms.green.up()
-                time.sleep(0.75)
+                time.sleep(1)
                 arms.green.down()
 
             elif c == 'c':

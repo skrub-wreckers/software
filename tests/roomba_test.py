@@ -31,13 +31,13 @@ if __name__ == "__main__":
 
             print "Right: "+str(rightIR.distInches)
             print "Left: "+str(leftIR.distInches)
-            #if rightIR.distInches < leftIR.distInches:
-            #    drive.go(0.1, sw.util.clamp(-0.1*(rightIR.distInches-14), -0.2, 0.2))
-            #else:
-            #    drive.go(0.1, sw.util.clamp(-0.1*(leftIR.distInches-14), -0.2, 0.2))
+            if rightIR.distInches < leftIR.distInches:
+                drive.go(0.1, sw.util.clamp(-0.1*(rightIR.distInches-20), -0.2, 0.2))
+            else:
+                drive.go(0.1, sw.util.clamp(-0.1*(leftIR.distInches-20), -0.2, 0.2))
             
-            #while leftIR.distInches < 14 and rightIR.distInches < 14:
-            #    drive.turn_angle(0.1)
+            while leftIR.distInches < 14 and rightIR.distInches < 14:
+                drive.turn_angle(0.1)
 
 
             """if c == 'q':

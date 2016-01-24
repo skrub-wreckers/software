@@ -15,7 +15,7 @@ class Arm(HardwareDevice):
         self.servo.write(0)
 
     def up(self):
-        for angle in range(0, 40, 4):
+        for angle in range(0, 40, 2):
             self.servo.write(angle)
             time.sleep(0.1)
 
@@ -27,5 +27,5 @@ class Arm(HardwareDevice):
 
 class Arms(HardwareDevice):
     def __init__(self, tamp):
-        self.green = Arm(tamp, pins.l_arm, lower=620, upper=2350)
-        self.red = Arm(tamp, pins.r_arm, lower=2320, upper=760)
+        self.green = Arm(tamp, pins.l_arm, lower=598, upper=2350)
+        self.red = Arm(tamp, pins.r_arm, lower=2350, upper=760)

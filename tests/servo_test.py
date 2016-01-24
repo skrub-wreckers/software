@@ -9,7 +9,7 @@ if __name__ == '__main__':
 		# Make the trackbar used for HSV masking
 
 		print("init")
-		servo = tamproxy.devices.Servo(tamp,6)
+		servo = tamproxy.devices.Servo(tamp,10)
 		# pin = tamproxy.devices.DigitalOutput(tamp,10)
 		# print("inited")
 		# pin.write(True)
