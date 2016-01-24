@@ -2,7 +2,7 @@ import sys
 import threading
 import time
 import pygame
-from Queue import Queue
+from Queue import Queue, Empty
 
 class Window(object):
     def __init__(self, psize, panels):
@@ -21,6 +21,12 @@ class Window(object):
         self.loop_thread.start()
 
         self.keys = Queue()
+
+    def get_key(self):
+        try:
+            return self.keys.get_nowait()
+        except Empty:
+            return None
 
     def update(self):
         events = pygame.event.get()
