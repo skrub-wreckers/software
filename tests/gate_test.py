@@ -15,10 +15,7 @@ if __name__ == "__main__":
             print led_on, reading.val
             time.sleep(0.1)
 
-            try:
-                c = w.keys.get_nowait()
-                if c == ' ':
-                    led_on = not led_on
-                    led.write(not led_on)
-            except:
-                pass
+            c = w.get_key()
+            if c == ' ':
+                led_on = not led_on
+                led.write(not led_on)

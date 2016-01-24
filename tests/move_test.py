@@ -55,8 +55,6 @@ if __name__ == "__main__":
                 arms.red.down()
 
             if move_cmd:
-                drive.l_enc.update()
-                drive.r_enc.update()
                 drive.go(*move_cmd)
                 time.sleep(0.25)
                 drive.stop()

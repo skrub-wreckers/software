@@ -1,5 +1,8 @@
 """ pin configuration on the teensy """
 
+# by convention, when there is both a left and a right pin, the left pin should
+# be closer to the usb port
+
 # analog pins, for readability
 A = range(21)
 
@@ -27,7 +30,7 @@ l_encoder_a = 30
 l_encoder_b = 29
 
 l_arm = 9
-r_arm = 6
+r_arm = 10
 
 stack_door = 3
 stack_flap = 4
