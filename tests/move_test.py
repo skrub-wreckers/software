@@ -14,11 +14,11 @@ if __name__ == "__main__":
         #arm2 = Arm(tamproxy, 9)
         arms = Arms(tamproxy)
 
-        w = Window("Eric")
         m = Mapper(drive.odometer)
         cam = Camera(geom=constants.camera_geometry, id=1)
         v = Vision(cam)
-
+        w = Window(500, [m, CameraPanel(500, v)])
+        
         while True:
             try:
                 v.update()
@@ -26,9 +26,9 @@ if __name__ == "__main__":
                 continue
             m.setCubePositions(v.cubes)
         
-            c = chr(cv2.waitKey(1) & 0xFF)
+            c = w.get_key()
             move_cmd = None
-
+            
 
             if c == 'q':
                 break
