@@ -29,7 +29,7 @@ class Odometer(HardwareDevice):
 
     @property
     def val(self):
-        """ transform the val based on our matrix """
+        """ transform the`val based on our matrix """
         reading = self._dev.val
         res = np.dot(self._ref_to_world, np.array([reading.x, reading.y, reading.theta, 1]))
         return reading._replace(x=res[0], y=res[1], theta=res[2])
@@ -44,18 +44,18 @@ class Odometer(HardwareDevice):
         """
         # transform from pose-relative to world
         pose_to_world = np.array([
-            [ np.cos(theta), np.sin(theta), 0,     x],
-            [-np.sin(theta), np.cos(theta), 0,     y],
-            [             0,             0, 1, theta],
-            [             0,             0, 0,     1]
+            [ np.cos(theta), -np.sin(theta), 0,     x],
+            [ np.sin(theta),  np.cos(theta), 0,     y],
+            [             0,              0, 1, theta],
+            [             0,              0, 0,     1]
         ])
 
         data = self._dev.val
         robot_to_ref = np.array([
-            [ np.cos(data.theta), np.sin(data.theta), 0, data.x    ],
-            [-np.sin(data.theta), np.cos(data.theta), 0, data.y    ],
-            [                  0,                  0, 1, data.theta],
-            [                  0,                  0, 0,          1]
+            [ np.cos(data.theta), -np.sin(data.theta), 0, data.x    ],
+            [ np.sin(data.theta),  np.cos(data.theta), 0, data.y    ],
+            [                   0,                  0, 1, data.theta],
+            [                   0,                  0, 0,          1]
         ])
 
         # we require that ref_to_world @ robot_to_ref = pose_to_world
@@ -66,7 +66,7 @@ class Odometer(HardwareDevice):
     @property
     def robot_matrix(self):
         """ returns a matrix that multiplies 2D robot space to world space """
-        data = self._dev.val
+        data = self.val
 
         return np.array([
             [ np.cos(data.theta), np.sin(data.theta), data.x],
