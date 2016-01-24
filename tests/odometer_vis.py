@@ -37,12 +37,8 @@ if __name__ == "__main__":
                 # print time.time(), odo.val
                 logwriter.writerow((time.time(),) + odo.val)
 
-                try:
-                    c = w.keys.get_nowait()
-                except Empty:
-                    pass
-                else:
-                    if c == 'r':
-                        odo.override_position(0, 0, 0)
-                    elif c == 'q':
-                        break
+                c = w.get_key()
+                if c == 'r':
+                    odo.override_position(12, 12, np.pi / 8)
+                elif c == 'q':
+                    break
