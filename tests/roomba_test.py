@@ -35,49 +35,17 @@ if __name__ == "__main__":
             print "Right: {:.1f}, Left:  {:.1f}".format(
                 rightIR.distInches, leftIR.distInches)
 
-            if rightIR.distInches < leftIR.distInches:
+            if leftIR.distInches < 14 and rightIR.distInches < 14:
+                print("corner")
+                drive.go(steer=0.1)
+            elif rightIR.distInches < leftIR.distInches:
                 left_pid.reset()
                 steer = right_pid.iterate(rightIR.distInches)
+                print("right {}".format(steer))
                 drive.go(0.1, sw.util.clamp(steer, -0.2, 0.2))
             else:
                 right_pid.reset()
                 steer = left_pid.iterate(leftIR.distInches)
+                print("left {}".format(steer))
                 drive.go(0.1, sw.util.clamp(-steer, -0.2, 0.2))
 
-            drive.go(steer=0.1)
-            while leftIR.distInches < 14 and rightIR.distInches < 14:
-                pass
-            drive.stop()
-
-
-            """if c == 'q':
-                break
-            elif c == 'w':
-                move_cmd = (0.2, 0)
-
-            elif c == 's':
-                move_cmd = (-0.2, 0)
-
-            elif c == 'a':
-                move_cmd = (0, 0.2)
-
-            elif c == 'd':
-                move_cmd = (0, -0.2)
-
-            elif c == ' ':
-                arms.green.up()
-                time.sleep(0.75)
-                arms.green.down()
-
-            elif c == 'c':
-                arms.red.up()
-                time.sleep(0.9)
-                arms.red.down()
-
-            if move_cmd:
-                drive.l_enc.update()
-                drive.r_enc.update()
-                drive.go(*move_cmd)
-                time.sleep(0.25)
-                drive.stop()
-                print drive.l_enc.val, drive.r_enc.val"""
