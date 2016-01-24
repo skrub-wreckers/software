@@ -1,5 +1,6 @@
 from __future__ import print_function
 import time
+import numpy as np
 
 def clamp(value, min, max):
     if value < min: 
@@ -69,14 +70,14 @@ class PID(object):
         err = self.setpoint - val
 
         # I
-        if self._last_time is not None:
+        if self._last_time is not None and np.isfinite(val):
             self._integral += err*(this_time - self._last_time)
 
         # D
         if dval is not None:
             # TODO: include d/dt(setpoint)?
             derr = -dval
-        elif self._last_time is not None:
+        elif self._last_time is not None and np.isfinite(val):
             derr = (err - self._last_err)/(this_time - self._last_time)
         else:
             derr = 0
