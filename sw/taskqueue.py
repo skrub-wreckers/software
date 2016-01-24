@@ -2,6 +2,11 @@ import threading
 import sys
 import inspect
 
+class sleep(object):
+    """A simple data object that should be yielded by a task to sleep interruptibly """
+    def __init__(self, dur):
+        self.dur = dur
+
 class TaskQueue(object):
     def __init__(self):
         # contains the current task. Setting this is locked through _task_lock.
@@ -18,7 +23,7 @@ class TaskQueue(object):
                 # get the next operation when notified by the main thread
                 while self._task is None:
                     self._task_lock.wait()
-                
+
                 # run the task
                 self._task._run()
                 self._task = None
@@ -89,11 +94,15 @@ class Task(object):
                     try:
                         # cancel the task if appropriate
                         if self._cancel_pending.is_set():
-                            gen.throw(TaskCancelled())
+                            val = gen.throw(TaskCancelled())
 
                         # otherwise continue on from the yield
                         else:
-                            gen.next()
+                            val = gen.next()
+
+                        # if a sleep was requested, instead wait on the cancellation
+                        if type(val) == sleep:
+                            self._cancel_pending.wait(timeout=val.dur)
 
                     except StopIteration:
                         # task exited normally (possibly ignoring the cancel)
