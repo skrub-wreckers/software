@@ -16,12 +16,15 @@ if __name__ == "__main__":
         drive = Drive(tamproxy)
         leftIR = LongIR(tamproxy, pins.l_ir_long)
         rightIR = LongIR(tamproxy, pins.r_ir_long)
-        
+
+        left_pid = sw.util.PID(0.1, setpoint=20)
+        right_pid = sw.util.PID(0.1, setpoint=20)
+
         m = Mapper(drive.odometer)
         cam = Camera(geom=sw.constants.camera_geometry, id=0)
         v = Vision(cam)
         w = Window(500, [m,CameraPanel(500, v)])
-        
+
         while True:
             try:
                 v.update()
@@ -29,15 +32,22 @@ if __name__ == "__main__":
                 continue
             m.setCubePositions(v.cubes)
 
-            print "Right: "+str(rightIR.distInches)
-            print "Left: "+str(leftIR.distInches)
+            print "Right: {:.1f}, Left:  {:.1f}".format(
+                rightIR.distInches, leftIR.distInches)
+
             if rightIR.distInches < leftIR.distInches:
-                drive.go(0.1, sw.util.clamp(-0.1*(rightIR.distInches-20), -0.2, 0.2))
+                left_pid.reset()
+                steer = right_pid.iterate(rightIR.distInches)
+                drive.go(0.1, sw.util.clamp(steer, -0.2, 0.2))
             else:
-                drive.go(0.1, sw.util.clamp(-0.1*(leftIR.distInches-20), -0.2, 0.2))
-            
+                right_pid.reset()
+                steer = left_pid.iterate(leftIR.distInches)
+                drive.go(0.1, sw.util.clamp(-steer, -0.2, 0.2))
+
+            drive.go(steer=0.1)
             while leftIR.distInches < 14 and rightIR.distInches < 14:
-                drive.turn_angle(0.1)
+                pass
+            drive.stop()
 
 
             """if c == 'q':
