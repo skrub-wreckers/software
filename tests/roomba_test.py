@@ -49,3 +49,5 @@ if __name__ == "__main__":
                 print("left {}".format(steer))
                 drive.go(0.1, sw.util.clamp(-steer, -0.2, 0.2))
 
+            time.sleep(0.05)
+
