@@ -13,7 +13,7 @@ import time
 if __name__ == "__main__":
     with TAMProxy() as tamproxy:
         
-        drive = Drive(tamproxy)
+        drive = RegulatedDrive(tamproxy)
         #arm = Arm(tamproxy, 10)
         #arm2 = Arm(tamproxy, 9)
         arms = Arms(tamproxy)
