@@ -39,9 +39,12 @@ class CameraPanel():
         if self.vision.frame is not None:
             pygame.surfarray.blit_array(surface.subsurface([10, 10, self.vision.frame.shape[1],self.vision.frame.shape[0]]), np.transpose(self.vision.frame,(1,0,2)))
             pygame.surfarray.blit_array(surface.subsurface([10, 250, self.vision.frame.shape[1],self.vision.frame.shape[0]]), np.transpose(self.vision.color_detect.debug_frame,(1,0,2)))
+            if self.vision.blobs is not None:
+                for blob in self.vision.blobs:
+                    pygame.draw.circle(surface, Colors.to_rgb(blob.color), (int(blob.pos[1]+10), int(blob.pos[0]+10)), 5)
         
     def update(self, events):
-        self.vision.update()
+        pass#self.vision.update()
 
 class Vision(object):
     """Takes an image and returns the angle to blobs"""
@@ -79,7 +82,8 @@ class Vision(object):
                 pass
             else:
                 cubes.append(Cube(pos=pos, color=blob.color))
-
+        
+        self.blobs = all_blobs
         self.cubes = cubes
 
         #self.debug_win.show(self.color_detect.debug_frame)
