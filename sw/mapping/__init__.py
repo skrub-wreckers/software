@@ -54,7 +54,7 @@ class Mapper(object):
     def draw(self, surface):
         ctx = Context(surface)
         ctx.translate(250, 250)
-        ctx.scale(self.ppi, self.ppi)
+        ctx.scale(self.ppi, -self.ppi)
 
         # inches
         ctx.translate(-5*24, -5*24)
@@ -104,8 +104,7 @@ class Mapper(object):
             ctx.save()
             ctx.translate(data.pos[0], data.pos[1])
             ctx.rotate(data.theta)
-
-            ctx.line((0,0,0), [0, 0], 10*data.dir)
+            ctx.line((0,0,0), [0, 0], [10, 0])
             ctx.circle((0,0,0), [0, 0], 8, 1)
             ctx.restore()
 
@@ -114,7 +113,7 @@ class Mapper(object):
                     ctx.apply_to(self.path_surface).line(
                         (100,100,100),
                         data.pos,
-                        draw_pos,
+                        self.last_pos,
                         2
                     )
             self.last_pos = data.pos
