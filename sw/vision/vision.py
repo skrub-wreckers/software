@@ -112,6 +112,6 @@ class Vision(object):
             filtered = (c for c in self.cubes if c.color == color)
 
         try:
-            return max(filtered, key=lambda c: c.distance)
+            return min(filtered, key=lambda c: c.distance)
         except ValueError:
             return None
