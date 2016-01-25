@@ -32,7 +32,7 @@ class Odometer(HardwareDevice):
         """ transform the`val based on our matrix """
         reading = self._dev.val
         res = np.dot(self._ref_to_world, np.array([reading.x, reading.y, reading.theta, 1]))
-        return reading._replace(x=res[0], y=res[1], theta=res[2])
+        return self.Reading._make(reading)._replace(x=res[0], y=res[1], theta=res[2])
 
     def override_position(self, x, y, theta):
         """
