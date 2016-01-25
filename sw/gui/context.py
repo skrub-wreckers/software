@@ -69,10 +69,19 @@ class Context(object):
 
 
     def lines(self, color, closed, pointlist, width=1):
-        pygame.draw.lines(self.surf, color, closed, map( self._apply, pointlist), width)
+        pygame.draw.lines(self.surf, color, closed,
+            [tuple(self._apply(p)) for p in pointlist],
+            width)
+
+    def polygon(self, color, pointlist, width=0):
+        pygame.draw.polygon(self.surf, color,
+            [tuple(self._apply(p)) for p in pointlist],
+            width
+        )
+
 
     def rect(self, color, rect, width=0):
-        self.lines(
+        self.polygon(
             color=color,
             pointlist=[
                 [rect.left, rect.top],
@@ -80,6 +89,5 @@ class Context(object):
                 [rect.right, rect.bottom],
                 [rect.left, rect.bottom],
             ],
-            closed=True,
             width=width
         )

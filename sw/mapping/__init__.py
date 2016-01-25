@@ -91,7 +91,7 @@ class Mapper(object):
                 Colors.to_rgb(cube.color),
                 pygame.rect.Rect(
                     cube.pos[:2] - [1, 1],
-                    cube.pos[:2] + [1, 1]
+                    [2, 2]
                 ),
                 0
             )
