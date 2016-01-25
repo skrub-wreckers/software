@@ -5,18 +5,28 @@ from tamproxy import TAMProxy
 from sw.hal import *
 from sw.vision.window import Window
 from sw.vision import Camera, Vision, Colors
+from sw.gui import Window
 import sw.constants as constants
 
 
 if __name__ == "__main__":
     with TAMProxy() as tamproxy:
+        
         drive = Drive(tamproxy)
         #arm = Arm(tamproxy, 10)
         #arm2 = Arm(tamproxy, 9)
         arms = Arms(tamproxy)
 
+        color = ColorSensor(tamproxy)
+        
         cam = Camera(geom=constants.camera_geometry, id=2)
         v = Vision(cam)
+        
+        m = Mapper(drive.odometer)
+        cam = Camera(geom=constants.camera_geometry, id=0)
+        v = Vision(cam)
+        w = Window(500, [m, CameraPanel(500, v)])
+        
         while True:
             try:
                 v.update()
@@ -24,10 +34,6 @@ if __name__ == "__main__":
                 continue
             cube = v.nearest_cube()
             #print cube
-
-            c = chr(cv2.waitKey(1) & 0xFF)
-            if c == 'q':
-                break
 
             if cube is None:
                 print "No cube"
@@ -39,12 +45,12 @@ if __name__ == "__main__":
                 else:
                     # todo: steer while moving?
                     drive.go_distance(cube.distance + 1)
-
-                    if cube.color == Colors.GREEN:
+                    val = color.val
+                    if Colors.to_rgb(val) == Colors.GREEN:
                         arms.green.up()
-                        time.sleep(0.75)
+                        time.sleep(1.0)
                         arms.green.down()
-                    elif cube.color == Colors.RED:
+                    elif Colors.to_rgb(val) == Colors.RED:
                         arms.red.up()
                         time.sleep(0.75)
                         arms.red.down()
