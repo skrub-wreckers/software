@@ -23,6 +23,13 @@ class RegulatedDrive(Drive):
 
     _async = async_method_decorator(lambda self: self._bg_queue)
 
+    def turn_angle(self, angle, **kwargs):
+        return self.turn_to(self.odometer.val.theta + angle, fix=False, **kwargs)
+
+    def drive_distance(self, dist, **kwargs):
+        odo = self.odometer.val
+        return self.go_to(odo.pos + odo.dir*dist, **kwargs)
+
     @_async
     def turn_to(self, angle, fix=True):
         """
