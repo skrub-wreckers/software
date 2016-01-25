@@ -53,7 +53,7 @@ class Context(object):
             pt = np.append(pt, [1])
 
         res = self.matrix.dot(pt)
-        return res[:2]
+        return res[:2].astype(int)
 
     def circle(self, color, pos, radius, width=0):
         pygame.draw.circle(
