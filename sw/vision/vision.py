@@ -30,10 +30,13 @@ class Cube(namedtuple('Cube', 'pos color')):
         return "<{} cube at {:.1f}, {:.1f}, {:.1f}>".format(Colors.name(self.color), self.pos[0], self.pos[1], self.pos[2])
 
 class CameraPanel():
-    def __init__(self, size, vision):
+    def __init__(self, vision, size = 500):
         self.vision = vision
         self.size = size
         self.name = "Camera"
+        
+    def set_size(self, size):
+        self.size = size
         
     def draw(self, surface):
         if self.vision.frame is not None:

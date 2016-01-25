@@ -30,6 +30,9 @@ class Mapper(object):
         self.map = map
         self.cubes = []
 
+    def set_size(self, size):
+        self.size = size
+        
     def setCubePositions(self, cubes):
         self.cubes = cubes
 
