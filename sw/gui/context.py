@@ -7,6 +7,11 @@ class Context(object):
         self.matrix = np.eye(3)
         self.old_transforms = []
 
+    def apply_to(self, new_surface):
+        m = Context(new_surface)
+        m.matrix = self.matrix
+        return m
+
     def save(self):
         self.old_transforms.append(self.matrix)
 

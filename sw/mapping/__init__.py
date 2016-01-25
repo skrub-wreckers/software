@@ -4,6 +4,7 @@ import numpy as np
 import pygame
 
 from ..vision import Colors
+from ..gui import Context
 
 def to_cv(val):
     """ np array to integer tuple """
@@ -15,7 +16,7 @@ def to_cv(val):
         return tuple(val.astype(int))
 
 class Mapper(object):
-    def __init__(self, odometer=None, size=500, ppi=3, map=None):
+    def __init__(self, odometer=None, size=500, ppi=2, map=None):
         self.odometer = odometer
         self.ppi = ppi
         self.size = size
@@ -46,34 +47,51 @@ class Mapper(object):
 
         else:
             return np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
-        
+
     def update(self, events):
         pass
 
     def draw(self, surface):
+        ctx = Context(surface)
+        ctx.translate(250, 250)
+        ctx.scale(self.ppi, self.ppi)
+
+        # inches
+        ctx.translate(-5*24, -5*24)
+
         surface.fill([255,255,255])
 
-        for lpos in range(-int(self.size/self.ppi/12), int(self.size/self.ppi/12)+1, 1):
-            pygame.draw.line(surface,
-                (255,0,0),
-                ((lpos*12*self.ppi)+(self.size/2.0),0),
-                ((lpos*12*self.ppi)+(self.size/2.0),self.size),
+        bounds = np.array([[0,0,1], [self.size,self.size,1]]).T
+        bounds = np.linalg.inv(ctx.matrix).dot(bounds)
+        xmin, xmax = sorted(bounds[0,:])
+        ymin, ymax = sorted(bounds[1,:])
+
+        # grid size
+        d = 12
+        for lpos in np.arange(np.floor(xmin/d), np.ceil(xmax/d)):
+            ctx.line(
+                (128, 0, 0) if lpos % 4 == 0 else (255, 0, 0),
+                (lpos * d, ymin),
+                (lpos * d, ymax),
                 1
             )
-            pygame.draw.line(surface,
-                (255,0,0),
-                (0,(lpos*12*self.ppi)+(self.size/2.0)),
-                (self.size,(lpos*12*self.ppi)+(self.size/2.0)),
+
+        for lpos in np.arange(np.floor(ymin/d), np.ceil(ymax/d)):
+            ctx.line(
+                (128, 0, 0) if lpos % 4 == 0 else (255, 0, 0),
+                (xmin, lpos * d),
+                (xmax, lpos * d),
                 1
             )
+
 
         for cube in self.cubes:
             pos = self.robot_matrix.dot(cube.pos)
-            pygame.draw.rect(surface,
+            ctx.rect(
                 Colors.to_rgb(cube.color),
                 pygame.rect.Rect(
-                    ((cube.pos[0]*self.ppi)+(self.size/2.0), (cube.pos[1]*self.ppi)+(self.size/2.0)),
-                    (2*self.ppi,2*self.ppi)
+                    cube.pos[:2] - [1, 1],
+                    cube.pos[:2] + [1, 1]
                 ),
                 0
             )
@@ -81,25 +99,36 @@ class Mapper(object):
         if self.odometer is not None:
             data = self.odometer.val
 
-            pos = np.array([data.x, -data.y])
-            dir = np.array([np.cos(data.theta), -np.sin(data.theta)])
-
-            draw_pos = (self.ppi * pos + self.size/2)
-
             surface.blit(self.path_surface, [0,0])
 
-            pygame.draw.aaline(surface, (0,0,0), to_cv(draw_pos), to_cv(draw_pos + self.ppi * 10*dir))
-            pygame.draw.circle(surface, (0,0,0), to_cv(draw_pos), to_cv(self.ppi * 8), 1)
+            ctx.save()
+            ctx.translate(data.pos[0], data.pos[1])
+            ctx.rotate(data.theta)
+
+            ctx.line((0,0,0), [0, 0], 10*data.dir)
+            ctx.circle((0,0,0), [0, 0], 8, 1)
+            ctx.restore()
 
             if self.last_pos is not None:
-                if (self.last_pos != draw_pos).any():
-                    pygame.draw.line(self.path_surface, (100,100,100), self.last_pos, draw_pos, 2)
-            self.last_pos = draw_pos
+                if (self.last_pos != data.pos).any():
+                    ctx.apply_to(self.path_surface).line(
+                        (100,100,100),
+                        data.pos,
+                        draw_pos,
+                        2
+                    )
+            self.last_pos = data.pos
 
         if self.map is not None:
             for wall in self.map.walls:
-                pygame.draw.line(surface, (0,0,255), (wall.x1 * 24 * self.ppi - (self.size/2) - self.ppi, wall.y1 * 24 * self.ppi - (self.size/2)- self.ppi),
-                                                    (wall.x2 * 24 * self.ppi - (self.size/2)- self.ppi, wall.y2 * 24 * self.ppi - (self.size/2)- self.ppi), 2)
+                ctx.line(
+                    (0,0,255),
+                    (wall.x1 * 24, wall.y1 * 24),
+                    (wall.x2 * 24, wall.y2 * 24),
+                    2
+                )
+
+                ctx._apply((wall.x1 * 24, wall.y1 * 24))
 
             for stack in self.map.stacks:
                 pass
