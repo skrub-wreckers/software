@@ -49,6 +49,7 @@ if __name__ == "__main__":
                 v.update()
             except IOError:
                 continue
+            m.setCubePositions(v.cubes)
             cube = v.nearest_cube()
             #print cube
 
@@ -57,11 +58,11 @@ if __name__ == "__main__":
                 drive.go(0, 0.1)
             elif abs(cube.angle_to) < np.radians(10):
                 print "Going {}in to {}".format(cube.distance, cube)
-                to_go = cube.pos
+                to_go = cube.pos2
                 if cube.distance > 60:
-                    to_go = cube.pos * 60 / np.linalg.norm(cube.pos)
+                    to_go = cube.pos2 * 60 / cube.distance
 
-                to_go = to_go.append(1)
+                to_go = np.append(to_go, 1)
                 dest = drive.odometer.robot_matrix.dot(to_go)
 
                 drive.go_to(dest[:2])

@@ -23,10 +23,10 @@ class Context(object):
 
     def rotate(self, theta):
         self.transform(np.array([
-            [ np.cos(theta), np.sin(theta), 0],
-            [-np.sin(theta), np.cos(theta), 0],
+            [ np.cos(theta), -np.sin(theta), 0],
+            [ np.sin(theta), np.cos(theta), 0],
             [             0,             0, 1],
-        ]))
+        ], dtype=np.float32))
 
     def scale(self, sx, sy=None):
         if sy is None:
@@ -35,32 +35,32 @@ class Context(object):
             [sx, 0, 0],
             [0, sy, 0],
             [0,  0, 1],
-        ]))
+        ], dtype=np.float32))
 
     def translate(self, x, y):
         self.transform(np.array([
             [1, 0, x],
             [0, 1, y],
             [0, 0, 1],
-        ]))
+        ], dtype=np.float32))
 
     def _apply(self, pt):
         if np.isscalar(pt):
-            return np.sqrt(np.linalg.norm(self.matrix)) * pt
+            return int(np.sqrt(np.linalg.norm(self.matrix[:2,:2])) * pt)
 
         pt = np.asarray(pt)
         if len(pt) == 2:
             pt = np.append(pt, [1])
 
         res = self.matrix.dot(pt)
-        return res[:2]
+        return res[:2].astype(int)
 
     def circle(self, color, pos, radius, width=0):
         pygame.draw.circle(
             self.surf,
             color,
             self._apply(pos),
-            int(self._apply(radius)),
+            self._apply(radius),
             width
         )
 
@@ -69,7 +69,7 @@ class Context(object):
 
 
     def lines(self, color, closed, pointlist, width=1):
-        pygame.draw.lines(color, closed, map(pointlist, self._apply), width)
+        pygame.draw.lines(self.surf, color, closed, map( self._apply, pointlist), width)
 
     def rect(self, color, rect, width=0):
         self.lines(

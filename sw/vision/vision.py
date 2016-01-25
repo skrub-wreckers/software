@@ -22,6 +22,10 @@ class Cube(namedtuple('Cube', 'pos color')):
         """ Planar distance """
         return np.linalg.norm(self.pos[:2])
 
+    @property
+    def pos2(self):
+        return self.pos[:2]
+
     def __str__(self):
         return "<{} cube at {:.1f}, {:.1f}, {:.1f}>".format(Colors.name(self.color), self.pos[0], self.pos[1], self.pos[2])
 
