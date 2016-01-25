@@ -55,14 +55,17 @@ if __name__ == "__main__":
             if cube is None:
                 print "No cube"
                 drive.go(0, 0.1)
-            elif abs(cube.angle_to) < np.radians(3):
+            elif abs(cube.angle_to) < np.radians(10):
                 print "Going {}in to {}".format(cube.distance, cube)
+                to_go = cube.pos
                 if cube.distance > 60:
-                    drive.go_distance(60)
-                else:
-                    # todo: steer while moving?
-                    drive.go_distance(cube.distance + 1)
-                    pick_up_cubes()
+                    to_go = cube.pos * 60 / np.linalg.norm(cube.pos)
+
+                to_go = to_go.append(1)
+                dest = drive.odometer.robot_matrix.dot(to_go)
+
+                drive.go_to(dest[:2])
+                pick_up_cubes()
             else:
                 print "Turning {} to {}".format(cube.angle_to, cube)
                 drive.turn_angle(cube.angle_to)
