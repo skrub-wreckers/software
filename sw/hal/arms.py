@@ -27,5 +27,5 @@ class Arm(HardwareDevice):
 
 class Arms(HardwareDevice):
     def __init__(self, tamp):
-        self.green = Arm(tamp, pins.l_arm, lower=598, upper=2350)
-        self.red = Arm(tamp, pins.r_arm, lower=2350, upper=760)
+        self.silo = Arm(tamp, pins.l_arm, lower=598, upper=2350)
+        self.dump = Arm(tamp, pins.r_arm, lower=2350, upper=760)
