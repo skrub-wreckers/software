@@ -54,15 +54,37 @@ class Mapper(object):
     def update(self, events):
         pass
 
+    def _draw_robot(self, ctx):
+        ctx.line((0,0,0), [0, 0], [10, 0])
+
+        points = [
+            (0, 0)
+        ]
+        n = 20
+        r = 8
+        for i in range(n+1):
+            f = float(i) / n
+            theta = np.pi *.25 *f + np.pi * 1.75 * (1-f)
+            points.append([r*np.cos(theta), r*np.sin(theta)])
+
+        ctx.polygon([255, 255, 0], points)
+
+
     def draw(self, surface):
         ctx = Context(surface)
         ctx.translate(250, 250)
         ctx.scale(self.ppi, -self.ppi)
 
-        # inches
-        ctx.translate(-5*24, -5*24)
+        # translate the map to be centered, if it exists
+        if self.map:
+            all_xs = [x for wall in self.map.walls for x in [wall.x1, wall.x2]]
+            all_ys = [y for wall in self.map.walls for y in [wall.y1, wall.y2]]
 
-        surface.fill([255,255,255])
+            c_x = (max(all_xs) + min(all_xs)) / 2.0
+            c_y = (max(all_ys) + min(all_ys)) / 2.0
+            ctx.translate(-c_x*24, -c_y*24)
+
+        surface.fill([0,0,0])
 
         bounds = np.array([[0,0,1], [self.size,self.size,1]]).T
         bounds = np.linalg.inv(ctx.matrix).dot(bounds)
@@ -73,7 +95,7 @@ class Mapper(object):
         d = 12
         for lpos in np.arange(np.floor(xmin/d), np.ceil(xmax/d)):
             ctx.line(
-                (128, 0, 0) if lpos % 4 == 0 else (255, 0, 0),
+                (128, 128, 128) if lpos % 4 == 0 else (64, 64, 64),
                 (lpos * d, ymin),
                 (lpos * d, ymax),
                 1
@@ -81,7 +103,7 @@ class Mapper(object):
 
         for lpos in np.arange(np.floor(ymin/d), np.ceil(ymax/d)):
             ctx.line(
-                (128, 0, 0) if lpos % 4 == 0 else (255, 0, 0),
+                (128, 128, 128) if lpos % 4 == 0 else (64, 64, 64),
                 (xmin, lpos * d),
                 (xmax, lpos * d),
                 1
@@ -101,26 +123,27 @@ class Mapper(object):
 
         if self.odometer is not None:
             data = self.odometer.val
+        else:
+            from ..hal import Odometer
+            data = Odometer.Reading(0, 24*5, 24*5, 0, 0, 0)
 
-            surface.blit(self.path_surface, [0,0])
+        surface.blit(self.path_surface, [0,0])
 
-            ctx.save()
-            ctx.translate(data.pos[0], data.pos[1])
-            ctx.rotate(data.theta)
-            ctx.line((0,0,0), [0, 0], [10, 0])
-            ctx.circle((0,0,0), [0, 0], 8, 1)
-            
-            ctx.restore()
+        ctx.save()
+        ctx.translate(data.pos[0], data.pos[1])
+        ctx.rotate(data.theta)
+        self._draw_robot(ctx)
+        ctx.restore()
 
-            if self.last_pos is not None:
-                if (self.last_pos != data.pos).any():
-                    ctx.apply_to(self.path_surface).line(
-                        (100,100,100),
-                        data.pos,
-                        self.last_pos,
-                        2
-                    )
-            self.last_pos = data.pos
+        if self.last_pos is not None:
+            if (self.last_pos != data.pos).any():
+                ctx.apply_to(self.path_surface).line(
+                    (255,255,0),
+                    data.pos,
+                    self.last_pos,
+                    2
+                )
+        self.last_pos = data.pos
 
         if self.map is not None:
             for wall in self.map.walls:
