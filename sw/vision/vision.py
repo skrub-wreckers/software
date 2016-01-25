@@ -79,8 +79,11 @@ class Vision(object):
         self.cubes = cubes
 
         #self.debug_win.show(self.color_detect.debug_frame)
-        
+
     def filter_blue(self, frame):
+        return frame
+
+        # for now
         is_blue = (frame.im == Colors.BLUE)
         is_blue = ndimage.binary_opening(is_blue, structure=np.ones((5,5)))
         is_blue = ndimage.binary_closing(is_blue, structure=np.ones((5,5)))
