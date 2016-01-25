@@ -13,6 +13,7 @@ if __name__ == "__main__":
 
         m = Mapper(drive.odometer)
         w = Window(500, [m])
+        t = None
 
         while True:
             c = w.get_key()
@@ -20,10 +21,15 @@ if __name__ == "__main__":
             if c == 'q':
                 break
             elif c == 'w':
-                drive.turn_to(0)
+                t = drive.turn_to(0, async=True)
             elif c == 'e':
-                drive.go_to([24,0])
+                t = drive.go_to([24,0], async=True)
             elif c == 'd':
-                drive.turn_to(np.pi)
+                t = drive.turn_to(np.pi, async=True)
             elif c == 's':
-                drive.go_to([0,0])
+                t = drive.go_to([0,0], async=True)
+            elif c == ' ' and t:
+                t.cancel()
+
+            if t and t.wait(0):
+                t = None
