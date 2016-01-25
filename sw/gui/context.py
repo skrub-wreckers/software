@@ -46,7 +46,7 @@ class Context(object):
 
     def _apply(self, pt):
         if np.isscalar(pt):
-            return np.sqrt(np.linalg.norm(self.matrix)) * pt
+            return int(np.sqrt(np.linalg.norm(self.matrix[:2,:2])) * pt)
 
         pt = np.asarray(pt)
         if len(pt) == 2:
@@ -60,7 +60,7 @@ class Context(object):
             self.surf,
             color,
             self._apply(pos),
-            int(self._apply(radius)),
+            self._apply(radius),
             width
         )
 
