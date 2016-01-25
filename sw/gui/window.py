@@ -21,6 +21,9 @@ class Window(object):
         self.loop_thread.start()
 
         self.keys = Queue()
+        
+        for panel in self.panels:
+            panel.set_size(self.psize)
 
     def get_key(self):
         try:
