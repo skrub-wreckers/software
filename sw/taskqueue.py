@@ -1,6 +1,7 @@
 import threading
 import sys
 import inspect
+import functools
 
 class sleep(object):
     """A simple data object that should be yielded by a task to sleep interruptibly """
@@ -41,6 +42,39 @@ class TaskQueue(object):
             self._task = task
 
         return task
+
+def async_method_decorator(get_queue):
+    """
+    Create a decorator for use at class scope, given a function that obtains
+    the queue from self.
+
+        class Test(object):
+            def __init__(self):
+                self.queue = TaskQueue()
+
+            _async = async_method_decorator(lambda self: self.queue)
+
+            @_async
+            def task(self, args):
+                pass
+
+        t = Test()
+        t.task()
+        t.task(async=True)
+    """
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapped(self, *args, **kwargs):
+            t = get_queue(self).enqueue(lambda: f(self, *args, **kwargs))
+            if kwargs.pop('async', False):
+                return t
+            else:
+                return t.wait()
+
+        return wrapped
+    return decorator
+
+
 
 class TaskCancelled(Exception):
     """Thrown at any `yield` in a task, if a cancel is requested"""
