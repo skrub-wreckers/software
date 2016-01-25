@@ -60,7 +60,7 @@ class Context(object):
             self.surf,
             color,
             self._apply(pos),
-            self._apply(radius),
+            int(self._apply(radius)),
             width
         )
 
