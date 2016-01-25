@@ -1,11 +1,12 @@
 import time
 import numpy as np
 
-from tamproxy.devices import Color, DigitalInput
+from tamproxy.devices import Color, DigitalInput, DigitalOutput, AnalogInput
 
 from . import HardwareDevice
 from .. import constants
 from ..vision import Colors
+from .. import pins
 
 class _PatchedDigitalInput(DigitalInput):
     def __init__(self, *args, **kwargs):
@@ -66,3 +67,26 @@ class ColorSensor(HardwareDevice):
             return Colors.RED
         else:
             return Colors.GREEN
+            
+class BreakBeam(HardwareDevice):
+    def __init__(self, tamp, led_pin, recv_pin):
+        self._led_pin = DigitalOutput(tamp, led_pin)
+        self._recv_pin =  AnalogInput(tamp, recv_pin)
+        self._led_pin.write(False)
+        
+    @property
+    def broken(self):
+        return self._recv_pin.val > 40000
+        
+class BreakBeams(HardwareDevice):
+    def __init__(self, tamp):
+        self.l_beam = BreakBeam(tamp, pins.l_bb_send, pins.l_bb_recv)
+        self.r_beam = BreakBeam(tamp, pins.r_bb_send, pins.r_bb_recv)
+        
+    @property
+    def blocked(self):
+        return self.l_beam.broken and self.r_beam.broken
+        
+    @property
+    def sides(self):
+        return [self.l_beam.broken, self.r_beam.broken]

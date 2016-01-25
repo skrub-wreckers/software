@@ -15,7 +15,7 @@ back_ir_short = 33
 
 # breakbeams
 l_bb_recv = A[13]
-r_bb_recv = A[14]
+r_bb_recv = A[12]
 l_bb_send = 0
 r_bb_send = 3
 

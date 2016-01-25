@@ -2,20 +2,16 @@ from tamproxy.devices import *
 from tamproxy import TAMProxy
 import time
 from sw.gui import Window
+from sw import pins
+from sw.hal.sensors import BreakBeams
 
 if __name__ == "__main__":
     with TAMProxy() as tamp:
-        led = DigitalOutput(tamp, 0)
-        reading = DigitalInput(tamp, 15)
+        
         w = Window(500, [])
 
-        led_on = True
+        b = BreakBeams(tamp)
 
         while True:
-            print led_on, reading.val
+            print b.blocked
             time.sleep(0.1)
-
-            c = w.get_key()
-            if c == ' ':
-                led_on = not led_on
-                led.write(not led_on)

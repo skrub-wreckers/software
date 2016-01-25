@@ -109,6 +109,7 @@ class Mapper(object):
             ctx.rotate(data.theta)
             ctx.line((0,0,0), [0, 0], [10, 0])
             ctx.circle((0,0,0), [0, 0], 8, 1)
+            
             ctx.restore()
 
             if self.last_pos is not None:
