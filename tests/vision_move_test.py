@@ -4,10 +4,11 @@ from tamproxy import TAMProxy
 
 from sw.hal import *
 from sw.vision.window import Window
-from sw.vision import Camera, Vision, Colors
+from sw.vision import Camera, Vision, Colors, CameraPanel
 from sw.gui import Window
 import sw.constants as constants
-
+from sw.mapping import Mapper
+import time
 
 if __name__ == "__main__":
     with TAMProxy() as tamproxy:
@@ -19,11 +20,8 @@ if __name__ == "__main__":
 
         color = ColorSensor(tamproxy)
         
-        cam = Camera(geom=constants.camera_geometry, id=2)
-        v = Vision(cam)
-        
         m = Mapper(drive.odometer)
-        cam = Camera(geom=constants.camera_geometry, id=0)
+        cam = Camera(geom=constants.camera_geometry, id=1)
         v = Vision(cam)
         w = Window(500, [m, CameraPanel(500, v)])
         
@@ -46,11 +44,11 @@ if __name__ == "__main__":
                     # todo: steer while moving?
                     drive.go_distance(cube.distance + 1)
                     val = color.val
-                    if Colors.to_rgb(val) == Colors.GREEN:
+                    if val == Colors.GREEN:
                         arms.green.up()
                         time.sleep(1.0)
                         arms.green.down()
-                    elif Colors.to_rgb(val) == Colors.RED:
+                    elif val == Colors.RED:
                         arms.red.up()
                         time.sleep(0.75)
                         arms.red.down()
