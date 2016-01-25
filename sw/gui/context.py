@@ -69,7 +69,7 @@ class Context(object):
 
 
     def lines(self, color, closed, pointlist, width=1):
-        pygame.draw.lines(color, closed, map(pointlist, self._apply), width)
+        pygame.draw.lines(self.surf, color, closed, map( self._apply, pointlist), width)
 
     def rect(self, color, rect, width=0):
         self.lines(
