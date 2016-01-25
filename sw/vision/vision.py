@@ -29,7 +29,7 @@ class Cube(namedtuple('Cube', 'pos color')):
     def __str__(self):
         return "<{} cube at {:.1f}, {:.1f}, {:.1f}>".format(Colors.name(self.color), self.pos[0], self.pos[1], self.pos[2])
 
-class CameraPanel():
+class CameraPanel(object):
     def __init__(self, vision, size = 500):
         self.vision = vision
         self.size = size
