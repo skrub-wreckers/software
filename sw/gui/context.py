@@ -26,7 +26,7 @@ class Context(object):
             [ np.cos(theta), np.sin(theta), 0],
             [-np.sin(theta), np.cos(theta), 0],
             [             0,             0, 1],
-        ]))
+        ], dtype=np.float32))
 
     def scale(self, sx, sy=None):
         if sy is None:
@@ -35,14 +35,14 @@ class Context(object):
             [sx, 0, 0],
             [0, sy, 0],
             [0,  0, 1],
-        ]))
+        ], dtype=np.float32))
 
     def translate(self, x, y):
         self.transform(np.array([
             [1, 0, x],
             [0, 1, y],
             [0, 0, 1],
-        ]))
+        ], dtype=np.float32))
 
     def _apply(self, pt):
         if np.isscalar(pt):
