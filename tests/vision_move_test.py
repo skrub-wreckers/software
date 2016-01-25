@@ -24,8 +24,27 @@ if __name__ == "__main__":
         cam = Camera(geom=constants.camera_geometry, id=1)
         v = Vision(cam)
         w = Window(500, [m, CameraPanel(500, v)])
-        
+
+        def pick_up_cubes():
+            while True:
+                val = color.val
+                if val == Colors.GREEN:
+                    drive.stop()
+                    arms.green.up()
+                    time.sleep(1.0)
+                    arms.green.down()
+                elif val == Colors.RED:
+                    drive.stop()
+                    arms.red.up()
+                    time.sleep(0.75)
+                    arms.red.down()
+                else:
+                    break
+
         while True:
+            # pick up any cubes we have
+            pick_up_cubes()
+
             try:
                 v.update()
             except IOError:
@@ -43,15 +62,7 @@ if __name__ == "__main__":
                 else:
                     # todo: steer while moving?
                     drive.go_distance(cube.distance + 1)
-                    val = color.val
-                    if val == Colors.GREEN:
-                        arms.green.up()
-                        time.sleep(1.0)
-                        arms.green.down()
-                    elif val == Colors.RED:
-                        arms.red.up()
-                        time.sleep(0.75)
-                        arms.red.down()
+                    pick_up_cubes()
             else:
                 print "Turning {} to {}".format(cube.angle_to, cube)
                 drive.turn_angle(cube.angle_to)
