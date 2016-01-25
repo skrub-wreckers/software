@@ -23,6 +23,7 @@ class RegulatedDrive(Drive):
 
     _async = async_method_decorator(lambda self: self._bg_queue)
 
+    # override base class methods
     def turn_angle(self, angle, **kwargs):
         return self.turn_to(self.odometer.val.theta + angle, fix=False, **kwargs)
 
