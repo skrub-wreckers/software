@@ -1,0 +1,80 @@
+import numpy as np
+import pygame
+
+class Context(object):
+    def __init__(self, surface=None):
+        self.surf = surface
+        self.matrix = np.eye(3)
+        self.old_transforms = []
+
+    def save(self):
+        self.old_transforms.append(self.matrix)
+
+    def restore(self):
+        self.matrix = self.old_transforms.pop()
+
+    def transform(self, matrix):
+        self.matrix = self.matrix.dot(matrix)
+
+    def rotate(self, theta):
+        self.transform(np.array([
+            [ np.cos(theta), np.sin(theta), 0],
+            [-np.sin(theta), np.cos(theta), 0],
+            [             0,             0, 1],
+        ]))
+
+    def scale(self, sx, sy=None):
+        if sy is None:
+            sx = sy
+        self.transform(np.array([
+            [sx, 0, 0],
+            [0, sy, 0],
+            [0,  0, 1],
+        ]))
+
+    def translate(self, x, y):
+        self.transform(np.array([
+            [1, 0, x],
+            [0, 1, y],
+            [0, 0, 1],
+        ]))
+
+    def _apply(self, pt):
+        if np.isscalar(pt):
+            return np.sqrt(np.linalg.norm(self.matrix)) * pt
+
+        pt = np.asarray(pt)
+        if len(pt) == 2:
+            pt = np.append(pt, [1])
+
+        res = self.matrix.dot(pt)
+        return res[:2]
+
+    def circle(self, color, pos, radius, width=0):
+        pygame.draw.circle(
+            self.surf,
+            color,
+            self._apply(pos),
+            self._apply(radius),
+            width
+        )
+
+    def line(self, color, start_pos, end_pos, width=1):
+        pygame.draw.line(self.surf, color, self._apply(start_pos), self._apply(end_pos), width)
+
+
+    def lines(self, color, closed, pointlist, width=1):
+        pygame.draw.lines(color, closed, map(pointlist, self._apply), width)
+
+    def rect(self, color, rect, width=0):
+        self.lines(
+            color=color,
+            pointlist=[
+                [rect.left, rect.top],
+                [rect.right, rect.top],
+                [rect.right, rect.bottom],
+                [rect.left, rect.bottom],
+            ],
+            closed=True,
+            width=width
+        )
