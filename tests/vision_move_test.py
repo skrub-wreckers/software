@@ -12,6 +12,8 @@ import time
 
 
 OUR_COLOR = Colors.RED
+
+
 THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 
 if __name__ == "__main__":
@@ -25,7 +27,7 @@ if __name__ == "__main__":
 
         def pick_up_cubes():
             while True:
-                val = r.color.val
+                val = r.color_sensor.val
                 if val == OUR_COLOR:
                     r.drive.stop()
                     r.arms.silo.up()
