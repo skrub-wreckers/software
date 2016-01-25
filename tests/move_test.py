@@ -17,20 +17,20 @@ if __name__ == "__main__":
         arms = Arms(tamproxy)
 
         m = Mapper(drive.odometer)
-        cam = Camera(geom=constants.camera_geometry, id=0)
+        cam = Camera(geom=constants.camera_geometry, id=1)
         v = Vision(cam)
-        w = Window(500, [m, CameraPanel(500, v)])
-        
+        w = Window(500, [m, CameraPanel(v)])
+
         while True:
             try:
                 v.update()
             except IOError:
                 continue
             m.setCubePositions(v.cubes)
-        
+
             c = w.get_key()
             move_cmd = None
-            
+
 
             if c == 'q':
                 break
@@ -47,14 +47,14 @@ if __name__ == "__main__":
                 move_cmd = (0, -0.2)
 
             elif c == ' ':
-                arms.green.up()
+                arms.silo.up()
                 time.sleep(1)
-                arms.green.down()
+                arms.silo.down()
 
             elif c == 'c':
-                arms.red.up()
+                arms.dump.up()
                 time.sleep(0.9)
-                arms.red.down()
+                arms.dump.down()
 
             if move_cmd:
                 drive.go(*move_cmd)
