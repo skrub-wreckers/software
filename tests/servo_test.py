@@ -1,5 +1,6 @@
 import tamproxy, tamproxy.devices
 import time
+from sw import pins
 
 import cv2
 
@@ -9,14 +10,14 @@ if __name__ == '__main__':
 		# Make the trackbar used for HSV masking
 
 		print("init")
-		servo = tamproxy.devices.Servo(tamp,10)
+		servo = tamproxy.devices.Servo(tamp,pins.stack_door)
 		# pin = tamproxy.devices.DigitalOutput(tamp,10)
 		# print("inited")
 		# pin.write(True)
 		# raw_input()
 		# pin.write(False)
 
-		cv2.namedWindow('frame', cv2.WINDOW_AUTOSIZE)
+		cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
 		cv2.createTrackbar('Position','frame', 1500,3000, servo.write_microseconds)
 
 		while True:
