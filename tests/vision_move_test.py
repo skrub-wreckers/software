@@ -58,14 +58,19 @@ if __name__ == "__main__":
                 r.drive.go(0, 0.1)
             elif abs(cube.angle_to) < np.radians(10):
                 print "Going {}in to {}".format(cube.distance, cube)
+                # limit distance
                 to_go = cube.pos2
                 if cube.distance > 60:
-                    to_go = cube.pos2 * 60 / cube.distance
+                    to_go = to_go * 60 / cube.distance
 
+                # transform to world space
                 to_go = np.append(to_go, 1)
                 dest = r.drive.odometer.robot_matrix.dot(to_go)
 
-                r.drive.go_to(dest[:2])
+                task = r.drive.go_to(dest[:2], async=True)
+                while not task.wait(0):
+                    if r.break_beams.blocked or r.color_sensor.val != Colors.NONE:
+                        task.cancel()
                 pick_up_cubes()
             else:
                 print "Turning {} to {}".format(cube.angle_to, cube)
