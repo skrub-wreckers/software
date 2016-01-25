@@ -9,6 +9,7 @@ from .window import Window
 
 import pygame
 import numpy as np
+import scipy.ndimage as ndimage
 
 class Cube(namedtuple('Cube', 'pos color')):
     @property
@@ -50,7 +51,7 @@ class Vision(object):
 
     def update(self):
         self.frame = self.cam.read()
-        self.color_detect = ColorDetectResult(self.frame)
+        self.color_detect = self.filter_blue(ColorDetectResult(self.frame))
         red_blobs = BlobDetector(self.color_detect, Colors.RED, 100).blobs
         green_blobs = BlobDetector(self.color_detect, Colors.GREEN, 100).blobs
 
@@ -78,6 +79,17 @@ class Vision(object):
         self.cubes = cubes
 
         #self.debug_win.show(self.color_detect.debug_frame)
+        
+    def filter_blue(self, frame):
+        is_blue = (frame.im == Colors.BLUE)
+        is_blue = ndimage.binary_opening(is_blue, structure=np.ones((5,5)))
+        is_blue = ndimage.binary_closing(is_blue, structure=np.ones((5,5)))
+
+        x, y = np.meshgrid(np.arange(frame.im.shape[1]), np.arange(frame.im.shape[0]))
+
+        blue_above = np.cumsum(is_blue, axis=0)
+        frame.mask_out(blue_above == 0)
+        return frame
 
     def nearest_cube(self, color=None):
         """ get the nearest cube, by cartesian distance, optionally of a specific color """
