@@ -69,9 +69,9 @@ class Odometer(HardwareDevice):
         data = self.val
 
         return np.array([
-            [ np.cos(data.theta), np.sin(data.theta), data.x],
-            [-np.sin(data.theta), np.cos(data.theta), data.y],
-            [                  0,                  0,      1]
+            [ np.cos(data.theta), -np.sin(data.theta), data.x],
+            [ np.sin(data.theta),  np.cos(data.theta), data.y],
+            [                  0,                   0,      1]
         ])
 
     @property
