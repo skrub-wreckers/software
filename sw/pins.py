@@ -32,8 +32,7 @@ l_encoder_b = 29
 l_arm = 9
 r_arm = 10
 
-stack_door = 3
-stack_flap = 4
+stack_door = 4
 dump_door  = 5
 dump_latch = 6
 

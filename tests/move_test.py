@@ -56,6 +56,12 @@ if __name__ == "__main__":
                 time.sleep(0.9)
                 arms.dump.down()
 
+            elif c == 'v':
+                arms.silo_door.write(180)
+            elif c == 'b':
+                arms.silo_door.write(0)
+
+
             if move_cmd:
                 drive.go(*move_cmd)
                 time.sleep(0.25)
