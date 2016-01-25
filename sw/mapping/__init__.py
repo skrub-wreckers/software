@@ -35,6 +35,7 @@ class Mapper(object):
         
     def setCubePositions(self, cubes):
         self.cubes = cubes
+        self.cubes_mat = self.robot_matrix
 
     @property
     def robot_matrix(self):
@@ -42,8 +43,8 @@ class Mapper(object):
             data = self.odometer.val
 
             return np.array([
-                [ np.cos(data.theta), np.sin(data.theta), 0, data.x],
-                [-np.sin(data.theta), np.cos(data.theta), 0, data.y],
+                [ np.cos(data.theta), -np.sin(data.theta), 0, data.x],
+                [ np.sin(data.theta), np.cos(data.theta), 0, data.y],
                 [                  0,                  0, 1,      0],
                 [                  0,                  0, 0,      1]
             ])
@@ -111,11 +112,11 @@ class Mapper(object):
 
 
         for cube in self.cubes:
-            pos = self.robot_matrix.dot(cube.pos)
+            pos = self.cubes_mat.dot(cube.pos)
             ctx.rect(
                 Colors.to_rgb(cube.color),
                 pygame.rect.Rect(
-                    cube.pos[:2] - [1, 1],
+                    pos[:2] - [1, 1],
                     [2, 2]
                 ),
                 0
