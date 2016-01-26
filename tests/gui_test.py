@@ -16,4 +16,3 @@ if __name__ == "__main__":
     w = window.Window(500, [Mapper(map=Arena.load('../sw/mapping/red_map.txt')),CameraPanel(v)])#[Mapper(drive.odometer), CameraPanel(500, v)])
     while True:
         pass
-        #pygame.event.pump()
