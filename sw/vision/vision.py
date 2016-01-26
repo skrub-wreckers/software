@@ -81,6 +81,7 @@ class Vision(object):
         self.ray = None
         self.angle_to = None
         self.frame = None
+        import scipy.ndimage as ndimage
         #self.debug_win = Window('vision debug')
 
     def update(self):
@@ -131,8 +132,6 @@ class Vision(object):
         #self.debug_win.show(self.color_detect.debug_frame)
 
     def filter_blue(self, frame):
-        return frame
-
         # for now
         is_blue = (frame.im == Colors.BLUE)
         is_blue = ndimage.binary_opening(is_blue, structure=np.ones((5,5)))
