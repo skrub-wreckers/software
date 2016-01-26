@@ -139,8 +139,8 @@ class Vision(object):
 
         x, y = np.meshgrid(np.arange(frame.im.shape[1]), np.arange(frame.im.shape[0]))
 
-        blue_above = np.cumsum(is_blue, axis=0)
-        frame.mask_out(blue_above == 0)
+        blue_below = np.cumsum(is_blue[::-1], axis=0)
+        frame.mask_out(blue_below == 0)
         return frame
 
     def nearest_cube(self, color=None):
