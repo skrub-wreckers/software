@@ -18,3 +18,5 @@ class Robot(HardwareDevice):
         self.back_short_ir = DigitalIR(self.tamp, pins.back_ir_short)
 
         self.break_beams = BreakBeams(self.tamp)
+        
+        self.time_remaining = constants.round_time
