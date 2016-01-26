@@ -30,7 +30,7 @@ class Profiler(object):
     def __call__(self, name):
         print()
         self.has_children = True
-        return Timer(name, self.indent + '  ')
+        return Profiler(name, self.indent + '  ')
 
 class PID(object):
     def __init__(self, kP, kI=0, kD=0, setpoint=0):
