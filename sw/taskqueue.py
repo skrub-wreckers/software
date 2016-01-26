@@ -65,8 +65,9 @@ def async_method_decorator(get_queue):
     def decorator(f):
         @functools.wraps(f)
         def wrapped(self, *args, **kwargs):
+            is_async = kwargs.pop('async', False)
             t = get_queue(self).enqueue(lambda: f(self, *args, **kwargs))
-            if kwargs.pop('async', False):
+            if is_async:
                 return t
             else:
                 return t.wait()
@@ -99,7 +100,7 @@ class Task(object):
         res = self._done.wait(*args, **kwargs)
 
         if res and self._exc_info is not None:
-            raise self._exc_info[0], None, self._exc_info[2]
+            raise self._exc_info[0], self._exc_info[1], self._exc_info[2]
 
         return res
 
