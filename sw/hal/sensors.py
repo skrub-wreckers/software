@@ -61,7 +61,7 @@ class ColorSensor(HardwareDevice):
 
         projected = (raw - self.ORIGIN).dot(self.WEIGHTS.T)
 
-        if projected[0] < 0.1:
+        if projected[0] < 0.6:
             return Colors.NONE
         elif projected[1] > 0:
             return Colors.RED
