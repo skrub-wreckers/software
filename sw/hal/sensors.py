@@ -76,7 +76,7 @@ class BreakBeam(HardwareDevice):
 
     @property
     def broken(self):
-        return self._recv_pin.val > 40000
+        return self._recv_pin.val > 12000
 
 class BreakBeams(HardwareDevice):
     def __init__(self, tamp):
