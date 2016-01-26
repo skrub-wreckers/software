@@ -79,7 +79,7 @@ def main(r):
 
             task = r.drive.go_to(dest[:2], async=True)
             while not task.wait(0):
-                if r.break_beams.blocked or r.color_sensor.val != Colors.NONE:
+                if r.break_beams.blocked and r.color_sensor.val != Colors.NONE:
                     task.cancel()
                 if r.left_short_ir.val:
                     task.cancel()
