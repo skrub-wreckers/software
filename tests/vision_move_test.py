@@ -8,6 +8,7 @@ from sw.vision import Camera, Vision, Colors, CameraPanel
 from sw.gui import Window, ControlPanel
 import sw.constants as constants
 from sw.mapping import Mapper
+from sw.mapping.arena import Arena
 import time
 
 from sw.taskqueue import TaskCancelled
