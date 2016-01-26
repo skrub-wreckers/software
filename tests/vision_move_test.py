@@ -92,7 +92,7 @@ if __name__ == "__main__":
         m = Mapper(r.drive.odometer)
         cam = Camera(geom=constants.camera_geometry, id=2)
         v = Vision(cam)
-        w = Window(500, [m, CameraPanel(500, v)])
+        w = Window(500, [m, CameraPanel(v)])
 
         while w.get_key() != ' ':
             pass
