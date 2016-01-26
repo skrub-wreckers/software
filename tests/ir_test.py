@@ -16,5 +16,7 @@ if __name__ == "__main__":
         w = Window(500, [m, CameraPanel(500, v)])
 
         while True:
-            print "Long Left IR ", r.left_long_ir.val, " Long Right IR ", r.right_long_ir.val
+            time.sleep(0.1)
+            print "Long Left IR ", r.left_long_ir.distInches, " Long Right IR ", r.right_long_ir.distInches
             print "Left Short IR ", r.left_short_ir.val, " Right Short IR ", r.right_short_ir.val, " Back Short IR ", r.back_short_ir.val
+            print

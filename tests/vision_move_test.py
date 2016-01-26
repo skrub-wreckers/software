@@ -39,6 +39,15 @@ def pick_up_cubes(r):
             break
         yield
 
+def avoid_wall(r, side, dir):
+    Drive.go_distance(r.drive, 4)
+    while side.val:
+        r.drive.go(0, dir*0.2)
+        time.sleep(0.05)
+        for _ in pick_up_cubes(r):
+            yield
+    Drive.go_distance(r.drive, 4)
+        
 def main(r):
     while True:
         # pick up any cubes we have
@@ -71,6 +80,14 @@ def main(r):
             while not task.wait(0):
                 if r.break_beams.blocked or r.color_sensor.val != Colors.NONE:
                     task.cancel()
+                if r.left_short_ir.val:
+                    task.cancel()
+                    for _ in avoid_wall(r,r.left_short_ir,-1):
+                        yield
+                if r.right_short_ir.val:
+                    task.cancel()
+                    for _ in avoid_wall(r,r.right_short_ir,1):
+                        yield
                 try:
                     yield
                 except TaskCancelled:
@@ -90,7 +107,7 @@ if __name__ == "__main__":
         r = Robot(tamproxy)
 
         m = Mapper(r.drive.odometer)
-        cam = Camera(geom=constants.camera_geometry, id=2)
+        cam = Camera(geom=constants.camera_geometry, id=1)
         v = Vision(cam)
         w = Window(500, [m, CameraPanel(v)])
 
@@ -115,6 +132,7 @@ if __name__ == "__main__":
         except TaskCancelled, StopIteration:
             pass
 
+        r.drive.stop()
         r.arms.silo_door.write(180)
         time.sleep(0.5)
         Drive.go_distance(r.drive, 6)
