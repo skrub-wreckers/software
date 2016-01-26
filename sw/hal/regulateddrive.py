@@ -48,7 +48,7 @@ class RegulatedDrive(Drive):
         pid.reset()
         pid.setpoint = angle
 
-        end_time = time.time() + 1.5*self._turn_time(angle - self.odometer.val.theta)
+        end_time = time.time() + 1.5*self._turn_time(angle - self.odometer.val.theta) + 1
 
         try:
             while True:
@@ -95,7 +95,7 @@ class RegulatedDrive(Drive):
         d_pid.setpoint = 0
 
 
-        end_time = time.time() + 1.5*self._distance_time(np.linalg.norm(goal_pos - start_pos))
+        end_time = time.time() + 1.5*self._distance_time(np.linalg.norm(goal_pos - start_pos)) + 1
 
         try:
             while True:
