@@ -19,7 +19,7 @@ OUR_COLOR = Colors.RED
 THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 
 
-ROUND_TIME = 20
+ROUND_TIME = 50
 SILO_TIME = ROUND_TIME - 30
 
 def pick_up_cubes(r):
@@ -96,6 +96,8 @@ if __name__ == "__main__":
 
         while w.get_key() != ' ':
             pass
+
+        print "started"
 
         start_time = time.time()
 
