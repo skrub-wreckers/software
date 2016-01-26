@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
         time_up = lambda: (time.time() - start_time) >= SILO_TIME
 
-        task = main()
+        task = main(r)
 
 
         while not time_up():
@@ -113,6 +113,6 @@ if __name__ == "__main__":
         except TaskCancelled, StopIteration:
             pass
 
-        r.arms.silo_door.open()
+        r.arms.silo_door.write(180)
         time.sleep(0.5)
         Drive.go_distance(r.drive, 4)
