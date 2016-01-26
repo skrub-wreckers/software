@@ -105,6 +105,7 @@ if __name__ == "__main__":
 
 
         while not time_up():
+            print "Time remaining: {}".format(time.time() - start_time)
             task.next()
 
         try:
