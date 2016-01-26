@@ -112,16 +112,16 @@ class Vision(object):
                     # no projection onto the plane
                     continue
 
-                for s in stacks:
-                    if stack.height == i and np.linalg.norm(pos[:2] - stack.pos[:2]) < 1:
-                        s.colors.append(blob.color)
+                for stack in stacks:
+                    if stack.height == i and np.linalg.norm(pos[:2] - stack.pos[:2]) < 2:
+                        stack.colors.append(blob.color)
                         return
                 else:
                     if i == 0:
-                        stacks.append(Stack(pos=pos, colors=[blob.color]))
+                        stacks.append(CubeStack(pos=pos, colors=[blob.color]))
 
         # Iterate over rays, starting from those pointing msot down
-        for blob, ray in sorted(rays_by_blob.items(), key=lambda r: r[2]):
+        for blob, ray in sorted(rays_by_blob.items(), key=lambda (r, b): r[2]):
             update_stacks(blob, ray)
 
 

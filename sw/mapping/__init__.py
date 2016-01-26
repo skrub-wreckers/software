@@ -30,9 +30,12 @@ class Mapper(object):
         self.map = map
         self.cubes = []
 
+        if map and odometer:
+            odometer.override_position(map.start[0]*24, map.start[1]*24, 0)
+
     def set_size(self, size):
         self.size = size
-        
+
     def setCubePositions(self, cubes):
         self.cubes = cubes
         self.cubes_mat = self.robot_matrix
@@ -111,19 +114,21 @@ class Mapper(object):
             )
 
         for stack in self.map.stacks:
-                for i,cube in enumerate(stack.cubes):
-                    ctx.circle(Colors.to_rgb(cube)*0.5, (stack.x*24, stack.y*24), (2*(3-i)))
+            for i,cube in enumerate(stack.cubes):
+                ctx.circle(Colors.to_rgb(cube)*0.5, (stack.x*24, stack.y*24), (2*(3-i)))
 
         for cube in self.cubes:
             pos = self.cubes_mat.dot(cube.pos)
-            ctx.rect(
-                Colors.to_rgb(cube.color),
-                pygame.rect.Rect(
-                    pos[:2] - [1, 1],
-                    [2, 2]
-                ),
-                0
-            )
+            for i, c in list(enumerate(cube.colors)):
+                size = np.ones(2) * (3.0 - i)
+                ctx.rect(
+                    Colors.to_rgb(c),
+                    pygame.rect.Rect(
+                        pos[:2] - size / 2,
+                        size
+                    ),
+                    0
+                )
 
         if self.odometer is not None:
             data = self.odometer.val

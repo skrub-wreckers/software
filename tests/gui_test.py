@@ -5,6 +5,7 @@ from sw.gui import window, ControlPanel
 from sw.hal import *
 from sw import constants
 import pygame
+import time
 
 from tamproxy import TAMProxy
 
@@ -13,6 +14,10 @@ if __name__ == "__main__":
     v = Vision(cam)
     with TAMProxy() as tamproxy:
         r = Robot(tamproxy)
-        w = window.Window(500, [Mapper(r.drive, map=Arena.load('../sw/mapping/red_map.txt')), CameraPanel(v), ControlPanel(r)])#[Mapper(drive.odometer), CameraPanel(500, v)])
+        m = Mapper(r.drive.odometer, map=Arena.load('../sw/mapping/red_map.txt'))
+        w = window.Window(500, [m, CameraPanel(v), ControlPanel(r)])#[Mapper(drive.odometer), CameraPanel(500, v)])
         while True:
+            v.update()
+            m.setCubePositions(v.cubes)
+            time.sleep(0.05)
             pass
