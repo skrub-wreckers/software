@@ -13,5 +13,5 @@ if __name__ == "__main__":
         b = BreakBeams(tamp)
 
         while True:
-            print b.blocked
+            print b.blocked, b.l_beam._recv_pin.val, b.r_beam._recv_pin.val
             time.sleep(0.1)
