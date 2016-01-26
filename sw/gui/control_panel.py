@@ -26,7 +26,9 @@ class ControlPanel(object):
                 d = sensor.distInches
                 if not np.isfinite(d):
                     d = 24
-                pygame.draw.rect(surface, (255,255,255), (325, 15+15*id, int((d/24.0)*50), 15))
+                pygame.draw.rect(surface, (255,255,255), (325, 15+15*id, int((d/24.0)*50), 10))
+                for tick in range(0, 4):
+                    pygame.draw.line(surface, (255,0,0), (325+(int(((tick+1)*0.25)*50)), 20+15*id), (325+(int(((tick+1)*0.25)*50)), 25+15*id))
                 #surface.blit(self.font.render(str(sensor.distInches)[:5], True, (255,255,255)), [325, 15+15*id])
             elif type(sensor) is DigitalIR:
                 pygame.draw.rect(surface, (255,255,255), (325, 15+15*id, int(sensor.val*50), 15))
