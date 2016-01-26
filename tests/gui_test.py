@@ -1,7 +1,7 @@
 from sw.mapping import Mapper
 from sw.mapping.arena import Arena
 from sw.vision import Vision, CameraPanel, Camera
-from sw.gui import window
+from sw.gui import window, ControlPanel
 from sw.hal import *
 from sw import constants
 import pygame
@@ -13,6 +13,6 @@ if __name__ == "__main__":
     v = Vision(cam)
     #with TAMProxy() as tamproxy:
         #drive = Drive(tamproxy)
-    w = window.Window(500, [Mapper(map=Arena.load('../sw/mapping/red_map.txt')),CameraPanel(v)])#[Mapper(drive.odometer), CameraPanel(500, v)])
+    w = window.Window(500, [Mapper(map=Arena.load('../sw/mapping/red_map.txt')), CameraPanel(v), ControlPanel(r)])#[Mapper(drive.odometer), CameraPanel(500, v)])
     while True:
         pass

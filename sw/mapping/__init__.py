@@ -110,6 +110,9 @@ class Mapper(object):
                 1
             )
 
+        for stack in self.map.stacks:
+                for i,cube in enumerate(stack.cubes):
+                    ctx.circle(Colors.to_rgb(cube)*0.5, (stack.x*24, stack.y*24), (2*(3-i)))
 
         for cube in self.cubes:
             pos = self.cubes_mat.dot(cube.pos)
@@ -156,6 +159,3 @@ class Mapper(object):
                 )
 
                 ctx._apply((wall.x1 * 24, wall.y1 * 24))
-
-            for stack in self.map.stacks:
-                pass

@@ -52,7 +52,7 @@ class CameraPanel(object):
                     pygame.draw.circle(surface, Colors.to_rgb(blob.color), (int(blob.pos[1]+10), int(blob.pos[0]+10)), 5)
         
     def update(self, events):
-        pass#self.vision.update()
+        self.vision.update()
 
 class Vision(object):
     """Takes an image and returns the angle to blobs"""
