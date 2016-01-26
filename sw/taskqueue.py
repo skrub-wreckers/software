@@ -147,5 +147,8 @@ class Task(object):
         except Exception:
             print('There was an exception in a queued task')
             self._exc_info = sys.exc_info()
+            import traceback
+            traceback.print_exception(*self._exc_info)
+            print()
         
         self._done.set()
