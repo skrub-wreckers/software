@@ -51,14 +51,20 @@ class Drive(HardwareDevice):
     def stop(self):
         self.go(throttle=0)
 
+    def _distance_time(self, dist):
+        return abs(dist) * 0.12
+
     def go_distance(self, dist):
         """ go a certain number of inches forwards, using timing """
         self.go(throttle= math.copysign(0.2, dist))
-        time.sleep(abs(dist) * 0.12)
+        time.sleep(self._distance_time(dist))
         self.stop()
+
+    def _turn_time(self, angle):
+        return abs(angle) / (math.pi*2)*4.45
 
     def turn_angle(self, angle):
         """ go a certain number of radians CCW, using timing """
         self.go(steer=math.copysign(0.2, angle))
-        time.sleep(abs(angle) / (math.pi*2)*4.45)
+        time.sleep(self._turn_time(angle))
         self.stop()
