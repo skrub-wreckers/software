@@ -145,7 +145,7 @@ class Task(object):
         except TaskCancelled:
             self._cancelled = True
         except Exception:
-            print('There was an exception in a queued task')
+            print('There was an exception in a queued task', self.f)
             self._exc_info = sys.exc_info()
             import traceback
             traceback.print_exception(*self._exc_info)
