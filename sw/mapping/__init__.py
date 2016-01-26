@@ -31,7 +31,7 @@ class Mapper(object):
         self.cubes = []
 
         if map and odometer:
-            odometer.override_position(map.start[0]*24, map.start[1]*24, 0)
+            odometer.override_position(map.start[0]*12, map.start[1]*12, 0)
 
     def set_size(self, size):
         self.size = size
@@ -86,7 +86,7 @@ class Mapper(object):
 
             c_x = (max(all_xs) + min(all_xs)) / 2.0
             c_y = (max(all_ys) + min(all_ys)) / 2.0
-            ctx.translate(-c_x*24, -c_y*24)
+            ctx.translate(-c_x*12, -c_y*12)
 
         surface.fill([0,0,0])
 
@@ -115,7 +115,7 @@ class Mapper(object):
 
         for stack in self.map.stacks:
             for i,cube in enumerate(stack.cubes):
-                ctx.circle(Colors.to_rgb(cube)*0.5, (stack.x*24, stack.y*24), (2*(3-i)))
+                ctx.circle(Colors.to_rgb(cube)*0.5, (stack.x*12, stack.y*12), (2*(3-i)))
 
         for cube in self.cubes:
             pos = self.cubes_mat.dot(cube.pos)
@@ -134,7 +134,7 @@ class Mapper(object):
             data = self.odometer.val
         else:
             from ..hal import Odometer
-            data = Odometer.Reading(0, 24*5, 24*5, 0, 0, 0)
+            data = Odometer.Reading(0, 12*5, 12*5, 0, 0, 0)
 
         surface.blit(self.path_surface, [0,0])
 
@@ -158,9 +158,9 @@ class Mapper(object):
             for wall in self.map.walls:
                 ctx.line(
                     (0,0,255),
-                    (wall.x1 * 24, wall.y1 * 24),
-                    (wall.x2 * 24, wall.y2 * 24),
+                    (wall.x1 * 12, wall.y1 * 12),
+                    (wall.x2 * 12, wall.y2 * 12),
                     2
                 )
 
-                ctx._apply((wall.x1 * 24, wall.y1 * 24))
+                ctx._apply((wall.x1 * 12, wall.y1 * 12))
