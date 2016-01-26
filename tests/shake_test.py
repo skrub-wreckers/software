@@ -4,6 +4,7 @@ from sw import pins
 import numpy as np
 
 from sw.vision import Colors
+from sw.hal import Robot
 
 import cv2
 
@@ -15,7 +16,7 @@ if __name__ == '__main__':
         print("init")
 
         while True:
-            dir = r.break_beam.dir
+            dir = r.break_beams.dir
             c = r.color_sensor.val
             if c != Colors.NONE:
                 print "Saw {} cube".format(c)
@@ -28,7 +29,10 @@ if __name__ == '__main__':
                 print "both broken"
             else:
                 print "wiggling {}".format(dir)
-                r.drive.turn_angle(np.radians(dir*5))
-                r.drive.turn_angle(np.radians(dir-5))
+                r.drive.go(steer=-dir*0.4)
+                time.sleep(0.05)
+                r.drive.go(steer=dir*0.2)
+                time.sleep(0.15)
+                r.drive.stop()
 
             time.sleep(0.05)
