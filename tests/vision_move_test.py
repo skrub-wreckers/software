@@ -115,7 +115,7 @@ if __name__ == "__main__":
     with TAMProxy() as tamproxy:
         r = Robot(tamproxy)
 
-        m = Mapper(r.drive.odometer)
+        m = Mapper(r.drive.odometer, map=Arena.load('../sw/mapping/red_map.txt'))
         cam = Camera(geom=constants.camera_geometry, id=1)
         v = Vision(cam)
         w = Window(500, [m, CameraPanel(v)])
