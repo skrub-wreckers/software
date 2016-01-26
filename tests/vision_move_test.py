@@ -65,7 +65,7 @@ def main(r):
 
         if cube is None:
             print "No cube"
-            drive.go(steer=0.1)
+            r.drive.go(steer=0.1)
         elif abs(cube.angle_to) < np.radians(10):
             print "Going {}in to {}".format(cube.distance, cube)
             # limit distance
