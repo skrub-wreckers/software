@@ -73,10 +73,11 @@ class BreakBeam(HardwareDevice):
         self._led_pin = DigitalOutput(tamp, led_pin)
         self._recv_pin =  AnalogInput(tamp, recv_pin)
         self._led_pin.write(False)
+        self._thres = 15000
 
     @property
     def broken(self):
-        return self._recv_pin.val > 15000
+        return self._recv_pin.val > self._thres
 
 class BreakBeams(HardwareDevice):
     def __init__(self, tamp):

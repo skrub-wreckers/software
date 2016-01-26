@@ -1,6 +1,7 @@
 from . import HardwareDevice, Arms, Drive, RegulatedDrive, ColorSensor, BreakBeams, DigitalIR
 from tamproxy.devices import LongIR
 from .. import pins
+from ..import constants
 
 
 class Robot(HardwareDevice):

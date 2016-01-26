@@ -40,6 +40,7 @@ class CameraPanel(object):
         self.size = size
         
     def draw(self, surface):
+        surface.fill((50,50,50))
         if self.vision.frame is not None:
             pygame.surfarray.blit_array(
                 surface.subsurface([10, 10, self.vision.frame.shape[1],self.vision.frame.shape[0]]),
