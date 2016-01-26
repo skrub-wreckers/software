@@ -145,6 +145,7 @@ class Task(object):
         except TaskCancelled:
             self._cancelled = True
         except Exception:
+            print('There was an exception in a queued task')
             self._exc_info = sys.exc_info()
         
         self._done.set()
