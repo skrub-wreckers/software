@@ -58,3 +58,5 @@ motorAngleD = 0.05
 
 angleTolerance = 0.01
 distanceTolerance = 0.01
+
+round_time = 180

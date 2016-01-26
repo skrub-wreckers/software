@@ -12,6 +12,9 @@ import time
 
 from sw.taskqueue import TaskCancelled
 
+import logging
+
+log = logging.getLogger('sw.test')
 
 OUR_COLOR = Colors.GREEN
 
@@ -23,22 +26,27 @@ ROUND_TIME = 180
 SILO_TIME = ROUND_TIME - 20
 
 def pick_up_cubes(r):
-    if(r.break_beams.blocked):
-        while True:
-            val = r.color_sensor.val
-            if val == OUR_COLOR:
-                r.drive.stop()
-                r.arms.silo.up()
-                time.sleep(1.0)
-                r.arms.silo.down()
-            elif val == THEIR_COLOR:
-                r.drive.stop()
-                r.arms.dump.up()
-                time.sleep(0.75)
-                r.arms.dump.down()
-            else:
-                break
-            yield
+    
+    while True:
+        val = r.color_sensor.val
+        blocked = r.break_beams.blocked
+        if blocked or val != Colors.NONE:
+            log.debug("Cube detection: beam={},sensor={}".format(blocked, val))
+        if not blocked:
+            break
+        if val == OUR_COLOR:
+            r.drive.stop()
+            r.arms.silo.up()
+            time.sleep(1.0)
+            r.arms.silo.down()
+        elif val == THEIR_COLOR:
+            r.drive.stop()
+            r.arms.dump.up()
+            time.sleep(0.75)
+            r.arms.dump.down()
+        else:
+            break
+        yield
 
 def avoid_wall(r, side, dir):
     Drive.go_distance(r.drive, 4)
@@ -67,7 +75,7 @@ def main(r):
             #  print "No cube"
             r.drive.go(steer=0.1)
         elif abs(cube.angle_to) < np.radians(10):
-            print "Going {}in to {}".format(cube.distance, cube)
+            log.debug("Going {}in to {}".format(cube.distance, cube))
             # limit distance
             to_go = cube.pos2
             if cube.distance > 60:
@@ -99,7 +107,7 @@ def main(r):
                 yield
 
         else:
-            print "Turning {} to {}".format(cube.angle_to, cube)
+            log.debug("Turning {} to {}".format(cube.angle_to, cube))
             r.drive.turn_angle(cube.angle_to)
 
 
@@ -108,14 +116,14 @@ if __name__ == "__main__":
         r = Robot(tamproxy)
 
         m = Mapper(r.drive.odometer)
-        cam = Camera(geom=constants.camera_geometry, id=2)
+        cam = Camera(geom=constants.camera_geometry, id=1)
         v = Vision(cam)
         w = Window(500, [m, CameraPanel(v)])
 
         while w.get_key() != ' ':
             pass
 
-        print "started"
+        log.debug("started")
 
         start_time = time.time()
 
@@ -125,7 +133,7 @@ if __name__ == "__main__":
 
 
         while not time_up():
-            print "Time remaining: {}".format(time.time() - start_time)
+            # print "Time remaining: {}".format(time.time() - start_time)
             task.next()
 
         try:

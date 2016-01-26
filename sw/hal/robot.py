@@ -1,6 +1,7 @@
 from . import HardwareDevice, Arms, Drive, RegulatedDrive, ColorSensor, BreakBeams, DigitalIR
 from tamproxy.devices import LongIR
 from .. import pins
+from ..import constants
 
 
 class Robot(HardwareDevice):
@@ -18,3 +19,5 @@ class Robot(HardwareDevice):
         self.back_short_ir = DigitalIR(self.tamp, pins.back_ir_short)
 
         self.break_beams = BreakBeams(self.tamp)
+        
+        self.time_remaining = constants.round_time
