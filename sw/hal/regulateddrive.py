@@ -48,6 +48,8 @@ class RegulatedDrive(Drive):
         pid.reset()
         pid.setpoint = angle
 
+        end_time = time.time() + 1.5*self._turn_time(angle - self.odometer.val.theta) + 1
+
         try:
             while True:
                 sensor = self.odometer.val
@@ -56,6 +58,10 @@ class RegulatedDrive(Drive):
                 yield sleep(0.05)
 
                 if pid.at_goal(err_t=np.radians(2), derr_t=np.radians(5)):
+                    break
+
+                if time.time() > end_time:
+                    warnings.warn('Timed out')
                     break
         finally:
             self.stop()
@@ -87,6 +93,9 @@ class RegulatedDrive(Drive):
 
         # d_pid is given the distance to go, since it's not 1D
         d_pid.setpoint = 0
+
+
+        end_time = time.time() + 1.5*self._distance_time(np.linalg.norm(goal_pos - start_pos)) + 1
 
         try:
             while True:
@@ -122,6 +131,10 @@ class RegulatedDrive(Drive):
 
                 # ignore transverse distance when terminating, since it's hard to get right
                 if d_pid.at_goal(err_t=0.25, derr_t=0.5):
+                    break
+
+                if time.time() > end_time:
+                    warnings.warn('Timed out')
                     break
         finally:
             self.stop()

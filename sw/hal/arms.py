@@ -23,6 +23,7 @@ class Arm(HardwareDevice):
 
     def down(self):
         self.servo.write(0)
+        time.sleep(1)
 
 
 class Arms(HardwareDevice):

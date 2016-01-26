@@ -12,8 +12,11 @@ import time
 
 from sw.taskqueue import TaskCancelled
 
+import logging
 
-OUR_COLOR = Colors.RED
+log = logging.getLogger('sw.test')
+
+OUR_COLOR = Colors.GREEN
 
 
 THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
@@ -23,8 +26,14 @@ ROUND_TIME = 180
 SILO_TIME = ROUND_TIME - 20
 
 def pick_up_cubes(r):
+    
     while True:
         val = r.color_sensor.val
+        blocked = r.break_beams.blocked
+        if blocked or val != Colors.NONE:
+            log.debug("Cube detection: beam={},sensor={}".format(blocked, val))
+        if not blocked:
+            break
         if val == OUR_COLOR:
             r.drive.stop()
             r.arms.silo.up()
@@ -63,9 +72,10 @@ def main(r):
         #print cube
 
         if cube is None:
-            print "No cube"
+            #  print "No cube"
+            r.drive.go(steer=0.1)
         elif abs(cube.angle_to) < np.radians(10):
-            print "Going {}in to {}".format(cube.distance, cube)
+            log.debug("Going {}in to {}".format(cube.distance, cube))
             # limit distance
             to_go = cube.pos2
             if cube.distance > 60:
@@ -77,7 +87,7 @@ def main(r):
 
             task = r.drive.go_to(dest[:2], async=True)
             while not task.wait(0):
-                if r.break_beams.blocked or r.color_sensor.val != Colors.NONE:
+                if r.break_beams.blocked and r.color_sensor.val != Colors.NONE:
                     task.cancel()
                 if r.left_short_ir.val:
                     task.cancel()
@@ -97,7 +107,7 @@ def main(r):
                 yield
 
         else:
-            print "Turning {} to {}".format(cube.angle_to, cube)
+            log.debug("Turning {} to {}".format(cube.angle_to, cube))
             r.drive.turn_angle(cube.angle_to)
 
 
@@ -113,7 +123,7 @@ if __name__ == "__main__":
         while w.get_key() != ' ':
             pass
 
-        print "started"
+        log.debug("started")
 
         start_time = time.time()
 
@@ -123,7 +133,7 @@ if __name__ == "__main__":
 
 
         while not time_up():
-            print "Time remaining: {}".format(time.time() - start_time)
+            # print "Time remaining: {}".format(time.time() - start_time)
             task.next()
 
         try:
