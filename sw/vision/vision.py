@@ -34,7 +34,7 @@ class CameraPanel(object):
         self.vision = vision
         self.size = size
         self.name = "Camera"
-        self.vision.update()
+        # self.vision.update()
         
     def set_size(self, size):
         self.size = size
