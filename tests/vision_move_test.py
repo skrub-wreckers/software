@@ -19,8 +19,8 @@ OUR_COLOR = Colors.RED
 THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 
 
-ROUND_TIME = 50
-SILO_TIME = ROUND_TIME - 30
+ROUND_TIME = 180
+SILO_TIME = ROUND_TIME - 20
 
 def pick_up_cubes(r):
     while True:
@@ -117,4 +117,4 @@ if __name__ == "__main__":
 
         r.arms.silo_door.write(180)
         time.sleep(0.5)
-        Drive.go_distance(r.drive, 4)
+        Drive.go_distance(r.drive, 6)
