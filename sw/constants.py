@@ -52,7 +52,7 @@ motorDistP = 0.15
 motorDistI = 0
 motorDistD = .0125
 
-motorAngleP = 1
+motorAngleP = 1.25
 motorAngleI = 0
 motorAngleD = 0.05
 
