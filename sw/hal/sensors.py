@@ -56,10 +56,16 @@ class ColorSensor(HardwareDevice):
         self._dev = Color(tamp, integrationTime=Color.INTEGRATION_TIME_2_4MS, gain=Color.GAIN_60X)
 
     @property
-    def val(self):
-        raw = np.array([self._dev.r, self._dev.g, self._dev.b, self._dev.c])
+    def raw_val(self):
+        return np.array([self._dev.r, self._dev.g, self._dev.b, self._dev.c])    
 
-        projected = (raw - self.ORIGIN).dot(self.WEIGHTS.T)
+    @classmethod
+    def project(cls, val):
+        return (val - cls.ORIGIN).dot(cls.WEIGHTS.T)
+
+    @property
+    def val(self):
+        projected = self.project(self.raw_val)
 
         if projected[1] < -0.2:
             return Colors.GREEN
@@ -67,6 +73,8 @@ class ColorSensor(HardwareDevice):
             return Colors.NONE
         else:
             return Colors.RED
+
+
 
 class BreakBeam(HardwareDevice):
     def __init__(self, tamp, led_pin, recv_pin):

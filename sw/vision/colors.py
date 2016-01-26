@@ -22,4 +22,5 @@ class Colors(object):
     def name(color):
         if color == Colors.RED:   return "red"
         if color == Colors.GREEN: return "green"
+        if color == Colors.NONE: return "none"
 
