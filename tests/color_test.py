@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
             c_val = np.float32([color.r, color.g, color.b, color.c])
 
-            screen.fill(c_val[:3])
+            screen.fill(np.clip(c_val[:3], 0, 255))
             pygame.draw.rect(
                 screen,
                 ideal_colors[active_name],
