@@ -61,12 +61,12 @@ class ColorSensor(HardwareDevice):
 
         projected = (raw - self.ORIGIN).dot(self.WEIGHTS.T)
 
-        if projected[0] < 0.6:
-            return Colors.NONE
-        elif projected[1] > 0:
-            return Colors.RED
-        else:
+        if projected[1] < -0.2:
             return Colors.GREEN
+        elif projected[1] < 0.1:
+            return Colors.NONE
+        else:
+            return Colors.RED
 
 class BreakBeam(HardwareDevice):
     def __init__(self, tamp, led_pin, recv_pin):

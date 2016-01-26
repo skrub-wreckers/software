@@ -13,7 +13,7 @@ import time
 from sw.taskqueue import TaskCancelled
 
 
-OUR_COLOR = Colors.RED
+OUR_COLOR = Colors.GREEN
 
 
 THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
@@ -106,7 +106,7 @@ if __name__ == "__main__":
         r = Robot(tamproxy)
 
         m = Mapper(r.drive.odometer)
-        cam = Camera(geom=constants.camera_geometry, id=1)
+        cam = Camera(geom=constants.camera_geometry, id=2)
         v = Vision(cam)
         w = Window(500, [m, CameraPanel(v)])
 
