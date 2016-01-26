@@ -23,21 +23,22 @@ ROUND_TIME = 180
 SILO_TIME = ROUND_TIME - 20
 
 def pick_up_cubes(r):
-    while True:
-        val = r.color_sensor.val
-        if val == OUR_COLOR:
-            r.drive.stop()
-            r.arms.silo.up()
-            time.sleep(1.0)
-            r.arms.silo.down()
-        elif val == THEIR_COLOR:
-            r.drive.stop()
-            r.arms.dump.up()
-            time.sleep(0.75)
-            r.arms.dump.down()
-        else:
-            break
-        yield
+    if(r.break_beams.blocked):
+        while True:
+            val = r.color_sensor.val
+            if val == OUR_COLOR:
+                r.drive.stop()
+                r.arms.silo.up()
+                time.sleep(1.0)
+                r.arms.silo.down()
+            elif val == THEIR_COLOR:
+                r.drive.stop()
+                r.arms.dump.up()
+                time.sleep(0.75)
+                r.arms.dump.down()
+            else:
+                break
+            yield
 
 def avoid_wall(r, side, dir):
     Drive.go_distance(r.drive, 4)
