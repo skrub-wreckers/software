@@ -5,7 +5,7 @@ from tamproxy import TAMProxy
 from sw.hal import *
 from sw.vision.window import Window
 from sw.vision import Camera, Vision, Colors, CameraPanel
-from sw.gui import Window
+from sw.gui import Window, ControlPanel
 import sw.constants as constants
 from sw.mapping import Mapper
 import time
@@ -118,7 +118,7 @@ if __name__ == "__main__":
         m = Mapper(r.drive.odometer, map=Arena.load('../sw/mapping/red_map.txt'))
         cam = Camera(geom=constants.camera_geometry, id=1)
         v = Vision(cam)
-        w = Window(500, [m, CameraPanel(v)])
+        w = Window(500, [m, CameraPanel(v), ControlPanel(r)])
 
         while w.get_key() != ' ':
             pass
