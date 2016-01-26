@@ -34,14 +34,19 @@ class CameraPanel(object):
         self.vision = vision
         self.size = size
         self.name = "Camera"
+        self.vision.update()
         
     def set_size(self, size):
         self.size = size
         
     def draw(self, surface):
         if self.vision.frame is not None:
-            pygame.surfarray.blit_array(surface.subsurface([10, 10, self.vision.frame.shape[1],self.vision.frame.shape[0]]), np.transpose(self.vision.frame,(1,0,2)))
-            pygame.surfarray.blit_array(surface.subsurface([10, 250, self.vision.frame.shape[1],self.vision.frame.shape[0]]), np.transpose(self.vision.color_detect.debug_frame,(1,0,2)))
+            pygame.surfarray.blit_array(
+                surface.subsurface([10, 10, self.vision.frame.shape[1],self.vision.frame.shape[0]]),
+                np.transpose(self.vision.frame,(1,0,2)))
+            pygame.surfarray.blit_array(
+                surface.subsurface([10, 250, self.vision.frame.shape[1],self.vision.frame.shape[0]]),
+                np.transpose(self.vision.color_detect.debug_frame,(1,0,2)))
             if self.vision.blobs is not None:
                 for blob in self.vision.blobs:
                     pygame.draw.circle(surface, Colors.to_rgb(blob.color), (int(blob.pos[1]+10), int(blob.pos[0]+10)), 5)
