@@ -11,7 +11,7 @@ import pygame
 import numpy as np
 import scipy.ndimage as ndimage
 
-class Cube(namedtuple('Cube', 'pos color')):
+class CubeStack(namedtuple('CubeStack', 'pos colors')):
     @property
     def angle_to(self):
         """ Planar angle """
@@ -26,8 +26,26 @@ class Cube(namedtuple('Cube', 'pos color')):
     def pos2(self):
         return self.pos[:2]
 
+    @property
+    def color(self):
+        """ deprecated """
+        return self.colors[0]
+
+    @property
+    def height(self):
+        return len(self.colors)
+
+
     def __str__(self):
-        return "<{} cube at {:.1f}, {:.1f}, {:.1f}>".format(Colors.name(self.color), self.pos[0], self.pos[1], self.pos[2])
+        if len(self.colors) > 1:
+            return "<{} stack at {:.1f}, {:.1f}, {:.1f}>".format(
+                ''.join(Colors.name(c) for c in self.colors), self.pos[0], self.pos[1], self.pos[2])
+        else:
+            return "<{} cube at {:.1f}, {:.1f}, {:.1f}>".format(
+                Colors.name(self.color), self.pos[0], self.pos[1], self.pos[2])
+
+# deprecated
+Cube = CubeStack
 
 class CameraPanel(object):
     def __init__(self, vision, size = 500):
@@ -35,10 +53,10 @@ class CameraPanel(object):
         self.size = size
         self.name = "Camera"
         # self.vision.update()
-        
+
     def set_size(self, size):
         self.size = size
-        
+
     def draw(self, surface):
         if self.vision.frame is not None:
             pygame.surfarray.blit_array(
@@ -50,7 +68,7 @@ class CameraPanel(object):
             if self.vision.blobs is not None:
                 for blob in self.vision.blobs:
                     pygame.draw.circle(surface, Colors.to_rgb(blob.color), (int(blob.pos[1]+10), int(blob.pos[0]+10)), 5)
-        
+
     def update(self, events):
         pass#self.vision.update()
 
@@ -77,22 +95,37 @@ class Vision(object):
         #   detect cubes in a stack
         #   look at cube area
 
-        cubes = []
-        for blob in all_blobs:
-            try:
-                pos = self.cam.geom.project_on(
-                    ray=self.cam.geom.ray_at(blob.pos[1], blob.pos[0]),
-                    normal=[0, 0, 1, 0],
-                    d=1  # center of the cube is 1in off the ground
-                )
-            except ValueError:
-                # no projection onto the plane
-                pass
-            else:
-                cubes.append(Cube(pos=pos, color=blob.color))
-        
+        rays_by_blob = {
+            blob: self.cam.geom.ray_at(blob.pos[1], blob.pos[0])
+            for blob in all_blobs
+        }
+
+        stacks = []
+
+        def update_stacks(blob, ray):
+            for i in [2, 1, 0]:
+                h = 1+2*i  # height off ground
+                try:
+                    pos = self.cam.geom.project_on(ray=ray, normal=[0, 0, 1, 0], d=h)
+                except ValueError:
+                    # no projection onto the plane
+                    continue
+
+                for s in stacks:
+                    if stack.height == i and np.linalg.norm(pos[:2] - stack.pos[:2]) < 1:
+                        s.colors.append(blob.color)
+                        return
+                else:
+                    if i == 0:
+                        stacks.append(Stack(pos=pos, colors=[blob.color]))
+
+        # Iterate over rays, starting from those pointing msot down
+        for blob, ray in sorted(rays_by_blob.items(), key=lambda r: r[2]):
+            update_stacks(blob, ray)
+
+
         self.blobs = all_blobs
-        self.cubes = cubes
+        self.cubes = stacks
 
         #self.debug_win.show(self.color_detect.debug_frame)
 
