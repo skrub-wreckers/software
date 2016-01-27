@@ -1,19 +1,21 @@
+import logging
+import time
+
 import cv2
 import numpy as np
+
 from tamproxy import TAMProxy
 
 from sw.hal import *
 from sw.vision.window import Window
 from sw.vision import Camera, Vision, Colors, CameraPanel
 from sw.gui import Window, ControlPanel
-import sw.constants as constants
+from sw import constants
 from sw.mapping import Mapper
 from sw.mapping.arena import Arena
-import time
 
 from sw.taskqueue import TaskCancelled
 
-import logging
 
 log = logging.getLogger('sw.test')
 
