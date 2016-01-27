@@ -137,17 +137,17 @@ def clean_up(r):
 
     # Turn until find good direction or if we spin all the way around
     r.drive.go(0, 0.15)
-    while (r.left_long_ir.distInches < constants.close_to_wall and \
-            r.right_long_ir.distInches < constants.close_to_wall) or \
-            (abs(r.drive.odometer.val.theta - startAngle) <= 2*pi):
-            yield asyncio.sleep(0.5)
-
+    gap_found = False
+    while not gap_found and abs(r.drive.odometer.val.theta - startAngle) <= 2*pi:
+        yield asyncio.sleep(0.05)
+        if min(r.left_long_ir.distInches, r.right_long_ir.distInches) < constants.close_to_wall:
+            gap_found = True
     r.drive.stop()
 
     r.arms.silo_door.write(180)
     yield asyncio.sleep(0.5)
 
-    if abs(r.drive.odometer.val.theta - startAngle) <= 2*pi:
+    if gap_found:
         Drive.go_distance(r.drive, 6)
 
 
