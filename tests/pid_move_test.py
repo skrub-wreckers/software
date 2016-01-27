@@ -14,25 +14,35 @@ def main_task():
     while True:
         c = w.get_key()
 
+        new_t = None
+
         if c == 'q':
             break
-        elif c == ' ':
-            if t: t.cancel()
-            t = asyncio.ensure_future(drive.turn_speed(np.radians(30)))
+        elif c == 'm':
+            new_t = drive.turn_speed(np.radians(5))
         elif c == 'w':
-            if t: t.cancel()
-            t = asyncio.ensure_future(drive.turn_to(0))
+            new_t = drive.turn_to(0)
         elif c == 'e':
-            if t: t.cancel()
-            t = asyncio.ensure_future(drive.go_to([24,0]))
+            new_t = drive.go_to([24,0])
         elif c == 'd':
-            if t: t.cancel()
-            t = asyncio.ensure_future(drive.turn_to(np.pi))
+            new_t = drive.turn_to(np.pi)
         elif c == 's':
-            if t: t.cancel()
-            t = asyncio.ensure_future(drive.go_to([0,0]))
+            new_t = drive.go_to([0,0])
         elif c == ' ' and t:
             t.cancel()
+            try:
+                yield From(t)
+            except asyncio.CancelledError:
+                pass
+
+        if new_t:
+            if t:
+                t.cancel()
+                try:
+                    yield From(t)
+                except asyncio.CancelledError:
+                    pass
+            t = asyncio.ensure_future(new_t)
 
         yield From(asyncio.sleep(0.05))
 
