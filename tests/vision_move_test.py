@@ -131,7 +131,7 @@ def clean_up(r):
 def main(r):
     task = asyncio.ensure_future(find_cubes(r))
     try:
-        yield From(asyncio.wait_for(task, ROUND_TIME))
+        yield From(asyncio.wait_for(task, SILO_TIME))
     except asyncio.TimeoutError:
         pass
 
