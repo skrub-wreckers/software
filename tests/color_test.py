@@ -58,7 +58,7 @@ if __name__ == '__main__':
                     if not os.path.exists(saveloc):
                         os.mkdir(saveloc)
                     for cname, samples in colors.iteritems():
-                        np.save(os.path.join(saveloc, cname), np.concatenate(samples))
+                        np.save(os.path.join(saveloc, cname), np.stack(samples))
                     sys.exit()
 
                 if event.type == pygame.KEYDOWN:

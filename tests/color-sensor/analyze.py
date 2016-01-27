@@ -15,7 +15,6 @@ all_data = {}
 
 for cname, mplname in colors:
     data = np.load(cname + '.npy')
-    data = data.reshape((-1, 4))
     all_data[cname] = data
 
     mean = np.mean(data, axis=0)
