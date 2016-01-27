@@ -109,7 +109,7 @@ def find_cubes(r):
 
         else:
             log.debug("Turning {} to {}".format(cube.angle_to, cube))
-            r.drive.turn_angle(cube.angle_to)
+            yield From(r.drive.turn_angle(cube.angle_to))
 
 def clean_up(r):
     r.drive.stop()
