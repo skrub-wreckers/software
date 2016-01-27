@@ -53,7 +53,7 @@ def pick_up_cubes(r):
                 log.warn('Beam broken, but no color reading')
                 break
         else:
-            if val != None:
+            if val != Colors.NONE:
                 log.warn('Color is {}, but beam not broken'.format(Colors.name(val)))
             break
 
