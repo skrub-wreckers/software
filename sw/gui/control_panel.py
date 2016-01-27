@@ -18,7 +18,7 @@ class ControlPanel(object):
 
         self.color_data = {}
         for c in [Colors.RED, Colors.GREEN, Colors.NONE]:
-            path = os.path.join('color-sensor', Colors.name(c) + '.npy')
+            path = os.path.join('../tests/color-sensor', Colors.name(c) + '.npy')
             raw = np.load(path).reshape((-1, 4))
 
             self.color_data[c] = ColorSensor.project(raw)
