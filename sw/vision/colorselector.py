@@ -1,6 +1,5 @@
 import os.path
 
-import scipy.signal
 import cv2
 import numpy as np
 
@@ -14,6 +13,8 @@ _edge_kernel = np.array([
 
 def _highlight_region(frame, mask, color):
     """ adds a colored border around a mask in an image """
+    import scipy.signal
+
     color = np.array(color)
     bmask = mask.astype(np.bool)
 

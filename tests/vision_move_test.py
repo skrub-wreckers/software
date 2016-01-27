@@ -3,6 +3,8 @@ import time
 
 import cv2
 import numpy as np
+from trollius import From
+import trollius as asyncio
 
 from tamproxy import TAMProxy
 
@@ -28,43 +30,50 @@ THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 ROUND_TIME = 180
 SILO_TIME = ROUND_TIME - 20
 
+@asyncio.coroutine
 def pick_up_cubes(r):
-    
     while True:
         val = r.color_sensor.val
         blocked = r.break_beams.blocked
-        if blocked or val != Colors.NONE:
-            log.debug("Cube detection: beam={},sensor={}".format(blocked, val))
-        if not blocked:
-            break
-        if val == OUR_COLOR:
-            r.drive.stop()
-            r.arms.silo.up()
-            time.sleep(1.0)
-            r.arms.silo.down()
-        elif val == THEIR_COLOR:
-            r.drive.stop()
-            r.arms.dump.up()
-            time.sleep(0.75)
-            r.arms.dump.down()
-        else:
-            break
-        yield
 
+        if blocked:
+            if val == OUR_COLOR:
+                r.drive.stop()
+                r.arms.silo.up()
+                log.info('Picked up {} block'.format(Color.name(val)))
+                time.sleep(1.0)
+                r.arms.silo.down()
+            elif val == THEIR_COLOR:
+                r.drive.stop()
+                r.arms.dump.up()
+                log.info('Picked up {} block'.format(Color.name(val)))
+                time.sleep(0.75)
+                r.arms.dump.down()
+            else:
+                log.warn('Beam broken, but no color reading')
+                break
+        else:
+            if val != None:
+                log.warn('Color is {}, but beam not broken'.format(Color.name(val)))
+            break
+
+        yield From(asyncio.sleep(0.05))
+
+@asyncio.coroutine
 def avoid_wall(r, side, dir):
+    log.info('Avoiding wall to {}'.format('left' if dir == 1 else 'right'))
     Drive.go_distance(r.drive, 4)
     while side.val:
         r.drive.go(0, dir*0.2)
-        time.sleep(0.05)
-        for _ in pick_up_cubes(r):
-            yield
+        yield From(asyncio.sleep(0.05))
+        yield From(pick_up_cubes(r))
     Drive.go_distance(r.drive, 4)
-        
-def main(r):
+
+@asyncio.coroutine
+def find_cubes(r):
     while True:
         # pick up any cubes we have
-        for _ in pick_up_cubes(r):
-            yield
+        yield From(pick_up_cubes(r))
 
         try:
             v.update()
@@ -88,31 +97,45 @@ def main(r):
             to_go = np.append(to_go, 1)
             dest = r.drive.odometer.robot_matrix.dot(to_go)
 
-            task = r.drive.go_to(dest[:2], async=True)
-            while not task.wait(0):
-                if r.break_beams.blocked and r.color_sensor.val != Colors.NONE:
-                    task.cancel()
-                if r.left_short_ir.val:
-                    task.cancel()
-                    for _ in avoid_wall(r,r.left_short_ir,-1):
-                        yield
-                if r.right_short_ir.val:
-                    task.cancel()
-                    for _ in avoid_wall(r,r.right_short_ir,1):
-                        yield
-                try:
-                    yield
-                except TaskCancelled:
-                    task.cancel()
-                    raise
+            task = asyncio.ensure_future(r.drive.go_to(dest[:2]))
+            try:
+                while not task.done():
+                    if r.break_beams.blocked and r.color_sensor.val != Colors.NONE:
+                        task.cancel()
+                    if r.left_short_ir.val:
+                        task.cancel()
+                        yield From(avoid_wall(r,r.left_short_ir,-1))
+                    if r.right_short_ir.val:
+                        task.cancel()
+                        yield From(avoid_wall(r,r.right_short_ir,1))
 
-            for _ in pick_up_cubes(r):
-                yield
+                    yield From(asyncio.sleep(0.05))
+
+            finally:
+                task.cancel()
 
         else:
             log.debug("Turning {} to {}".format(cube.angle_to, cube))
-            r.drive.turn_angle(cube.angle_to)
+            yield From(r.drive.turn_angle(cube.angle_to))
 
+@asyncio.coroutine
+def clean_up(r):
+    log.info('Doing round cleanup')
+    r.drive.stop()
+    r.arms.silo_door.write(180)
+    yield asyncio.sleep(0.5)
+    Drive.go_distance(r.drive, 6)
+
+
+@asyncio.coroutine
+def main(r):
+    task = asyncio.ensure_future(find_cubes(r))
+    try:
+        yield From(asyncio.wait_for(task, SILO_TIME))
+    except asyncio.TimeoutError:
+        pass
+
+    yield From(clean_up(r))
 
 if __name__ == "__main__":
     with TAMProxy() as tamproxy:
@@ -128,23 +151,7 @@ if __name__ == "__main__":
 
         log.debug("started")
 
-        start_time = time.time()
-
-        time_up = lambda: (time.time() - start_time) >= SILO_TIME
-
-        task = main(r)
-
-
-        while not time_up():
-            # print "Time remaining: {}".format(time.time() - start_time)
-            task.next()
-
-        try:
-            task.throw(TaskCancelled())
-        except TaskCancelled, StopIteration:
-            pass
-
-        r.drive.stop()
-        r.arms.silo_door.write(180)
-        time.sleep(0.5)
-        Drive.go_distance(r.drive, 6)
+        loop = asyncio.get_event_loop()
+        loop.set_debug(True)
+        loop.run_until_complete(main(r))
+        loop.close()

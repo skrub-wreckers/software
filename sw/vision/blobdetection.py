@@ -1,7 +1,6 @@
 from collections import namedtuple
 
 import numpy as np
-import scipy.ndimage
 
 Blob = namedtuple('Blob', 'color pos area')
 
@@ -12,6 +11,8 @@ class BlobDetector(object):
 
         self.blobs is a list of Blob objects, containing .pos == (y, x), .color, and .area
         """
+        import scipy.ndimage
+
         mask = color_detect_result.im == color
         labelled, n_regions = scipy.ndimage.measurements.label(mask)
 

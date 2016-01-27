@@ -13,5 +13,5 @@ setup(
 
     keywords='maslab',
     packages=['sw'],
-    install_requires=['tamproxy', 'opencv-python', 'pygame', 'scipy', 'numpy'],
+    install_requires=['trollius', 'tamproxy', 'opencv-python', 'pygame', 'scipy', 'numpy'],
 )

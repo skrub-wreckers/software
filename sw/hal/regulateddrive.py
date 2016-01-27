@@ -3,9 +3,10 @@ from collections import namedtuple
 import threading
 import time
 
+from trollius import From
+import trollius as asyncio
 import numpy as np
 
-from ..taskqueue import TaskQueue, async_method_decorator, sleep
 from . import Drive
 from .. import constants
 from .. import util
@@ -19,19 +20,16 @@ class RegulatedDrive(Drive):
 
         self._dist_pid = util.PID(constants.motorDistP, constants.motorDistI, constants.motorDistD)
         self._angle_pid = util.PID(constants.motorAngleP, constants.motorAngleI, constants.motorAngleD)
-        self._bg_queue = TaskQueue()
-
-    _async = async_method_decorator(lambda self: self._bg_queue)
 
     # override base class methods
-    def turn_angle(self, angle, **kwargs):
-        return self.turn_to(self.odometer.val.theta + angle, fix=False, **kwargs)
+    def turn_angle(self, angle):
+        return self.turn_to(self.odometer.val.theta + angle, fix=False)
 
-    def drive_distance(self, dist, **kwargs):
+    def drive_distance(self, dist):
         odo = self.odometer.val
-        return self.go_to(odo.pos + odo.dir*dist, **kwargs)
+        return self.go_to(odo.pos + odo.dir*dist)
 
-    @_async
+    @asyncio.coroutine
     def turn_to(self, angle, fix=True):
         """
         Turn to the absolute angle specified
@@ -55,7 +53,7 @@ class RegulatedDrive(Drive):
                 sensor = self.odometer.val
                 steer = pid.iterate(sensor.theta, dval=sensor.omega)
                 self.go(steer=util.clamp(steer, -0.4, 0.4))
-                yield sleep(0.05)
+                yield From(asyncio.sleep(0.05))
 
                 if pid.at_goal(err_t=np.radians(2), derr_t=np.radians(5)):
                     break
@@ -66,7 +64,7 @@ class RegulatedDrive(Drive):
         finally:
             self.stop()
 
-    @_async
+    @asyncio.coroutine
     def go_to(self, pos):
         """ go in a straight line to pos """
         goal_pos = np.array(pos)
@@ -127,7 +125,7 @@ class RegulatedDrive(Drive):
                     throttle=np.clip(throttle, -0.2, 0.2),
                     steer=np.clip(steer, -0.4, 0.4)
                 )
-                yield sleep(0.05)
+                yield From(asyncio.sleep(0.05))
 
                 # ignore transverse distance when terminating, since it's hard to get right
                 if d_pid.at_goal(err_t=0.25, derr_t=0.5):
