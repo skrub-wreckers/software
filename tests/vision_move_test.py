@@ -87,7 +87,7 @@ def find_cubes(r):
 
             # start scanning for cubes
             if cube is None:
-                search_task = subtasks.ensure_future(r.drive.turn_speed(np.radians(10)))
+                search_task = asyncio.ensure_future(r.drive.turn_speed(np.radians(10)))
                 continue
 
             # we found a cube - stop scanning
