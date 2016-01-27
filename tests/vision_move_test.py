@@ -51,7 +51,7 @@ def pick_up_cubes(r):
             r.arms.dump.down()
         else:
             break
-        yield asyncio.sleep(0.05)
+        yield From(asyncio.sleep(0.05))
 
 @asyncio.coroutine
 def avoid_wall(r, side, dir):
@@ -59,7 +59,7 @@ def avoid_wall(r, side, dir):
     while side.val:
         r.drive.go(0, dir*0.2)
         time.sleep(0.05)
-        yield From(pick_up_cubes())
+        yield From(pick_up_cubes(r))
     Drive.go_distance(r.drive, 4)
 
 @asyncio.coroutine
@@ -90,7 +90,7 @@ def find_cubes(r):
             to_go = np.append(to_go, 1)
             dest = r.drive.odometer.robot_matrix.dot(to_go)
 
-            task = asyncio.ensure_future(r.drive.go_to(dest[:2], async='asyncio')
+            task = asyncio.ensure_future(r.drive.go_to(dest[:2]))
             try:
                 while not task.done():
                     if r.break_beams.blocked and r.color_sensor.val != Colors.NONE:
@@ -120,9 +120,13 @@ def clean_up(r):
 
 @asyncio.coroutine
 def main(r):
-    task = asyncio.ensure_future(find_cubes(robot))
-    yield from asyncio.sleep(ROUND_TIME)
-    task.cancel()
+    task = asyncio.ensure_future(find_cubes(r))
+    try:
+        yield From(asyncio.wait_for(task, ROUND_TIME))
+    except asyncio.TimeoutError:
+        pass
+
+    yield From(clean_up(r))
 
 if __name__ == "__main__":
     with TAMProxy() as tamproxy:
@@ -138,18 +142,6 @@ if __name__ == "__main__":
 
         log.debug("started")
 
-        start_time = time.time()
-
-        time_up = lambda: (time.time() - start_time) >= SILO_TIME
-
-        task = main(r)
-
-
-        while not time_up():
-            # print "Time remaining: {}".format(time.time() - start_time)
-            task.next()
-
-        try:
-            task.throw(TaskCancelled())
-        except TaskCancelled, StopIteration:
-            pass
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main(r))
+        loop.close()
