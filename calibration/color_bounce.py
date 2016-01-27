@@ -29,11 +29,11 @@ FILE_NAME = "none"
 colors = []
 
 @asyncio.coroutine
-def capture_color():
+def capture_color(r):
     try:
         while True:
             yield From(asyncio.sleep(0.1))
-            colors.append(np.float32([color.r, color.g, color.b, color.c]))
+            colors.append(r.color_sensor.raw_val)
     finally:
         print "Saving results..."
         np.save(os.path.join(saveloc, FILE_NAME), colors)
@@ -51,7 +51,7 @@ def avoid_wall(r, side, dir):
 @asyncio.coroutine
 def main(r):
     try:
-        ctask = asyncio.ensure_future(capture_color)
+        ctask = asyncio.ensure_future(capture_color(r))
         while True:
             try:
                 v.update()
