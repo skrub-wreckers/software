@@ -32,13 +32,15 @@ THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 ROUND_TIME = constants.round_time
 SILO_TIME = ROUND_TIME - 20
 
+USE_BREAKBEAM = False
+
 @asyncio.coroutine
 def pick_up_cubes(r):
     while True:
         val = r.color_sensor.val
         blocked = r.break_beams.blocked
 
-        if blocked:
+        if blocked or not USE_BREAKBEAM:
             if val == OUR_COLOR:
                 r.drive.stop()
                 r.arms.silo.up()
@@ -49,7 +51,7 @@ def pick_up_cubes(r):
                 r.arms.dump.up()
                 log.info('Picked up {} block'.format(Colors.name(val)))
                 r.arms.dump.down()
-            else:
+            elif USE_BREAKBEAM:
                 log.warn('Beam broken, but no color reading')
                 break
         else:
