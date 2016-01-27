@@ -23,7 +23,7 @@ if __name__ == '__main__':
         
         # Turn around until the front of the robot is clear for N inches or it has gone 360
         print r.left_long_ir.distInches, r.right_long_ir.distInches
-        while r.left_long_ir.distInches >= CLOSE_TO_WALL and r.right_long_ir.distInches >= CLOSE_TO_WALL:
+        while r.left_long_ir.distInches < CLOSE_TO_WALL and r.right_long_ir.distInches < CLOSE_TO_WALL:
             print r.left_long_ir.distInches, r.right_long_ir.distInches
             r.drive.go(0, 0.1)
 
