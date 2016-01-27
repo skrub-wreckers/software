@@ -141,7 +141,7 @@ class Vision(object):
 
         # find all pixels with no blue pixels below them
         blue_below = np.cumsum(is_blue[::-1], axis=0)[::-1]
-        frame.mask_out((blue_below == 0) & ~is_blue)
+        frame.mask_out((blue_below > 0) & ~is_blue)
 
         return frame
 
