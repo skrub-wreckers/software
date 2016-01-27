@@ -22,12 +22,31 @@ class RegulatedDrive(Drive):
         self._angle_pid = util.PID(constants.motorAngleP, constants.motorAngleI, constants.motorAngleD)
 
     # override base class methods
-    def turn_angle(self, angle, **kwargs):
-        return self.turn_to(self.odometer.val.theta + angle, fix=False, **kwargs)
+    def turn_angle(self, angle):
+        return self.turn_to(self.odometer.val.theta + angle, fix=False)
 
-    def drive_distance(self, dist, **kwargs):
+    def drive_distance(self, dist):
         odo = self.odometer.val
-        return self.go_to(odo.pos + odo.dir*dist, **kwargs)
+        return self.go_to(odo.pos + odo.dir*dist)
+
+    @asyncio.coroutine
+    def turn_speed(self, omega):
+        pid = util.PID(1, 0, 0)
+        pid.setpoint = omega
+        steer = 0
+        last_t = time.time()
+        try:
+            while True:
+                curr_t = time.time()
+                sensor = self.odometer.val
+                steer += pid.iterate(sensor.omega) * (curr_t - last_t)
+                steer = util.clamp(steer, -0.4, 0.4)
+                self.go(steer=steer)
+
+                last_t = curr_t
+                yield From(asyncio.sleep(0.05))
+        finally:
+            self.stop()
 
     @asyncio.coroutine
     def turn_to(self, angle, fix=True):
