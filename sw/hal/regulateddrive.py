@@ -30,6 +30,20 @@ class RegulatedDrive(Drive):
         return self.go_to(odo.pos + odo.dir*dist)
 
     @asyncio.coroutine
+    def turn_speed(sefl, omega):
+        pid = util.PID(255, 0, 0)
+        pid.setpoint = omega
+        steer = 0
+        try:
+            while True:
+                sensor = self.odometer.val
+                steer += pid.iterate(sensor.omega)
+                self.go(steer=util.clamp(steer, -0.4, 0.4))
+                yield From(asyncio.sleep(0.05))
+        finally:
+            self.stop()
+
+    @asyncio.coroutine
     def turn_to(self, angle, fix=True):
         """
         Turn to the absolute angle specified

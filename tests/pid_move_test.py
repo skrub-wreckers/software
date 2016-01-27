@@ -16,20 +16,19 @@ def main_task():
 
         if c == 'q':
             break
+        elif c == ' ':
+            if t: t.cancel()
+            t = asyncio.ensure_future(drive.turn_speed(np.radians(30)))
         elif c == 'w':
-            print "Doing a thing"
             if t: t.cancel()
             t = asyncio.ensure_future(drive.turn_to(0))
         elif c == 'e':
-            print "Doing a thing"
             if t: t.cancel()
             t = asyncio.ensure_future(drive.go_to([24,0]))
         elif c == 'd':
-            print "Doing a thing"
             if t: t.cancel()
             t = asyncio.ensure_future(drive.turn_to(np.pi))
         elif c == 's':
-            print "Doing a thing"
             if t: t.cancel()
             t = asyncio.ensure_future(drive.go_to([0,0]))
         elif c == ' ' and t:
