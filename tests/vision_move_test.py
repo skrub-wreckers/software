@@ -143,5 +143,6 @@ if __name__ == "__main__":
         log.debug("started")
 
         loop = asyncio.get_event_loop()
+        loop.set_debug(True)
         loop.run_until_complete(main(r))
         loop.close()
