@@ -1,6 +1,6 @@
 import tamproxy, tamproxy.devices
-import numpy as np
 import time
+from sw import constants
 from math import pi
 
 from sw.hal import Robot
@@ -16,7 +16,9 @@ if __name__ == '__main__':
     with tamproxy.TAMProxy() as tamp:
         r = Robot(tamp)
         w = Window(500, [ControlPanel(r)])
-        r.arms.silo_door.write(0)
+
+
+        startAngle = r.drive.odometer.val.theta
 
         # If went all the way around without finding anything, pick the best direction 
         # = combine with side sensors and knowing angles
@@ -24,7 +26,9 @@ if __name__ == '__main__':
         # Turn around until the front of the robot is clear for N inches or it has gone 360
         r.drive.go(0, 0.1)
         print r.left_long_ir.distInches, r.right_long_ir.distInches
-        while r.left_long_ir.distInches < CLOSE_TO_WALL and r.right_long_ir.distInches < CLOSE_TO_WALL:
+        while (r.left_long_ir.distInches < constants.close_to_wall and \
+            r.right_long_ir.distInches < constants.close_to_wall) or \
+            (abs(r.drive.odometer.val.theta - startAngle) <= 2*pi):
             print r.left_long_ir.distInches, r.right_long_ir.distInches
 
         r.drive.go(0, 0)
