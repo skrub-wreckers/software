@@ -85,6 +85,7 @@ def find_cubes(r):
     try:
         search_task = None
         while True:
+            yield
             # pick up any cubes we have
             yield From(pick_up_cubes(r))
 
