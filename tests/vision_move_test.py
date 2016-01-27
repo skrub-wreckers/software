@@ -96,13 +96,17 @@ def find_cubes(r):
             #print cube
 
             # start scanning for cubes
-            if cube is None:
-                search_task = asyncio.ensure_future(r.drive.turn_speed(np.radians(10)))
+            if cube is None
+                if search_task is None:
+                    log.info('No cubes in view - scanning')
+                    search_task = asyncio.ensure_future(r.drive.turn_speed(np.radians(10)))
                 continue
 
             # we found a cube - stop scanning
             if search_task:
                 search_task.cancel()
+                search_task = None
+                log.info('Stopped scanning')
 
             if abs(cube.angle_to) > np.radians(10):
                 log.debug("Turning {} to {}".format(cube.angle_to, cube))
