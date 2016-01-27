@@ -65,7 +65,7 @@ def avoid_wall(r, side, dir):
     Drive.go_distance(r.drive, 4)
     while side.val:
         r.drive.go(0, dir*0.2)
-        time.sleep(0.05)
+        yield From(asyncio.sleep(0.05))
         yield From(pick_up_cubes(r))
     Drive.go_distance(r.drive, 4)
 
