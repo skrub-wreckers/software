@@ -45,5 +45,5 @@ class ColorDetectResult(object):
     def debug_frame(self):
         # convert color ids to rgb
         frame = Colors.to_rgb(self.im)
-        frame[self.im & Colors.NONE != 0] //= 8
+        frame[self.im & Colors.NONE != 0] = frame[self.im & Colors.NONE != 0] // 2 + np.array([128, 128, 128]) // 2
         return frame
