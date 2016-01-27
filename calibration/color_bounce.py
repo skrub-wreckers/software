@@ -32,9 +32,10 @@ colors = []
 def capture_color():
     try:
         while True:
-            sleep(0.1)
+            yield From(asyncio.sleep(0.1))
             colors.append(np.float32([color.r, color.g, color.b, color.c]))
     finally:
+        print "Saving results..."
         np.save(os.path.join(saveloc, FILE_NAME), colors)
         
 
