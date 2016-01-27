@@ -39,7 +39,7 @@ class CubeStack(namedtuple('CubeStack', 'pos colors')):
     def __str__(self):
         if len(self.colors) > 1:
             return "<{} stack at {:.1f}, {:.1f}, {:.1f}>".format(
-                ''.join(Colors.name(c) for c in self.colors), self.pos[0], self.pos[1], self.pos[2])
+                ','.join(Colors.name(c) for c in self.colors), self.pos[0], self.pos[1], self.pos[2])
         else:
             return "<{} cube at {:.1f}, {:.1f}, {:.1f}>".format(
                 Colors.name(self.color), self.pos[0], self.pos[1], self.pos[2])
