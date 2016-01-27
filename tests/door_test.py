@@ -22,9 +22,13 @@ if __name__ == '__main__':
         # = combine with side sensors and knowing angles
         
         # Turn around until the front of the robot is clear for N inches or it has gone 360
+        print r.left_long_ir.distInches, r.right_long_ir.distInches
         while r.left_long_ir.distInches >= CLOSE_TO_WALL and r.right_long_ir.distInches >= CLOSE_TO_WALL:
+            print r.left_long_ir.distInches, r.right_long_ir.distInches
             r.drive.go(0, 0.1)
 
-        r.arms.silo_door.write(180)
-        time.sleep(0.5)
-        r.drive.go_distance(6)
+        r.drive.go(0, 0)
+
+        # r.arms.silo_door.write(180)
+        # time.sleep(0.5)
+        # r.drive.go_distance(6)
