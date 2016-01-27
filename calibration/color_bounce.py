@@ -32,9 +32,10 @@ colors = []
 def capture_color():
     try:
         while True:
-            sleep(0.1)
+            yield From(asyncio.sleep(0.1))
             colors.append(np.float32([color.r, color.g, color.b, color.c]))
     finally:
+        print "Saving results..."
         np.save(os.path.join(saveloc, FILE_NAME), colors)
         
 
@@ -49,32 +50,36 @@ def avoid_wall(r, side, dir):
 
 @asyncio.coroutine
 def main(r):
-    while True:
-        try:
-            v.update()
-        except IOError:
-            continue
+    try:
+        ctask = asyncio.ensure_future(capture_color)
+        while True:
+            try:
+                v.update()
+            except IOError:
+                continue
 
-        #print cube
-        angle_to = math.pi*(random.randint(-180,180)/180.0)
-        
-        log.debug("Turning {}".format(angle_to))
-        
-        yield From(r.drive.turn_angle(angle_to))
-        task = asyncio.ensure_future(r.drive.go_to(10))
-        try:
-            while not task.done():
-                if r.left_short_ir.val:
-                    task.cancel()
-                    yield From(avoid_wall(r,r.left_short_ir,-1))
-                if r.right_short_ir.val:
-                    task.cancel()
-                    yield From(avoid_wall(r,r.right_short_ir,1))
+            #print cube
+            angle_to = math.pi*(random.randint(-180,180)/180.0)
+            
+            log.debug("Turning {}".format(angle_to))
+            
+            yield From(r.drive.turn_angle(angle_to))
+            task = asyncio.ensure_future(r.drive.go_to(10))
+            try:
+                while not task.done():
+                    if r.left_short_ir.val:
+                        task.cancel()
+                        yield From(avoid_wall(r,r.left_short_ir,-1))
+                    if r.right_short_ir.val:
+                        task.cancel()
+                        yield From(avoid_wall(r,r.right_short_ir,1))
 
-                yield From(asyncio.sleep(0.05))
+                    yield From(asyncio.sleep(0.05))
 
-        finally:
-            task.cancel()
+            finally:
+                task.cancel()
+    finally:
+        ctask.cancel()
 
 if __name__ == "__main__":
     with TAMProxy() as tamproxy:
