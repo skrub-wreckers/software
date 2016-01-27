@@ -39,8 +39,8 @@ try:
 
 				x, y = np.meshgrid(np.arange(cam.shape[1]), np.arange(cam.shape[0]))
 
-				blue_above = np.cumsum(is_blue, axis=0)
-				res.mask_out(blue_above == 0)
+				blue_below = np.cumsum(is_blue[::-1], axis=0)[::-1]
+				res.mask_out((blue_below > 0) & ~is_blue)
 			with Profiler('fill'):
 				red_blobs = vision.BlobDetector(res,  Colors.RED, 1000)
 				green_blobs = vision.BlobDetector(res, Colors.GREEN, 1000)
