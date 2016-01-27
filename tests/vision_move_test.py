@@ -51,8 +51,9 @@ def pick_up_cubes(r):
                 r.arms.dump.up()
                 log.info('Picked up {} block'.format(Colors.name(val)))
                 r.arms.dump.down()
-            elif USE_BREAKBEAM:
-                log.warn('Beam broken, but no color reading')
+            else:
+                if USE_BREAKBEAM:
+                    log.warn('Beam broken, but no color reading')
                 break
         else:
             if val != Colors.NONE:
