@@ -57,7 +57,7 @@ class ColorSensor(HardwareDevice):
 
     @property
     def raw_val(self):
-        return np.array([self._dev.r, self._dev.g, self._dev.b, self._dev.c])    
+        return np.array([self._dev.r, self._dev.g, self._dev.b, self._dev.c])
 
     @classmethod
     def project(cls, val):
