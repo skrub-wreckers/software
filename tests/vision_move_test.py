@@ -1,5 +1,6 @@
 import logging
 import time
+from math import pi
 
 import cv2
 import numpy as np
@@ -27,7 +28,7 @@ CAMERA_ID = 2
 THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 
 
-ROUND_TIME = 180
+ROUND_TIME = constants.round_time
 SILO_TIME = ROUND_TIME - 20
 
 @asyncio.coroutine
@@ -40,13 +41,13 @@ def pick_up_cubes(r):
             if val == OUR_COLOR:
                 r.drive.stop()
                 r.arms.silo.up()
-                log.info('Picked up {} block'.format(Color.name(val)))
+                log.info('Picked up {} block'.format(Colors.name(val)))
                 time.sleep(1.0)
                 r.arms.silo.down()
             elif val == THEIR_COLOR:
                 r.drive.stop()
                 r.arms.dump.up()
-                log.info('Picked up {} block'.format(Color.name(val)))
+                log.info('Picked up {} block'.format(Colors.name(val)))
                 time.sleep(0.75)
                 r.arms.dump.down()
             else:
@@ -54,7 +55,7 @@ def pick_up_cubes(r):
                 break
         else:
             if val != None:
-                log.warn('Color is {}, but beam not broken'.format(Color.name(val)))
+                log.warn('Color is {}, but beam not broken'.format(Colors.name(val)))
             break
 
         yield From(asyncio.sleep(0.05))
@@ -122,9 +123,23 @@ def find_cubes(r):
 def clean_up(r):
     log.info('Doing round cleanup')
     r.drive.stop()
+
+    startAngle = r.drive.odometer.val.theta
+
+    # Turn until find good direction or if we spin all the way around
+    r.drive.go(0, 0.15)
+    while (r.left_long_ir.distInches < constants.close_to_wall and \
+            r.right_long_ir.distInches < constants.close_to_wall) or \
+            (abs(r.drive.odometer.val.theta - startAngle) <= 2*pi):
+            yield asyncio.sleep(0.5)
+
+    r.drive.stop()
+
     r.arms.silo_door.write(180)
     yield asyncio.sleep(0.5)
-    Drive.go_distance(r.drive, 6)
+
+    if abs(r.drive.odometer.val.theta - startAngle) <= 2*pi:
+        Drive.go_distance(r.drive, 6)
 
 
 @asyncio.coroutine

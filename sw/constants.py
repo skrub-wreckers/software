@@ -60,3 +60,6 @@ angleTolerance = 0.01
 distanceTolerance = 0.01
 
 round_time = 180
+
+close_to_wall = 12
+
