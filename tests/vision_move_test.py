@@ -77,7 +77,8 @@ def avoid_wall(r, side, dir):
         r.drive.go(0, dir*0.2)
         yield From(asyncio.sleep(0.05))
         yield From(pick_up_cubes(r))
-    Drive.go_distance(r.drive, 4)
+    Drive.turn_angle(r.drive, np.pi/16*dir)
+    Drive.go_distance(r.drive, 8)
 
 @asyncio.coroutine
 def find_cubes(r):
