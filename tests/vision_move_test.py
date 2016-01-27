@@ -111,6 +111,7 @@ def find_cubes(r):
             log.debug("Turning {} to {}".format(cube.angle_to, cube))
             yield From(r.drive.turn_angle(cube.angle_to))
 
+@asyncio.coroutine
 def clean_up(r):
     r.drive.stop()
     r.arms.silo_door.write(180)
