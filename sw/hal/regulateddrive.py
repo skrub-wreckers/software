@@ -30,15 +30,20 @@ class RegulatedDrive(Drive):
         return self.go_to(odo.pos + odo.dir*dist)
 
     @asyncio.coroutine
-    def turn_speed(sefl, omega):
-        pid = util.PID(255, 0, 0)
+    def turn_speed(self, omega):
+        pid = util.PID(1, 0, 0)
         pid.setpoint = omega
         steer = 0
+        last_t = time.time()
         try:
             while True:
+                curr_t = time.time()
                 sensor = self.odometer.val
-                steer += pid.iterate(sensor.omega)
-                self.go(steer=util.clamp(steer, -0.4, 0.4))
+                steer += pid.iterate(sensor.omega) * (curr_t - last_t)
+                steer = util.clamp(steer, -0.4, 0.4)
+                self.go(steer=steer)
+
+                last_t = curr_t
                 yield From(asyncio.sleep(0.05))
         finally:
             self.stop()
