@@ -35,26 +35,33 @@ def pick_up_cubes(r):
     while True:
         val = r.color_sensor.val
         blocked = r.break_beams.blocked
-        if blocked or val != Colors.NONE:
-            log.debug("Cube detection: beam={},sensor={}".format(blocked, val))
-        if not blocked:
-            break
-        if val == OUR_COLOR:
-            r.drive.stop()
-            r.arms.silo.up()
-            time.sleep(1.0)
-            r.arms.silo.down()
-        elif val == THEIR_COLOR:
-            r.drive.stop()
-            r.arms.dump.up()
-            time.sleep(0.75)
-            r.arms.dump.down()
+
+        if blocked:
+            if val == OUR_COLOR:
+                r.drive.stop()
+                r.arms.silo.up()
+                log.info('Picked up {} block'.format(Color.name(val)))
+                time.sleep(1.0)
+                r.arms.silo.down()
+            elif val == THEIR_COLOR:
+                r.drive.stop()
+                r.arms.dump.up()
+                log.info('Picked up {} block'.format(Color.name(val)))
+                time.sleep(0.75)
+                r.arms.dump.down()
+            else:
+                log.warn('Beam broken, but no color reading')
+                break
         else:
+            if val != None:
+                log.warn('Color is {}, but beam not broken'.format(Color.name(val)))
             break
+
         yield From(asyncio.sleep(0.05))
 
 @asyncio.coroutine
 def avoid_wall(r, side, dir):
+    log.info('Avoiding wall to {}'.format('left' if dir == 1 else 'right'))
     Drive.go_distance(r.drive, 4)
     while side.val:
         r.drive.go(0, dir*0.2)
@@ -113,6 +120,7 @@ def find_cubes(r):
 
 @asyncio.coroutine
 def clean_up(r):
+    log.info('Doing round cleanup')
     r.drive.stop()
     r.arms.silo_door.write(180)
     yield asyncio.sleep(0.5)
