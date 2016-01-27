@@ -21,7 +21,6 @@ if __name__ == '__main__':
             if c != Colors.NONE:
                 print "Saw {} cube".format(c)
                 r.arms.silo.up()
-                time.sleep(1)
                 r.arms.silo.down()
             if dir is None:
                 print "No beams broken"

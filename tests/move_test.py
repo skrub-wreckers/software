@@ -48,12 +48,10 @@ if __name__ == "__main__":
 
             elif c == ' ':
                 arms.silo.up()
-                time.sleep(1)
                 arms.silo.down()
 
             elif c == 'c':
                 arms.dump.up()
-                time.sleep(0.9)
                 arms.dump.down()
 
             elif c == 'v':

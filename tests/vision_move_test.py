@@ -43,13 +43,11 @@ def pick_up_cubes(r):
                 r.drive.stop()
                 r.arms.silo.up()
                 log.info('Picked up {} block'.format(Colors.name(val)))
-                time.sleep(1.0)
                 r.arms.silo.down()
             elif val == THEIR_COLOR:
                 r.drive.stop()
                 r.arms.dump.up()
                 log.info('Picked up {} block'.format(Colors.name(val)))
-                time.sleep(0.75)
                 r.arms.dump.down()
             else:
                 log.warn('Beam broken, but no color reading')
