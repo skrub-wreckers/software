@@ -38,15 +38,15 @@ class Arm(HardwareDevice):
 class Arms(HardwareDevice):
     def __init__(self, tamp):
         self.silo = Arm(tamp, pins.l_arm,
-            lower=598,
+            lower=590,
             upper=2350,
-            up_traj=zip(range(0, 40, 2), itertools.repeat(0.1)) + [(180, 1)],
+            up_traj=zip(range(0, 40, 1), itertools.repeat(0.025)) + [(180, 1)],
             down_traj=[(0, 1)]
         )
         self.dump = Arm(tamp, pins.r_arm,
             lower=2350,
             upper=760,
-            up_traj=zip(range(0, 40, 2), itertools.repeat(0.1)) + [(180, 1)],
+            up_traj=zip(range(0, 40, 2), itertools.repeat(0.05)) + [(180, 1)],
             down_traj=[(0, 0.75)]
         )
 
