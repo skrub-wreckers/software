@@ -134,8 +134,8 @@ class Vision(object):
     def filter_blue(self, frame):
         # for now
         is_blue = (frame.im == Colors.BLUE)
-        # is_blue = ndimage.binary_opening(is_blue, structure=np.ones((5,5)))
-        is_blue = ndimage.binary_closing(is_blue, structure=np.ones((3,3)))
+        is_blue = ndimage.binary_opening(is_blue, structure=np.ones((5,5)))
+        is_blue = ndimage.binary_closing(is_blue, structure=np.ones((5,5)))
 
         x, y = np.meshgrid(np.arange(frame.im.shape[1]), np.arange(frame.im.shape[0]))
 
