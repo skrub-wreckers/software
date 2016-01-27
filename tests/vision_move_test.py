@@ -97,7 +97,7 @@ def find_cubes(r):
             #print cube
 
             # start scanning for cubes
-            if cube is None
+            if cube is None:
                 if search_task is None:
                     log.info('No cubes in view - scanning')
                     search_task = asyncio.ensure_future(r.drive.turn_speed(np.radians(10)))
