@@ -34,30 +34,37 @@ SILO_TIME = ROUND_TIME - 20
 
 USE_BREAKBEAM = False
 
+def get_cube(r):
+    val = r.color_sensor.val
+    blocked = r.break_beams.blocked
+
+    if val == Colors.NONE:
+        if USE_BREAKBEAM and blocked:
+            log.warn('Beam broken, but no color reading')
+        return Colors.NONE
+
+    if USE_BREAKBEAM and not blocked:
+        log.warn('Color is {}, but beam not broken'.format(Colors.name(val)))
+        return Colors.NONE
+
+    return val
+
 @asyncio.coroutine
 def pick_up_cubes(r):
     while True:
-        val = r.color_sensor.val
-        blocked = r.break_beams.blocked
+        val = get_cube(r)
 
-        if blocked or not USE_BREAKBEAM:
-            if val == OUR_COLOR:
-                r.drive.stop()
-                r.arms.silo.up()
-                log.info('Picked up {} block'.format(Colors.name(val)))
-                r.arms.silo.down()
-            elif val == THEIR_COLOR:
-                r.drive.stop()
-                r.arms.dump.up()
-                log.info('Picked up {} block'.format(Colors.name(val)))
-                r.arms.dump.down()
-            else:
-                if USE_BREAKBEAM:
-                    log.warn('Beam broken, but no color reading')
-                break
+        if val == OUR_COLOR:
+            r.drive.stop()
+            r.arms.silo.up()
+            log.info('Picked up {} block'.format(Colors.name(val)))
+            r.arms.silo.down()
+        elif val == THEIR_COLOR:
+            r.drive.stop()
+            r.arms.dump.up()
+            log.info('Picked up {} block'.format(Colors.name(val)))
+            r.arms.dump.down()
         else:
-            if val != Colors.NONE:
-                log.warn('Color is {}, but beam not broken'.format(Colors.name(val)))
             break
 
         yield From(asyncio.sleep(0.05))
@@ -114,7 +121,7 @@ def find_cubes(r):
                 task = asyncio.ensure_future(r.drive.go_to(dest[:2]))
                 try:
                     while not task.done():
-                        if r.break_beams.blocked and r.color_sensor.val != Colors.NONE:
+                        if get_cube(r) != Colors.NONE:
                             task.cancel()
                         if r.left_short_ir.val:
                             task.cancel()
