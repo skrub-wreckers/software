@@ -17,6 +17,7 @@ from sw import constants
 from sw.mapping import Mapper
 from sw.mapping.arena import Arena
 
+
 from sw.taskqueue import TaskCancelled
 
 
@@ -72,52 +73,62 @@ def avoid_wall(r, side, dir):
 
 @asyncio.coroutine
 def find_cubes(r):
-    while True:
-        # pick up any cubes we have
-        yield From(pick_up_cubes(r))
+    try:
+        search_task = None
+        while True:
+            # pick up any cubes we have
+            yield From(pick_up_cubes(r))
 
-        try:
-            v.update()
-        except IOError:
-            continue
-        m.setCubePositions(v.cubes)
-        cube = v.nearest_cube()
-        #print cube
-
-        if cube is None:
-            #  print "No cube"
-            r.drive.go(steer=0.1)
-        elif abs(cube.angle_to) < np.radians(10):
-            log.debug("Going {}in to {}".format(cube.distance, cube))
-            # limit distance
-            to_go = cube.pos2
-            if cube.distance > 60:
-                to_go = to_go * 60 / cube.distance
-
-            # transform to world space
-            to_go = np.append(to_go, 1)
-            dest = r.drive.odometer.robot_matrix.dot(to_go)
-
-            task = asyncio.ensure_future(r.drive.go_to(dest[:2]))
             try:
-                while not task.done():
-                    if r.break_beams.blocked and r.color_sensor.val != Colors.NONE:
-                        task.cancel()
-                    if r.left_short_ir.val:
-                        task.cancel()
-                        yield From(avoid_wall(r,r.left_short_ir,-1))
-                    if r.right_short_ir.val:
-                        task.cancel()
-                        yield From(avoid_wall(r,r.right_short_ir,1))
+                v.update()
+            except IOError:
+                continue
+            m.setCubePositions(v.cubes)
+            cube = v.nearest_cube()
+            #print cube
 
-                    yield From(asyncio.sleep(0.05))
+            # start scanning for cubes
+            if cube is None:
+                search_task = subtasks.ensure_future(r.drive.turn_speed(np.radians(10)))
+                continue
 
-            finally:
-                task.cancel()
+            # we found a cube - stop scanning
+            if search_task:
+                search_task.cancel()
 
-        else:
-            log.debug("Turning {} to {}".format(cube.angle_to, cube))
-            yield From(r.drive.turn_angle(cube.angle_to))
+            if abs(cube.angle_to) > np.radians(10):
+                log.debug("Turning {} to {}".format(cube.angle_to, cube))
+                yield From(r.drive.turn_angle(cube.angle_to))
+            else:
+                log.debug("Going {}in to {}".format(cube.distance, cube))
+                # limit distance
+                to_go = cube.pos2
+                if cube.distance > 60:
+                    to_go = to_go * 60 / cube.distance
+
+                # transform to world space
+                to_go = np.append(to_go, 1)
+                dest = r.drive.odometer.robot_matrix.dot(to_go)
+
+                task = asyncio.ensure_future(r.drive.go_to(dest[:2]))
+                try:
+                    while not task.done():
+                        if r.break_beams.blocked and r.color_sensor.val != Colors.NONE:
+                            task.cancel()
+                        if r.left_short_ir.val:
+                            task.cancel()
+                            yield From(avoid_wall(r,r.left_short_ir,-1))
+                        if r.right_short_ir.val:
+                            task.cancel()
+                            yield From(avoid_wall(r,r.right_short_ir,1))
+
+                        yield From(asyncio.sleep(0.05))
+
+                finally:
+                    task.cancel()
+    finally:
+        if search_task:
+            search_task.cancel()
 
 @asyncio.coroutine
 def clean_up(r):
