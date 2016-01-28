@@ -82,6 +82,14 @@ def avoid_wall(r, ir, bumper, dir):
     Drive.go_distance(r.drive, 8)
 
 @asyncio.coroutine
+def search_for_cubes(r):
+    # TODO: Replace with wall following soon
+    if r.left_short_ir.val:
+        yield From(r.drive.turn_speed(np.radians(-30)))
+    else:
+        yield From(r.drive.turn_speed(np.radians(30)))
+
+@asyncio.coroutine
 def find_cubes(r):
     try:
         search_task = None
@@ -102,11 +110,7 @@ def find_cubes(r):
             if cube is None:
                 if search_task is None:
                     log.info('No cubes in view - scanning')
-                    # TODO: Replace with wall following soon
-                    if r.left_short_ir.val:
-                        search_task = asyncio.ensure_future(r.drive.turn_speed(np.radians(-30)))
-                    else:
-                        search_task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
+                    search_task = asyncio.ensure_future(search_for_cubes(r))
                 continue
 
             # we found a cube - stop scanning

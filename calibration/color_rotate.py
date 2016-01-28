@@ -21,8 +21,6 @@ from sw.mapping.arena import Arena
 
 log = logging.getLogger('sw.test')
 
-saveloc = 'color-sensor'
-
 CAMERA_ID = 2
 FILE_NAME_C = "none"
 FILE_NAME_B = "bb"
@@ -71,7 +69,7 @@ if __name__ == "__main__":
         r = Robot(tamproxy)
 
         m = Mapper(r.drive.odometer, map=Arena.load('../sw/mapping/red_map.txt'))
-        cam = Camera(geom=constants.camera_geometry, id=1)
+        cam = Camera(geom=constants.camera_geometry, id=2)
         v = Vision(cam)
         c = ControlPanel(r)
         w = Window(500, [m, CameraPanel(v), c])
