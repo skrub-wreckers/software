@@ -8,6 +8,12 @@ from .. import constants
 from ..vision import Colors
 from .. import pins
 
+class LimitSwitch(DigitalInput):
+    def _handle_update(self, request, response):
+        # reverse the polarity so that it's "1" when it's pressed
+        self.val = not ord(response)
+
+
 class _PatchedDigitalInput(DigitalInput):
     def __init__(self, *args, **kwargs):
         self.on_update = kwargs.pop('on_update')

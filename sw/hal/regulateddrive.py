@@ -25,7 +25,7 @@ class RegulatedDrive(Drive):
     def turn_angle(self, angle):
         return self.turn_to(self.odometer.val.theta + angle, fix=False)
 
-    def drive_distance(self, dist):
+    def go_distance(self, dist):
         odo = self.odometer.val
         return self.go_to(odo.pos + odo.dir*dist)
 

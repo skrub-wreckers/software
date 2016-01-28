@@ -17,6 +17,10 @@ from sw import constants
 from sw.mapping import Mapper
 from sw.mapping.arena import Arena
 
+
+from sw.taskqueue import TaskCancelled
+
+
 log = logging.getLogger('sw.test')
 
 OUR_COLOR = Colors.GREEN
@@ -69,17 +73,49 @@ def pick_up_cubes(r):
 @asyncio.coroutine
 def avoid_wall(r, ir, bumper, dir):
     log.info('Avoiding wall to {}'.format('left' if dir == 1 else 'right'))
-    if bumper.val:
-        log.info("Bumper was hit; backing up")
-        Drive.go_distance(r.drive, -1)
-    yield From(r.drive.turn_angle(dir * np.radians(30)))
+    Drive.go_distance(r.drive, -8)
     while ir.val and bumper.val:
-        log.info("turning to avoid wall")
         r.drive.go(0, dir*0.2)
         yield From(asyncio.sleep(0.05))
         yield From(pick_up_cubes(r))
     Drive.turn_angle(r.drive, np.pi/16*dir)
     Drive.go_distance(r.drive, 8)
+
+
+# Go forward, turn 30, and repeat (not true wall-following)
+@asyncio.coroutine
+def dumb_drive(r):
+    while True:
+        yield
+        yield From(r.drive.go_distance(12))
+        # Choose the wall that we're closest to
+        if not r.left_short_ir.val:
+            yield From(r.drive.turn_angle(np.radians(30)))
+        elif not r.right_short_ir.val:
+            yield From(r.drive.turn_angle(-np.radians(30)))
+
+
+@asyncio.coroutine
+def wall_fondle(r):
+    try:
+        task = asyncio.ensure_future(dumb_drive(r))
+        while True:
+            yield
+            yield From(dumb_drive(r))
+            if r.l_bumper.val:
+                task.cancel()
+                yield From(avoid_wall(r,r.left_short_ir,r.l_bumper,-1))
+                task = asyncio.ensure_future(dumb_drive(r))
+            if r.r_bumper.val:
+                task.cancel()
+                yield From(avoid_wall(r,r.right_short_ir,r.r_bumper,1))
+                task = asyncio.ensure_future(dumb_drive(r))
+            if get_cube(r):
+                task.cancel()
+                yield From(pick_up_cubes(r))
+    finally:
+        task.cancel()
+
 
 @asyncio.coroutine
 def find_cubes(r):
@@ -102,8 +138,8 @@ def find_cubes(r):
             if cube is None:
                 if search_task is None:
                     log.info('No cubes in view - scanning')
-                    # TODO: Smart turn so turn away from walls
-                    search_task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
+                    # TODO: Replace with wall following
+                    search_task = asyncio.ensure_future(wall_fondle(r))
                 continue
 
             # we found a cube - stop scanning
@@ -131,22 +167,12 @@ def find_cubes(r):
                     while not task.done():
                         if get_cube(r) != Colors.NONE:
                             task.cancel()
-                        if r.left_short_ir.val and r.right_short_ir.val and \
-                            min(r.left_long_ir.distInches, r.right_long_ir.distInches) < constants.close_to_wall:
+                        if r.l_bumper.val:
                             task.cancel()
-                            log.debug("All sensors hit")
-                            if r.left_bumper.val:
-                                yield From(r.drive.turn_angle(np.radians(-120)))
-                            else:
-                                yield From(r.drive.turn_angle(np.radians(120)))
-                        if r.left_bumper.val or r.left_short_ir.val:
-                            log.debug("Left side triggered")
+                            yield From(avoid_wall(r,r.left_short_ir,r.l_bumper,-1))
+                        if r.r_bumper.val:
                             task.cancel()
-                            yield From(avoid_wall(r,r.left_short_ir,r.left_bumper,-1))
-                        if r.right_bumper.val or r.right_short_ir.val:
-                            log.debug("Right side triggered")
-                            task.cancel()
-                            yield From(avoid_wall(r,r.right_short_ir,r.right_bumper,1))
+                            yield From(avoid_wall(r,r.right_short_ir,r.r_bumper,1))
                         yield From(asyncio.sleep(0.05))
 
                 finally:
@@ -180,7 +206,7 @@ def clean_up(r):
 
 @asyncio.coroutine
 def main(r):
-    task = asyncio.ensure_future(find_cubes(r))
+    task = asyncio.ensure_future(wall_fondle(r))
     try:
         yield From(asyncio.wait_for(task, SILO_TIME))
     except asyncio.TimeoutError:
@@ -195,10 +221,9 @@ if __name__ == "__main__":
         m = Mapper(r.drive.odometer, map=Arena.load('../sw/mapping/red_map.txt'))
         cam = Camera(geom=constants.camera_geometry, id=CAMERA_ID)
         v = Vision(cam)
-        c = ControlPanel(r)
-        w = Window(500, [m, CameraPanel(v), c])
+        w = Window(500, [m, CameraPanel(v), ControlPanel(r)])
 
-        while not c.started:
+        while w.get_key() != ' ':
             pass
 
         log.debug("started")

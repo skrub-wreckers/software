@@ -8,5 +8,5 @@ from .arms import Arms
 from .odometer import Odometer
 from .drive import Drive
 from .regulateddrive import RegulatedDrive
-from .sensors import ColorSensor, DigitalIR, BreakBeams
+from .sensors import ColorSensor, DigitalIR, BreakBeams, LimitSwitch
 from .robot import Robot
