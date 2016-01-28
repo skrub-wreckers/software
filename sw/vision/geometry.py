@@ -3,6 +3,24 @@ from collections import namedtuple
 
 import numpy as np
 
+class lazy_property(object):
+    '''
+    meant to be used for lazy evaluation of an object attribute.
+    property should represent non-mutable data, as it replaces itself.
+    '''
+
+    def __init__(self,fget):
+        self.fget = fget
+        self.func_name = fget.__name__
+
+    def __get__(self,obj,cls):
+        if obj is None:
+            return None
+        value = self.fget(obj)
+        setattr(obj,self.func_name,value)
+        return value
+
+
 _Geometry = namedtuple('_Geometry', 'w h wfov hfov matrix')
 
 class Geometry(_Geometry):
@@ -18,7 +36,7 @@ class Geometry(_Geometry):
             raise ValueError('Size must be positive')
 
         if not matrix.shape == (4, 4):
-            raise ValueError('Matrix should be a homogenous 4x4')
+            raise ValueError('Matrix should be a homogeneous 4x4')
 
         return super(Geometry, cls).__new__(cls, w, h, wfov, hfov, matrix)
 
@@ -26,7 +44,7 @@ class Geometry(_Geometry):
         """
         Returns the direction in world space, with components
         [forward, left, up], corresponding to a given pixel in the image.
-        Uses homogenous coordinates
+        Uses homogeneous coordinates
         """
         if self.wfov is None or self.hfov is None:
             raise ValueError('FOV not specified')
@@ -63,11 +81,11 @@ class Geometry(_Geometry):
 
         return origin + ray*t
 
-    @property
+    @lazy_property
     def projection_matrix(self):
         """
         Returns a 3x4 matrix that transforms a point in space into pixel coordinates
-        Uses homogenous coordinates:
+        Uses homogeneous coordinates:
 
             res = g.projection_matrix.dot(pixel)
             res = res / res[-1]
@@ -104,3 +122,8 @@ class Geometry(_Geometry):
                 .dot(plane_to_planerel)
                 .dot(camera_to_plane).T
         ).T
+
+    def on_screen(self, point):
+        """ return true if the homogeneous pixel coordinate is on_screen """
+        p = point / point[-1]
+        return  point[-1] > 0 and 0 <= p[0] <= self.w and 0 <= p[1] <= self.h
