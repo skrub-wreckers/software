@@ -13,8 +13,9 @@ class Thresholder(object):
 
 
 thresh_red   = Thresholder([1, -0.65,  -0.65], 16)
-thresh_green = Thresholder([-0.9, 1, -0.3], 4)
+thresh_green = Thresholder([-1, 0.75, -0.17], 6)
 thresh_blue  = Thresholder([-0.3, -0.9, 1], 8)
+thresh_yellow = Thresholder([-0.8, 0.2, -1], 12)
 thresh_black = Thresholder([-1, -1, -1], -225)
 
 class ColorDetectResult(object):
@@ -30,10 +31,13 @@ class ColorDetectResult(object):
         is_green = thresh_green.apply(frame)
         is_blue = thresh_blue.apply(frame)
         is_black = thresh_black.apply(frame)
+        is_yellow = thresh_yellow.apply(frame)
+
 
         # priority order here
         im[is_black] = Colors.BLACK
         im[is_green] = Colors.GREEN
+        im[is_yellow] = Colors.RED | Colors.GREEN
         im[is_blue] = Colors.BLUE
         im[is_red] = Colors.RED
         self.im = im
