@@ -62,3 +62,37 @@ class Geometry(_Geometry):
             raise ValueError("Ray does not hit plane")
 
         return origin + ray*t
+
+    @property
+    def projection_matrix(self):
+        # project a 3d point onto the image plane at unit distance with centered origin
+        camera_to_plane = np.array([
+            [0, -1, 0, 0],
+            [0, 0, -1, 0],
+            [1, 0, 0, 0]
+        ])
+
+
+        plane_w = 2*np.tan(self.wfov/2)
+        plane_h = 2*np.tan(self.hfov/2)
+
+        # project from centered origin to bottom left origin in [0,1]^2
+        plane_to_planerel = np.array([
+            [1/plane_w, 0, 0.5],
+            [0, 1/plane_h, 0.5],
+            [0, 0, 1]
+        ])
+
+        # convert to pixel coordinates
+        planerel_to_pixel = np.array([
+            [self.w, 0, 0],
+            [0, self.h, 0],
+            [0, 0, 1]
+        ])
+
+        return (
+            planerel_to_pixel
+            .dot(plane_to_planerel)
+            .dot(camera_to_plane)
+            .dot(np.linalg.inv(self.matrix))
+        )
