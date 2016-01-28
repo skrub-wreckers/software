@@ -63,6 +63,7 @@ def main(r):
             yield
     finally:
         ctask.cancel()
+        yield From(ctask)
 
 if __name__ == "__main__":
     with TAMProxy() as tamproxy:
