@@ -55,7 +55,7 @@ for cname, mplname in colors:
     res = (all_data[cname] - origin).dot(flatten.T)
 
 
-    ax.plot(res[:,0], res[:,1], color=mplname)
+    ax.scatter(res[:,0], res[:,1], color=mplname)
 
 print 'ORIGIN = {!r}'.format(origin)
 print 'WEIGHTS = {!r}'.format(flatten)

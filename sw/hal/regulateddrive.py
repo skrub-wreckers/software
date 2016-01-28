@@ -78,8 +78,7 @@ class RegulatedDrive(Drive):
                     break
 
                 if time.time() > end_time:
-                    warnings.warn('Timed out')
-                    break
+                    raise asyncio.TimeoutError
         finally:
             self.stop()
 
@@ -151,8 +150,7 @@ class RegulatedDrive(Drive):
                     break
 
                 if time.time() > end_time:
-                    warnings.warn('Timed out')
-                    break
+                    raise asyncio.TimeoutError
         finally:
             self.stop()
 

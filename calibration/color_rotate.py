@@ -22,8 +22,8 @@ from sw.mapping.arena import Arena
 log = logging.getLogger('sw.test')
 
 CAMERA_ID = 2
-FILE_NAME_C = "none"
-FILE_NAME_B = "bb"
+FILE_NAME_C = "green"
+FILE_NAME_B = "bb-green"
 colors = []
 breakbeams = []
 
@@ -34,7 +34,7 @@ def capture_color(r):
             if c.started:
                 yield From(asyncio.sleep(0.1))
                 colors.append(r.color_sensor.raw_val)
-                breakbeams.append((r.breakbeams.l_beam_recv_pin.val, r.breakbeams.r_beam_recv_pin.val,))
+                breakbeams.append((r.break_beams.l_beam._recv_pin.val, r.break_beams.r_beam._recv_pin.val,))
             yield
     finally:
         print "Saving results..."
@@ -55,13 +55,20 @@ def main(r):
             elif turn_task is not None:
                 turn_task.cancel()
                 turn_task = None
-            if abs(r.drive.odometer.val.theta - start_angle):
+            if abs(r.drive.odometer.val.theta - start_angle) > 2*np.pi:
                 if turn_task is not None:
                     turn_task.cancel()
                     c.started = False
                     turn_task = None
+
+            if ctask.done():
+                yield From(ctask)
+
             yield
+            if w.get_key() == ' ':
+                break
     finally:
+        print "Finally in main"
         ctask.cancel()
         yield From(ctask)
 
@@ -79,5 +86,12 @@ if __name__ == "__main__":
 
         loop = asyncio.get_event_loop()
         loop.set_debug(True)
-        loop.run_until_complete(main(r))
-        loop.close()
+        main_task = main(r)
+        try:
+            loop.run_until_complete(main_task)
+        except KeyboardInterrupt:
+            print "Interrupted"
+            main_task.cancel()
+            loop.run_forever()
+        finally:
+            loop.close()

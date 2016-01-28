@@ -9,7 +9,6 @@ from .window import Window
 
 import pygame
 import numpy as np
-import scipy.ndimage as ndimage
 
 class CubeStack(namedtuple('CubeStack', 'pos colors')):
     @property

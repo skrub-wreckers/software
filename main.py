@@ -177,10 +177,7 @@ def clean_up(r):
         if min(r.left_long_ir.distInches, r.right_long_ir.distInches) < constants.close_to_wall:
             gap_found = True
     r.drive.stop()
-    r.arms.silo_latch.write(90)
-    yield asyncio.sleep(0.25)
-    r.arms.silo_door.write(180)
-    yield asyncio.sleep(0.5)
+    r.silo.open()
 
     if gap_found:
         Drive.go_distance(r.drive, 6)
