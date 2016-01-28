@@ -102,7 +102,7 @@ def find_cubes(r):
             if cube is None:
                 if search_task is None:
                     log.info('No cubes in view - scanning')
-                    # TODO: Smart turn so turn away from walls
+                    # TODO: Replace with wall following soon
                     if r.left_short_ir.val:
                         search_task = asyncio.ensure_future(r.drive.turn_speed(np.radians(-30)))
                     else:
