@@ -49,7 +49,7 @@ class RegulatedDrive(Drive):
             self.stop()
 
     @asyncio.coroutine
-    def turn_to(self, angle, fix=True):
+    def turn_to(self, angle, fix=True, throw_timeout=False):
         """
         Turn to the absolute angle specified
 
@@ -78,12 +78,15 @@ class RegulatedDrive(Drive):
                     break
 
                 if time.time() > end_time:
-                    raise asyncio.TimeoutError
+                    if throw_timeout:
+                        raise asyncio.TimeoutError
+                    else:
+                        warnings.warn('Timed out during drive_to')
         finally:
             self.stop()
 
     @asyncio.coroutine
-    def go_to(self, pos):
+    def go_to(self, pos, throw_timeout=False):
         """ go in a straight line to pos """
         goal_pos = np.array(pos)
 
@@ -150,7 +153,10 @@ class RegulatedDrive(Drive):
                     break
 
                 if time.time() > end_time:
-                    raise asyncio.TimeoutError
+                    if throw_timeout:
+                        raise asyncio.TimeoutError
+                    else:
+                        warnings.warn('Timed out during drive_to')
         finally:
             self.stop()
 

@@ -132,7 +132,7 @@ def find_cubes(r):
                 to_go = np.append(to_go, 1)
                 dest = r.drive.odometer.val.robot_matrix.dot(to_go)
 
-                task = asyncio.ensure_future(r.drive.go_to(dest[:2]))
+                task = asyncio.ensure_future(r.drive.go_to(dest[:2], throw_timeout=True))
                 try:
                     while not task.done():
                         if get_cube(r) != Colors.NONE:
