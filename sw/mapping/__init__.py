@@ -39,8 +39,24 @@ class Mapper(object):
 
     def update_cubes_from(self, vision):
         self.vision = vision
-        self.cubes = vision.cubes
-        self.cubes_mat = self.robot_matrix
+        m = self.robot_matrix
+        new_cubes = [
+            cube._replace(pos=m.dot(cube.pos))
+            for cube in vision.cubes
+        ]
+        geom = vision.cam.geom
+        for cube in self.cubes:
+            # remove old cubes that are duplicates of the existing reading
+            if any(np.linalg.norm(cube.pos - new.pos) < 2 for new in new_cubes):
+                self.cubes.remove(cube)
+
+            # remove old cubes that should be on screen but aren't
+            rel_pos = np.linalg.solve(m, cube.pos)
+            proj_pos = geom.projection_matrix.dot(rel_pos)
+            if geom.on_screen(proj_pos):
+                self.cubes.remove(cube)
+
+        self.cubes += new_cubes
 
     @property
     def robot_matrix(self):
@@ -84,7 +100,7 @@ class Mapper(object):
                 ctx.circle(Colors.to_rgb(cube)*0.5, (stack.x*12, stack.y*12), (2*(3-i)))
 
         for cube in self.cubes:
-            pos = self.cubes_mat.dot(cube.pos)
+            pos = cube.pos
             for i, c in list(enumerate(cube.colors)):
                 size = np.ones(2) * (3.0 - i)
                 ctx.rect(
