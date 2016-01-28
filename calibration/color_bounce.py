@@ -18,8 +18,6 @@ from sw import constants
 from sw.mapping import Mapper
 from sw.mapping.arena import Arena
 
-from sw.taskqueue import TaskCancelled
-
 log = logging.getLogger('sw.test')
 
 saveloc = 'color-sensor'

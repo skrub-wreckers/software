@@ -64,7 +64,7 @@ class ControlPanel(object):
 
         center = [60, 170]
         scale = 100
-        pygame.draw.rect(surface, PANEL_BG, (10, 100, 160, 160))
+        pygame.draw.rect(surface, PANEL_BG, (10, 100, 310, 160))
 
         for c, points in self.color_data.items():
             c = Colors.to_rgb(c)
@@ -87,9 +87,6 @@ class ControlPanel(object):
             pygame.draw.rect(surface, (255,255,255), (130,15,105,50))
         pygame.draw.rect(surface, (255,255,255), (130,70,int(105*(self.robot.break_beams.r_beam._recv_pin.val/65536.0)),10))
         pygame.draw.line(surface, (255,0,0), (130+int(105*(self.robot.break_beams.r_beam._thres/65536.0)), 75), (130+int(105*(self.robot.break_beams.r_beam._thres/65536.0)),80))
-
-    def draw_time(self, surface):
-        pygame.draw.rect(surface, PANEL_BG, (180, 100, 150, 160))
     
     def update(self, events):
         for event in events:
