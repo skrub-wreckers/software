@@ -117,10 +117,7 @@ class Mapper(object):
                 size = np.ones(2) * (3.0 - i)
                 ctx.rect(
                     Colors.to_rgb(c),
-                    pygame.rect.Rect(
-                        pos[:2] - size / 2,
-                        size
-                    ),
+                    tuple(pos[:2] - size / 2) + tuple(size)
                     0
                 )
 

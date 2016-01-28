@@ -81,13 +81,14 @@ class Context(object):
 
 
     def rect(self, color, rect, width=0):
+        left, top, w, h = rect
         self.polygon(
             color=color,
             pointlist=[
-                [rect.left, rect.top],
-                [rect.right, rect.top],
-                [rect.right, rect.bottom],
-                [rect.left, rect.bottom],
+                [left, top],
+                [left + w, top],
+                [left + w, top + h],
+                [left, top + h],
             ],
             width=width
         )
