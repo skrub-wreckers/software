@@ -36,7 +36,7 @@ l_arm = 9
 r_arm = 10
 
 stack_door = 4
-stack_latch = 6
+stack_latch = 5
 
 gyro_cs = 24
 

@@ -51,6 +51,6 @@ class Arms(HardwareDevice):
         )
 
         self.silo_door = Servo(tamp, pins.stack_door, 1550, 700)
-        self.silo_latch = Servo(tamp, pins.stack_latch, 1130, 1830)
+        self.silo_latch = Servo(tamp, pins.stack_latch, 1830, 1130)
         self.silo_door.write(0)
         self.silo_latch.write(0)
