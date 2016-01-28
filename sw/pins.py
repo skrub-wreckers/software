@@ -13,6 +13,9 @@ l_ir_short = 15
 r_ir_short = 14
 back_ir_short = 33
 
+l_bumper = 32
+r_bumper = 31
+
 # breakbeams
 l_bb_recv = A[13]
 r_bb_recv = A[12]
