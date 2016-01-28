@@ -153,8 +153,8 @@ def find_cubes(r):
                             log.debug("Right side triggered")
                             task.cancel()
                             yield From(avoid_wall(r,r.right_short_ir,r.right_bumper,1))
-                        yield From(asyncio.sleep(0.05))
 
+                        yield From(asyncio.wait([task, asyncio.sleep(0.05)], asyncio.FIRST_COMPLETED)
                 finally:
                     task.cancel()
     finally:
