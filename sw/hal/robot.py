@@ -1,4 +1,4 @@
-from . import HardwareDevice, Arms, Drive, RegulatedDrive, ColorSensor, BreakBeams, DigitalIR, LimitSwitch
+from . import HardwareDevice, Arms, Silo, Drive, RegulatedDrive, ColorSensor, BreakBeams, DigitalIR, LimitSwitch
 from tamproxy.devices import LongIR, DigitalInput
 from .. import pins
 from ..import constants
@@ -8,6 +8,7 @@ class Robot(HardwareDevice):
     def __init__(self, tamp):
         self.tamp = tamp
         self.arms = Arms(self.tamp)
+        self.silo = Silo(self.tamp)
         self.drive = RegulatedDrive(self.tamp)
         self.color_sensor = ColorSensor(self.tamp)
 

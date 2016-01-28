@@ -4,7 +4,7 @@ __all__ = [
     'ColorSensor', 'DigitalIR', 'BreakBeams', 'Robot']
 
 from .hardwaredevice import HardwareDevice
-from .arms import Arms
+from .arms import Arms, Silo
 from .odometer import Odometer
 from .drive import Drive
 from .regulateddrive import RegulatedDrive
