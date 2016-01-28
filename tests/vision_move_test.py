@@ -131,10 +131,10 @@ def find_cubes(r):
                     while not task.done():
                         if get_cube(r) != Colors.NONE:
                             task.cancel()
-                        if r.left_bumper.val:
+                        if r.left_bumper.val or r.left_short_ir.val:
                             task.cancel()
                             yield From(avoid_wall(r,r.left_short_ir,r.left_bumper,-1))
-                        if r.right_bumper.val:
+                        if r.right_bumper.val or r.right_short_ir.val:
                             task.cancel()
                             yield From(avoid_wall(r,r.right_short_ir,r.right_bumper,1))
                         yield From(asyncio.sleep(0.05))
