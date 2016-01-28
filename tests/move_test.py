@@ -1,5 +1,5 @@
 from sw.hal import *
-from sw.gui import Window
+from sw.gui import Window, ControlPanel
 from sw.vision import Camera, Vision, CameraPanel
 from sw.mapping import Mapper
 from sw import constants
@@ -11,15 +11,12 @@ from tamproxy import TAMProxy
 
 if __name__ == "__main__":
     with TAMProxy() as tamproxy:
-        drive = Drive(tamproxy)
-        #arm = Arm(tamproxy, 10)
-        #arm2 = Arm(tamproxy, 9)
-        arms = Arms(tamproxy)
+        r = Robot(tamproxy)
 
-        m = Mapper(drive.odometer)
-        cam = Camera(geom=constants.camera_geometry, id=1)
+        m = Mapper(r.drive.odometer)
+        cam = Camera(geom=constants.camera_geometry, id=0)
         v = Vision(cam)
-        w = Window(500, [m, CameraPanel(v)])
+        w = Window(500, [m, CameraPanel(v), ControlPanel(r)])
 
         while True:
             try:
@@ -47,21 +44,21 @@ if __name__ == "__main__":
                 move_cmd = (0, -0.2)
 
             elif c == ' ':
-                arms.silo.up()
-                arms.silo.down()
+                r.arms.silo.up()
+                r.arms.silo.down()
 
             elif c == 'c':
-                arms.dump.up()
-                arms.dump.down()
+                r.arms.dump.up()
+                r.arms.dump.down()
 
             elif c == 'v':
-                arms.silo_door.write(180)
+                r.arms.silo_door.write(180)
             elif c == 'b':
-                arms.silo_door.write(0)
+                r.arms.silo_door.write(0)
 
 
             if move_cmd:
-                drive.go(*move_cmd)
+                r.drive.go(*move_cmd)
                 time.sleep(0.25)
-                drive.stop()
-                print drive.l_enc.val, drive.r_enc.val
+                r.drive.stop()
+                print r.drive.l_enc.val, r.drive.r_enc.val
