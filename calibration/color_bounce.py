@@ -2,6 +2,7 @@ import logging
 import time
 import math
 import os
+import random
 
 import cv2
 import numpy as np
