@@ -40,7 +40,6 @@ class ControlPanel(object):
         self.draw_ir(surface)
         self.draw_colorsensor(surface)
         self.draw_breakbeams(surface)
-        self.draw_time(surface)
 
     def draw_ir(self, surface):
         pygame.draw.rect(surface, PANEL_BG, (250,10,150,80))
