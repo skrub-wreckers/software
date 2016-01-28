@@ -29,6 +29,7 @@ class Mapper(object):
 
         self.map = map
         self.cubes = []
+        self.vision = None
 
         if map and odometer:
             odometer.override_position(map.start[0]*12, map.start[1]*12, 0)
@@ -37,7 +38,8 @@ class Mapper(object):
         self.size = size
 
     def update_cubes_from(self, vision):
-        self.cubes = v.cubes
+        self.vision = vision
+        self.cubes = vision.cubes
         self.cubes_mat = self.robot_matrix
 
     @property
@@ -51,21 +53,6 @@ class Mapper(object):
 
     def update(self, events):
         pass
-
-    def _draw_robot(self, ctx):
-        ctx.line((0,0,0), [0, 0], [10, 0])
-
-        points = [
-            (0, 0)
-        ]
-        n = 20
-        r = 8
-        for i in range(n+1):
-            f = float(i) / n
-            theta = np.pi *.25 *f + np.pi * 1.75 * (1-f)
-            points.append([r*np.cos(theta), r*np.sin(theta)])
-
-        ctx.polygon([255, 255, 0], points)
 
     def _draw_grid(self, ctx):
         bounds = np.array([[0,0,1], [self.size,self.size,1]]).T
@@ -102,9 +89,61 @@ class Mapper(object):
                 size = np.ones(2) * (3.0 - i)
                 ctx.rect(
                     Colors.to_rgb(c),
-                    tuple(pos[:2] - size / 2) + tuple(size)
+                    tuple(pos[:2] - size / 2) + tuple(size),
                     0
                 )
+
+    def _draw_fov(self, ctx):
+        if self.vision is None:
+            return
+
+        FAR = 48
+
+        # draw the FOV
+        g = self.vision.cam.geom
+        pixel_bl = np.array([0, g.h, 1])
+        pixel_br = np.array([g.w, g.h, 1])
+        pixel_tr = np.array([g.w, 0, 1])
+        pixel_tl = np.array([0, 0, 1])
+
+        # solve proj.dot(point) == pixel and point.dot(e_Z) == 0
+        solve = lambda pixel: np.linalg.solve(
+            np.r_[
+                g.projection_matrix,
+                [[0, 0, 1, 0]]
+            ],
+            np.r_[pixel, 0]
+        )
+
+        point_bl = solve(pixel_bl)
+        point_br = solve(pixel_br)
+        point_tr = solve(pixel_tr)
+        point_tl = solve(pixel_tl)
+
+        # these ones intersect:
+        point_bl = point_bl[:2] / point_bl[-1]
+        point_br = point_br[:2] / point_br[-1]
+
+        # these do not:
+        point_tr = point_tr[:2] / np.linalg.norm(point_tr[:2]) * FAR
+        point_tl = point_tl[:2] / np.linalg.norm(point_tl[:2]) * FAR
+
+        ctx.polygon([64, 64, 0], [point_bl, point_br, point_tr, point_tl])
+        ctx.polygon([128, 128, 0], [point_bl, point_br, point_tr, point_tl], width=1)
+
+
+    def _draw_robot(self, ctx):
+        points = [
+            (0, 0)
+        ]
+        n = 20
+        r = 8
+        for i in range(n+1):
+            f = float(i) / n
+            theta = np.pi *.25 *f + np.pi * 1.75 * (1-f)
+            points.append([r*np.cos(theta), r*np.sin(theta)])
+
+        ctx.polygon([255, 255, 0], points)
 
     def _draw_walls(self, ctx):
          if self.map is not None:
@@ -121,6 +160,16 @@ class Mapper(object):
         ctx.translate(250, 250)
         ctx.scale(self.ppi, -self.ppi)
 
+        if self.odometer is not None:
+            data = self.odometer.val
+        else:
+            from ..hal import Odometer
+            data = Odometer.Reading(0, 12*5, 12*5, 0, 0, 0)
+
+        robot_ctx = ctx.clone()
+        robot_ctx.translate(data.pos[0], data.pos[1])
+        robot_ctx.rotate(data.theta)
+
         # translate the map to be centered, if it exists
         if self.map:
             all_xs = [x for wall in self.map.walls for x in [wall.x1, wall.x2]]
@@ -132,23 +181,15 @@ class Mapper(object):
 
         surface.fill([0,0,0])
 
+        self._draw_fov(robot_ctx)
+
         self._draw_grid(ctx)
 
         self._draw_cubes(ctx)
 
-        if self.odometer is not None:
-            data = self.odometer.val
-        else:
-            from ..hal import Odometer
-            data = Odometer.Reading(0, 12*5, 12*5, 0, 0, 0)
-
         surface.blit(self.path_surface, [0,0])
 
-        ctx.save()
-        ctx.translate(data.pos[0], data.pos[1])
-        ctx.rotate(data.theta)
-        self._draw_robot(ctx)
-        ctx.restore()
+        self._draw_robot(robot_ctx)
 
         if self.last_pos is not None:
             if (self.last_pos != data.pos).any():

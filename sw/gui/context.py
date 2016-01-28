@@ -12,6 +12,9 @@ class Context(object):
         m.matrix = self.matrix
         return m
 
+    def clone(self):
+        return self.apply_to(self.surf)
+
     def save(self):
         self.old_transforms.append(self.matrix)
 
