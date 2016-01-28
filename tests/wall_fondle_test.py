@@ -160,7 +160,7 @@ def find_cubes(r):
 
                 # transform to world space
                 to_go = np.append(to_go, 1)
-                dest = r.drive.odometer.robot_matrix.dot(to_go)
+                dest = r.drive.odometer.val.robot_matrix.dot(to_go)
 
                 task = asyncio.ensure_future(r.drive.go_to(dest[:2]))
                 try:
