@@ -11,7 +11,7 @@ from sw.vision.window import Window
 from sw.vision.colors import Colors
 from sw.util import Profiler
 
-cam = vision.Camera(w=544, h=288, debug=False, id=1)
+cam = vision.Camera(w=320, h=240, debug=False, id=1)
 
 selector = ColorSelector(cam.shape)
 result_win = Window('result')
@@ -27,7 +27,7 @@ try:
 		try:
 			frame = cam.read()
 		except IOError:
-			print('No frame')
+			#print('No frame')
 			continue
 		Profiler.ENABLED = False
 		with Profiler('all') as profiler:
