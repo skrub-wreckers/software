@@ -60,6 +60,10 @@ def main(r):
                     turn_task.cancel()
                     c.started = False
                     turn_task = None
+
+            if ctask.done():
+                ctask.result()
+
             yield
     finally:
         ctask.cancel()
