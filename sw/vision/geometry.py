@@ -65,6 +65,13 @@ class Geometry(_Geometry):
 
     @property
     def projection_matrix(self):
+        """
+        Returns a 3x4 matrix that transforms a point in space into pixel coordinates
+        Uses homogenous coordinates:
+
+            res = g.projection_matrix.dot(pixel)
+            res = res / res[-1]
+        """
         # project a 3d point onto the image plane at unit distance with centered origin
         camera_to_plane = np.array([
             [0, -1, 0, 0],
@@ -90,9 +97,10 @@ class Geometry(_Geometry):
             [0, 0, 1]
         ])
 
-        return (
+        # XA = B => X = BA^-1 = solve(A.T, B.T).T
+        return np.linalg.solve(
+            self.matrix.T,
             planerel_to_pixel
-            .dot(plane_to_planerel)
-            .dot(camera_to_plane)
-            .dot(np.linalg.inv(self.matrix))
-        )
+                .dot(plane_to_planerel)
+                .dot(camera_to_plane).T
+        ).T
