@@ -139,9 +139,12 @@ class Vision(object):
         import scipy.ndimage as ndimage
 
         # for now
+        structure = np.ones((5,5))
         is_blue = (frame.im == Colors.BLUE)
-        is_blue = ndimage.binary_opening(is_blue, structure=np.ones((5,5)))
-        is_blue = ndimage.binary_closing(is_blue, structure=np.ones((5,5)))
+        is_blue = ndimage.binary_erosion(is_blue, structure, border_value=1)
+        is_blue = ndimage.binary_dilation(is_blue, structure, border_value=0)
+        is_blue = ndimage.binary_dilation(is_blue, structure, border_value=0)
+        is_blue = ndimage.binary_erosion(is_blue, structure, border_value=1)
 
         x, y = np.meshgrid(np.arange(frame.im.shape[1]), np.arange(frame.im.shape[0]))
 
