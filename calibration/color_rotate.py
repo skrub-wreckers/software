@@ -55,7 +55,7 @@ def main(r):
             elif turn_task is not None:
                 turn_task.cancel()
                 turn_task = None
-            if abs(r.drive.odometer.val.theta - start_angle):
+            if abs(r.drive.odometer.val.theta - start_angle) > 2*np.pi:
                 if turn_task is not None:
                     turn_task.cancel()
                     c.started = False
