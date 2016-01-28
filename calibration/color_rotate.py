@@ -21,10 +21,9 @@ from sw.mapping.arena import Arena
 
 log = logging.getLogger('sw.test')
 
-saveloc = 'color-sensor'
-
 CAMERA_ID = 2
-FILE_NAME = "none"
+FILE_NAME_C = "none"
+FILE_NAME_B = "bb"
 colors = []
 breakbeams = []
 
@@ -39,8 +38,8 @@ def capture_color(r):
             yield
     finally:
         print "Saving results..."
-        np.save(os.path.join(saveloc, FILE_NAME), colors)
-        np.save(os.path.join(saveloc, FILE_NAME), breakbeams)
+        np.save(FILE_NAME, colors)
+        np.save(FILE_NAME, breakbeams)
 
 @asyncio.coroutine
 def main(r):
@@ -52,11 +51,14 @@ def main(r):
             if c.started:
                 if turn_task is None:
                     turn_task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
-                    start_angle = r.drive.odometer.theta
+                    start_angle = r.drive.odometer.val.theta
             elif turn_task is not None:
                 turn_task.cancel()
-            if abs(r.drive.odometer.theta - start_angle):
+                turn_task = None
+            if abs(r.drive.odometer.val.theta - start_angle)>6.28:
                 turn_task.cancel()
+                c.started = False
+                turn_task = None
             yield
     finally:
         ctask.cancel()
@@ -66,7 +68,7 @@ if __name__ == "__main__":
         r = Robot(tamproxy)
 
         m = Mapper(r.drive.odometer, map=Arena.load('../sw/mapping/red_map.txt'))
-        cam = Camera(geom=constants.camera_geometry, id=1)
+        cam = Camera(geom=constants.camera_geometry, id=2)
         v = Vision(cam)
         c = ControlPanel(r)
         w = Window(500, [m, CameraPanel(v), c])
