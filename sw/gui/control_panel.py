@@ -11,7 +11,7 @@ import pygame
 PANEL_BG = (150, 150, 150)
 
 START_COLORS = {True:[200,0,0], False:[0,200,0]}
-START_RECT = (350,350,100,100)
+START_RECT = (350,100,100,100)
 
 class ControlPanel(object):
     def __init__(self, robot, size = 500):
@@ -96,4 +96,4 @@ class ControlPanel(object):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if util.point_in(event.pos, START_RECT):
                     print "Start button pressed"
-                    self.started = True
+                    self.started = not self.started
