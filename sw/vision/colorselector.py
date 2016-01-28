@@ -47,9 +47,10 @@ class ColorSelector(Window):
         super(ColorSelector, self).__init__(name)
 
         self.colors = [
-            ColorData('red',   [0, 0, 255], shape),
+            ColorData('red',   [255, 0, 0], shape),
             ColorData('green', [0, 255, 0], shape),
-            ColorData('blue',  [255, 0, 0], shape),
+            ColorData('yellow', [255, 255, 0], shape),
+            ColorData('blue',  [0, 0, 255], shape),
             ColorData('black',  [32, 32, 32], shape),
             ColorData('white',  [192, 192, 192], shape)
         ]
