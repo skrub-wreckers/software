@@ -73,7 +73,8 @@ def pick_up_cubes(r):
 @asyncio.coroutine
 def avoid_wall(r, ir, bumper, dir):
     log.info('Avoiding wall to {}'.format('left' if dir == 1 else 'right'))
-    Drive.go_distance(r.drive, -8)
+    Drive.go_distance(r.drive, -2)
+    yield From(r.drive.turn_angle(np.radians(30)))
     while ir.val and bumper.val:
         r.drive.go(0, dir*0.2)
         yield From(asyncio.sleep(0.05))
