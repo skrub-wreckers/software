@@ -1,7 +1,7 @@
 from .window import Window
 from ..hal import ColorSensor, BreakBeams, DigitalIR
 from ..vision import Colors
-from tamproxy.devices import LongIR
+from tamproxy.devices import LongIR, DigitalInput
 import pygame
 import numpy as np
 import os
@@ -42,14 +42,14 @@ class ControlPanel(object):
                 d = sensor.distInches
                 if not np.isfinite(d):
                     d = 24
-                pygame.draw.rect(surface, (255,255,255), (325, 15+15*id, int((d/24.0)*50), 10))
+                pygame.draw.rect(surface, (255,255,255), (325, 15+12*id, int((d/24.0)*50), 10))
                 for tick in range(0, 4):
-                    pygame.draw.line(surface, (255,0,0), (325+(int(((tick+1)*0.25)*50)), 20+15*id), (325+(int(((tick+1)*0.25)*50)), 25+15*id))
+                    pygame.draw.line(surface, (255,0,0), (325+(int(((tick+1)*0.25)*50)), 20+12*id), (325+(int(((tick+1)*0.25)*50)), 25+12*id))
                 #surface.blit(self.font.render(str(sensor.distInches)[:5], True, (255,255,255)), [325, 15+15*id])
             elif type(sensor) is DigitalIR:
-                pygame.draw.rect(surface, (255,255,255), (325, 15+15*id, int(sensor.val*50), 15))
+                pygame.draw.rect(surface, (255,255,255), (325, 15+12*id, int(sensor.val*50), 12))
             elif type(sensor) is DigitalInput:
-                pygame.draw.rect(surface, (0,0,0), (325, 15+15*id, int((not sensor.val)*50), 15))
+                pygame.draw.rect(surface, (0,0,0), (325, 15+12*id, int((not sensor.val)*50), 12))
 
     def draw_colorsensor(self, surface):
         pygame.draw.rect(surface, PANEL_BG, (410, 10, 80, 80))
