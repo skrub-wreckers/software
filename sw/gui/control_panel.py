@@ -33,7 +33,7 @@ class ControlPanel(object):
 
     def draw(self, surface):
         surface.fill((50,50,50))
-        pygame.draw.rect(surface, (0,200,0), PLAY_RECT)
+        pygame.draw.rect(surface, (0,200,0), START_RECT)
 
         self.draw_ir(surface)
         self.draw_colorsensor(surface)
