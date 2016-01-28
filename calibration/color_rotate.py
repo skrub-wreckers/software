@@ -66,6 +66,7 @@ def main(r):
 
             yield
     finally:
+        print "Finally in main"
         ctask.cancel()
         yield From(ctask)
 
@@ -83,5 +84,11 @@ if __name__ == "__main__":
 
         loop = asyncio.get_event_loop()
         loop.set_debug(True)
-        loop.run_until_complete(main(r))
-        loop.close()
+        main_task = main(r)
+        try:
+            loop.run_until_complete(main_task)
+        except KeyboardInterrupt:
+            main_task.cancel()
+            loop.run_forever()
+        finally:
+            loop.close()
