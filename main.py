@@ -19,7 +19,7 @@ from sw.mapping.arena import Arena
 log = logging.getLogger('sw.test')
 
 OUR_COLOR = Colors.GREEN
-CAMERA_ID = 2
+CAMERA_ID = 1
 
 THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     with TAMProxy() as tamproxy:
         r = Robot(tamproxy)
 
-        m = Mapper(r.drive.odometer, map=Arena.load('../sw/mapping/red_map.txt'))
+        m = Mapper(r.drive.odometer, map=Arena.load('sw/mapping/red_map.txt'))
         cam = Camera(geom=constants.camera_geometry, id=CAMERA_ID)
         v = Vision(cam)
         c = ControlPanel(r)

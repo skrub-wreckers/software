@@ -23,11 +23,11 @@ class ControlPanel(object):
 
         self.color_data = {}
         for c in [Colors.RED, Colors.GREEN, Colors.NONE]:
-            path = os.path.join('../tests/color-sensor', Colors.name(c) + '.npy')
+            path = os.path.join(os.path.dirname(__file__), '../../tests/color-sensor', Colors.name(c) + '.npy')
             raw = np.load(path).reshape((-1, 4))
 
             self.color_data[c] = ColorSensor.project(raw)
-            
+
         self.started = False
 
     def set_size(self, size):
@@ -88,7 +88,7 @@ class ControlPanel(object):
             pygame.draw.rect(surface, (255,255,255), (130,15,105,50))
         pygame.draw.rect(surface, (255,255,255), (130,70,int(105*(self.robot.break_beams.r_beam._recv_pin.val/65536.0)),10))
         pygame.draw.line(surface, (255,0,0), (130+int(105*(self.robot.break_beams.r_beam._thres/65536.0)), 75), (130+int(105*(self.robot.break_beams.r_beam._thres/65536.0)),80))
-    
+
     def update(self, events):
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
