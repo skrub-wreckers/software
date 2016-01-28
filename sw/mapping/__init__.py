@@ -44,16 +44,10 @@ class Mapper(object):
     def robot_matrix(self):
         if self.odometer is not None:
             data = self.odometer.val
-
-            return np.array([
-                [ np.cos(data.theta), -np.sin(data.theta), 0, data.x],
-                [ np.sin(data.theta), np.cos(data.theta), 0, data.y],
-                [                  0,                  0, 1,      0],
-                [                  0,                  0, 0,      1]
-            ])
+            return data.robot_matrix3
 
         else:
-            return np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
+            return np.eye(4)
 
     def update(self, events):
         pass
