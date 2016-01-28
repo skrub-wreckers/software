@@ -1,7 +1,7 @@
 from __future__ import print_function
 import time
 import numpy as np
-from sw import constants
+from . import constants
 
 def clamp(value, min, max):
     if value < min: 

@@ -164,10 +164,7 @@ def find_cubes(r):
                         yield From(r.drive.turn_angle(np.radians(45)))
                 finally:
                     task.cancel()
-                    
 
-
->>>>>>> Stashed changes
     finally:
         if search_task:
             search_task.cancel()
