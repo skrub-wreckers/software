@@ -24,7 +24,8 @@ log = logging.getLogger('sw.test')
 saveloc = 'color-sensor'
 
 CAMERA_ID = 2
-FILE_NAME = "none"
+FILE_NAME_C = "none"
+FILE_NAME_B = "bb"
 colors = []
 breakbeams = []
 
@@ -39,8 +40,8 @@ def capture_color(r):
             yield
     finally:
         print "Saving results..."
-        np.save(os.path.join(saveloc, FILE_NAME), colors)
-        np.save(os.path.join(saveloc, FILE_NAME), breakbeams)
+        np.save(FILE_NAME_C, colors)
+        np.save(FILE_NAME_B, breakbeams)
 
 @asyncio.coroutine
 def main(r):
@@ -55,8 +56,12 @@ def main(r):
                     start_angle = r.drive.odometer.val.theta
             elif turn_task is not None:
                 turn_task.cancel()
+                turn_task = None
             if abs(r.drive.odometer.val.theta - start_angle):
-                turn_task.cancel()
+                if turn_task is not None:
+                    turn_task.cancel()
+                    c.started = False
+                    turn_task = None
             yield
     finally:
         ctask.cancel()
