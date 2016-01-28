@@ -52,14 +52,9 @@ if __name__ == "__main__":
                 r.arms.dump.down()
 
             elif c == 'v':
-                r.arms.silo_latch.write(180)
-                time.sleep(1)
-                r.arms.silo_door.write(180)
+                r.silo.open()
             elif c == 'b':
-                r.arms.silo_door.write(0)
-                time.sleep(1)
-                r.arms.silo_latch.write(0)
-
+                r.silo.close()
 
             if move_cmd:
                 r.drive.go(*move_cmd)
