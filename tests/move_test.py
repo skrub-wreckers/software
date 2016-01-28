@@ -23,7 +23,7 @@ if __name__ == "__main__":
                 v.update()
             except IOError:
                 continue
-            m.setCubePositions(v.cubes)
+            m.update_cubes_from(v)
 
             c = w.get_key()
             move_cmd = None

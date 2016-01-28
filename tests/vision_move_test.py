@@ -94,7 +94,7 @@ def find_cubes(r):
                 yield From(asyncio.get_event_loop().run_in_executor(None, v.update))
             except IOError:
                 continue
-            m.setCubePositions(v.cubes)
+            m.update_cubes_from(v)
             cube = v.nearest_cube()
             #print cube
 

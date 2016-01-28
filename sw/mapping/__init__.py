@@ -36,8 +36,8 @@ class Mapper(object):
     def set_size(self, size):
         self.size = size
 
-    def setCubePositions(self, cubes):
-        self.cubes = cubes
+    def update_cubes_from(self, vision):
+        self.cubes = v.cubes
         self.cubes_mat = self.robot_matrix
 
     @property

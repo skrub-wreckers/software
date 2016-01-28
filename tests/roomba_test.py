@@ -30,7 +30,7 @@ if __name__ == "__main__":
                 v.update()
             except IOError:
                 continue
-            m.setCubePositions(v.cubes)
+            m.update_cubes_from(v)
 
             print "Right: {:.1f}, Left:  {:.1f}".format(
                 rightIR.distInches, leftIR.distInches)

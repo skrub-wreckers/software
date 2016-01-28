@@ -18,6 +18,6 @@ if __name__ == "__main__":
         w = window.Window(500, [m, CameraPanel(v), ControlPanel(r)])#[Mapper(drive.odometer), CameraPanel(500, v)])
         while True:
             v.update()
-            m.setCubePositions(v.cubes)
+            m.update_cubes_from(v)
             time.sleep(0.05)
             pass
