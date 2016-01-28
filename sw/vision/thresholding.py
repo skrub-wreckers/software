@@ -15,7 +15,7 @@ class Thresholder(object):
 thresh_red   = Thresholder([1, -0.65,  -0.65], 16)
 thresh_green = Thresholder([-1, 0.75, -0.17], 6)
 thresh_blue  = Thresholder([-0.3, -0.9, 1], 8)
-thresh_yellow = Thresholder([0.8, 0.2, -1], 12)
+thresh_yellow = Thresholder([0.75, 0.2, -1], 16)
 thresh_black = Thresholder([-1, -1, -1], -225)
 
 class ColorDetectResult(object):
