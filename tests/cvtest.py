@@ -29,6 +29,7 @@ try:
 		except IOError:
 			print('No frame')
 			continue
+		Profiler.ENABLED = False
 		with Profiler('all') as profiler:
 			with profiler('detect') as p:
 				res = vision.ColorDetectResult(frame)

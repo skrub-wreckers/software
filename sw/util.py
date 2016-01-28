@@ -14,6 +14,7 @@ def point_in(point, rect):
     return point[0] > rect[0] and point[0] < (rect[0]+rect[2]) and point[1] > rect[1] and point[1] < (rect[1]+rect[3])
 
 class Profiler(object):
+    ENABLED = True
     def __init__(self, name, indent=''):
         self.name = name
         self.indent = indent
@@ -21,10 +22,12 @@ class Profiler(object):
 
     def __enter__(self):
         self.t = time.time()
-        print(self.indent +'Timing {}... '.format(self.name), end='')
+        if self.ENABLED:
+            print(self.indent +'Timing {}... '.format(self.name), end='')
         return self
 
     def __exit__(self, *args):
+        if not self.ENABLED: return
         if self.has_children:
             print()
             print(self.indent + '  ' + str(time.time() - self.t))
@@ -32,7 +35,8 @@ class Profiler(object):
             print(str(time.time() - self.t))
 
     def __call__(self, name):
-        print()
+        if self.ENABLED:
+            print()
         self.has_children = True
         return Profiler(name, self.indent + '  ')
 
