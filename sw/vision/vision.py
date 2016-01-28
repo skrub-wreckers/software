@@ -44,6 +44,11 @@ class CubeStack(namedtuple('CubeStack', 'pos colors')):
             return "<{} cube at {:.1f}, {:.1f}, {:.1f}>".format(
                 Colors.name(self.color), self.pos[0], self.pos[1], self.pos[2])
 
+    def __eq__(self, other):
+        if not isinstance(other, CubeStack):
+            return False
+        return np.all(self.pos == other.pos) and self.colors == other.colors
+
 # deprecated
 Cube = CubeStack
 
