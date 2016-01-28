@@ -1,5 +1,5 @@
 from .window import Window
-from ..hal import ColorSensor, BreakBeams, DigitalIR
+from ..hal import ColorSensor, BreakBeams, DigitalIR, LimitSwitch
 from ..vision import Colors
 from .. import util
 from tamproxy.devices import LongIR, DigitalInput
@@ -54,8 +54,8 @@ class ControlPanel(object):
                 #surface.blit(self.font.render(str(sensor.distInches)[:5], True, (255,255,255)), [325, 15+15*id])
             elif type(sensor) is DigitalIR:
                 pygame.draw.rect(surface, (255,255,255), (325, 15+12*id, int(sensor.val*50), 12))
-            elif type(sensor) is DigitalInput:
-                pygame.draw.rect(surface, (0,0,0), (325, 15+12*id, int((not sensor.val)*50), 12))
+            elif type(sensor) is LimitSwitch:
+                pygame.draw.rect(surface, (0,0,0), (325, 15+12*id, int(sensor.val*50), 12))
 
     def draw_colorsensor(self, surface):
         pygame.draw.rect(surface, PANEL_BG, (410, 10, 80, 80))

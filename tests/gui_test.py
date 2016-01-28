@@ -10,7 +10,7 @@ import time
 from tamproxy import TAMProxy
 
 if __name__ == "__main__":
-    cam = Camera(geom=constants.camera_geometry, id=0)
+    cam = Camera(geom=constants.camera_geometry, id=1)
     v = Vision(cam)
     with TAMProxy() as tamproxy:
         r = Robot(tamproxy)

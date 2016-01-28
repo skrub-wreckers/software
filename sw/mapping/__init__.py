@@ -49,6 +49,7 @@ class Mapper(object):
             # remove old cubes that are duplicates of the existing reading
             if any(np.linalg.norm(cube.pos - new.pos) < 2 for new in new_cubes):
                 self.cubes.remove(cube)
+                continue
 
             # remove old cubes that should be on screen but aren't
             rel_pos = np.linalg.solve(m, cube.pos)
