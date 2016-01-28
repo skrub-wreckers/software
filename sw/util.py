@@ -9,6 +9,10 @@ def clamp(value, min, max):
         return max
     else:
         return value
+
+def point_in(point, rect):
+    return point[0] > rect[0] and point[0] < (rect[0]+rect[2]) and point[1] > rect[1] and point[1] < (rect[1]+rect[3])
+
 class Profiler(object):
     def __init__(self, name, indent=''):
         self.name = name

@@ -17,10 +17,6 @@ from sw import constants
 from sw.mapping import Mapper
 from sw.mapping.arena import Arena
 
-
-from sw.taskqueue import TaskCancelled
-
-
 log = logging.getLogger('sw.test')
 
 OUR_COLOR = Colors.GREEN
@@ -199,9 +195,10 @@ if __name__ == "__main__":
         m = Mapper(r.drive.odometer, map=Arena.load('../sw/mapping/red_map.txt'))
         cam = Camera(geom=constants.camera_geometry, id=CAMERA_ID)
         v = Vision(cam)
-        w = Window(500, [m, CameraPanel(v), ControlPanel(r)])
+        c = ControlPanel(r)
+        w = Window(500, [m, CameraPanel(v), c])
 
-        while w.get_key() != ' ':
+        while not c.started:
             pass
 
         log.debug("started")
