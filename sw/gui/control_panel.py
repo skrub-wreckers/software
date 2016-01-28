@@ -36,6 +36,8 @@ class ControlPanel(object):
     def draw(self, surface):
         surface.fill((50,50,50))
         pygame.draw.rect(surface, START_COLORS[self.started], START_RECT)
+        t_surf = self.font.render(str(self.robot.time_remaining), True, (0,0,0))
+        surface.blit(t_surf, (int(START_RECT[0]+(START_RECT[2]/2.0)-(t_surf.get_width()/2.0)),int(START_RECT[1]+(START_RECT[3]/2.0)-(t_surf.get_height()/2.0))))
 
         self.draw_ir(surface)
         self.draw_colorsensor(surface)
