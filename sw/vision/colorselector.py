@@ -47,9 +47,10 @@ class ColorSelector(Window):
         super(ColorSelector, self).__init__(name)
 
         self.colors = [
-            ColorData('red',   [0, 0, 255], shape),
+            ColorData('red',   [255, 0, 0], shape),
             ColorData('green', [0, 255, 0], shape),
-            ColorData('blue',  [255, 0, 0], shape),
+            ColorData('yellow', [255, 255, 0], shape),
+            ColorData('blue',  [0, 0, 255], shape),
             ColorData('black',  [32, 32, 32], shape),
             ColorData('white',  [192, 192, 192], shape)
         ]
@@ -103,7 +104,8 @@ class ColorSelector(Window):
             os.mkdir(path)
         for c in self.colors:
             all_data = np.concatenate(c.matches)
-            np.save(os.path.join(path, c.name), all_data)
+            if len(all_data) > 0:
+                np.save(os.path.join(path, c.name), all_data)
 
     def clear(self):
         for c in self.colors:

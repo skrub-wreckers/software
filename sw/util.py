@@ -14,6 +14,7 @@ def point_in(point, rect):
     return point[0] > rect[0] and point[0] < (rect[0]+rect[2]) and point[1] > rect[1] and point[1] < (rect[1]+rect[3])
 
 class Profiler(object):
+    ENABLED = True
     def __init__(self, name, indent=''):
         self.name = name
         self.indent = indent
@@ -21,10 +22,12 @@ class Profiler(object):
 
     def __enter__(self):
         self.t = time.time()
-        print(self.indent +'Timing {}... '.format(self.name), end='')
+        if self.ENABLED:
+            print(self.indent +'Timing {}... '.format(self.name), end='')
         return self
 
     def __exit__(self, *args):
+        if not self.ENABLED: return
         if self.has_children:
             print()
             print(self.indent + '  ' + str(time.time() - self.t))
@@ -32,7 +35,8 @@ class Profiler(object):
             print(str(time.time() - self.t))
 
     def __call__(self, name):
-        print()
+        if self.ENABLED:
+            print()
         self.has_children = True
         return Profiler(name, self.indent + '  ')
 
@@ -74,14 +78,14 @@ class PID(object):
         err = self.setpoint - val
 
         # I
-        if self._last_time is not None and np.isfinite(val):
+        if self._last_time is not None and np.isfinite(val).all():
             self._integral += err*(this_time - self._last_time)
 
         # D
         if dval is not None:
             # TODO: include d/dt(setpoint)?
             derr = -dval
-        elif self._last_time is not None and np.isfinite(val):
+        elif self._last_time is not None and np.isfinite(val).all():
             derr = (err - self._last_err)/(this_time - self._last_time)
         else:
             derr = 0

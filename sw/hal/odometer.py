@@ -20,6 +20,24 @@ class Odometer(HardwareDevice):
         def vel(self):
             return self.dir * self.v
 
+        @property
+        def robot_matrix(self):
+            """ returns a matrix that multiplies 2D robot space to world space """
+
+            return np.array([
+                [ np.cos(self.theta), -np.sin(self.theta), self.x],
+                [ np.sin(self.theta),  np.cos(self.theta), self.y],
+                [                  0,                   0,      1]
+            ])
+
+        @property
+        def robot_matrix3(self):
+            """ returns a matrix that multiplies 3D robot space to world space """
+            res = np.eye(4)
+            i = np.array([0,1,3]).reshape(1, -1)
+            res[i.T,i] = self.robot_matrix
+            return res
+
     def __init__(self, odometer):
         self._dev = odometer
 
@@ -63,23 +81,5 @@ class Odometer(HardwareDevice):
 
         self._ref_to_world = np.dot(pose_to_world, np.linalg.inv(robot_to_ref))
 
-    @property
-    def robot_matrix(self):
-        """ returns a matrix that multiplies 2D robot space to world space """
-        data = self.val
-
-        return np.array([
-            [ np.cos(data.theta), -np.sin(data.theta), data.x],
-            [ np.sin(data.theta),  np.cos(data.theta), data.y],
-            [                  0,                   0,      1]
-        ])
-
-    @property
-    def robot_matrix3(self):
-        """ returns a matrix that multiplies 3D robot space to world space """
-        res = np.eye(4)
-        i = np.array([0,1,3]).reshape(1, -1)
-        res[i.T,i] = self.robot_matrix
-        return res
 
 

@@ -10,6 +10,7 @@ scatter3(  red(:,3),   red(:,2),   red(:,1), 'r')
 scatter3( blue(:,3),  blue(:,2),  blue(:,1), 'b')
 scatter3(black(:,3), black(:,2), black(:,1), 'k')
 scatter3(white(:,3), white(:,2), white(:,1), 'w')
+scatter3(yellow(:,3), yellow(:,2), yellow(:,1), 'y')
 xlim([0 255])
 ylim([0 255])
 zlim([0 255])
@@ -26,6 +27,7 @@ ax.ZTick = 0:64:256;
 dirs = [
 	{[1 -0.65 -0.65]', 16, 'r'};
 	{[-0.9 1 -0.3]', 8, 'g'};
+	{[-1 0.2 0.8]', 8, 'y'};
     {[-0.3 -0.9 1]', 8, 'b'};
 	{[-1 -1 -1]', -110, 'k'};
 ]';

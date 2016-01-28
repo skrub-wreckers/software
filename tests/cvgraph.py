@@ -9,7 +9,7 @@ import scipy.spatial
 import scipy.io
 
 
-colors = ['red', 'green', 'blue', 'black', 'white']
+colors = ['red', 'green', 'blue', 'black', 'white', 'yellow']
 
 color_data = {
 	c: np.load('color-data/{}.npy'.format(c)) for c in colors
