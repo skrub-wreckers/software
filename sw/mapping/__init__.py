@@ -146,7 +146,7 @@ class Mapper(object):
         ctx.polygon([255, 255, 0], points)
 
     def _draw_walls(self, ctx):
-         if self.map is not None:
+        if self.map is not None:
             for wall in self.map.walls:
                 ctx.line(
                     (0,0,255),
@@ -160,15 +160,6 @@ class Mapper(object):
         ctx.translate(250, 250)
         ctx.scale(self.ppi, -self.ppi)
 
-        if self.odometer is not None:
-            data = self.odometer.val
-        else:
-            from ..hal import Odometer
-            data = Odometer.Reading(0, 12*5, 12*5, 0, 0, 0)
-
-        robot_ctx = ctx.clone()
-        robot_ctx.translate(data.pos[0], data.pos[1])
-        robot_ctx.rotate(data.theta)
 
         # translate the map to be centered, if it exists
         if self.map:
@@ -178,6 +169,16 @@ class Mapper(object):
             c_x = (max(all_xs) + min(all_xs)) / 2.0
             c_y = (max(all_ys) + min(all_ys)) / 2.0
             ctx.translate(-c_x*12, -c_y*12)
+
+        if self.odometer is not None:
+            data = self.odometer.val
+        else:
+            from ..hal import Odometer
+            data = Odometer.Reading(0, 12*5, 12*5, 0, 0, 0)
+
+        robot_ctx = ctx.clone()
+        robot_ctx.translate(data.pos[0], data.pos[1])
+        robot_ctx.rotate(data.theta)
 
         surface.fill([0,0,0])
 
