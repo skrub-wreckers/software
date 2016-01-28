@@ -67,23 +67,7 @@ class Mapper(object):
 
         ctx.polygon([255, 255, 0], points)
 
-
-    def draw(self, surface):
-        ctx = Context(surface)
-        ctx.translate(250, 250)
-        ctx.scale(self.ppi, -self.ppi)
-
-        # translate the map to be centered, if it exists
-        if self.map:
-            all_xs = [x for wall in self.map.walls for x in [wall.x1, wall.x2]]
-            all_ys = [y for wall in self.map.walls for y in [wall.y1, wall.y2]]
-
-            c_x = (max(all_xs) + min(all_xs)) / 2.0
-            c_y = (max(all_ys) + min(all_ys)) / 2.0
-            ctx.translate(-c_x*12, -c_y*12)
-
-        surface.fill([0,0,0])
-
+    def _draw_grid(self, ctx):
         bounds = np.array([[0,0,1], [self.size,self.size,1]]).T
         bounds = np.linalg.inv(ctx.matrix).dot(bounds)
         xmin, xmax = sorted(bounds[0,:])
@@ -107,6 +91,7 @@ class Mapper(object):
                 1
             )
 
+    def _draw_cubes(self, ctx):
         for stack in self.map.stacks:
             for i,cube in enumerate(stack.cubes):
                 ctx.circle(Colors.to_rgb(cube)*0.5, (stack.x*12, stack.y*12), (2*(3-i)))
@@ -120,6 +105,36 @@ class Mapper(object):
                     tuple(pos[:2] - size / 2) + tuple(size)
                     0
                 )
+
+    def _draw_walls(self, ctx):
+         if self.map is not None:
+            for wall in self.map.walls:
+                ctx.line(
+                    (0,0,255),
+                    (wall.x1 * 12, wall.y1 * 12),
+                    (wall.x2 * 12, wall.y2 * 12),
+                    2
+                )
+
+    def draw(self, surface):
+        ctx = Context(surface)
+        ctx.translate(250, 250)
+        ctx.scale(self.ppi, -self.ppi)
+
+        # translate the map to be centered, if it exists
+        if self.map:
+            all_xs = [x for wall in self.map.walls for x in [wall.x1, wall.x2]]
+            all_ys = [y for wall in self.map.walls for y in [wall.y1, wall.y2]]
+
+            c_x = (max(all_xs) + min(all_xs)) / 2.0
+            c_y = (max(all_ys) + min(all_ys)) / 2.0
+            ctx.translate(-c_x*12, -c_y*12)
+
+        surface.fill([0,0,0])
+
+        self._draw_grid(ctx)
+
+        self._draw_cubes(ctx)
 
         if self.odometer is not None:
             data = self.odometer.val
@@ -145,13 +160,4 @@ class Mapper(object):
                 )
         self.last_pos = data.pos
 
-        if self.map is not None:
-            for wall in self.map.walls:
-                ctx.line(
-                    (0,0,255),
-                    (wall.x1 * 12, wall.y1 * 12),
-                    (wall.x2 * 12, wall.y2 * 12),
-                    2
-                )
-
-                ctx._apply((wall.x1 * 12, wall.y1 * 12))
+        self._draw_walls(ctx)
