@@ -47,8 +47,8 @@ class Mapper(object):
         geom = vision.cam.geom
         for cube in self.cubes:
             rel_pos = np.linalg.solve(m, cube.pos)
-            proj_pos = geom.projection.dot(rel_pos)
-            if geom.on_screen(proj_pos)
+            proj_pos = geom.projection_matrix.dot(rel_pos)
+            if geom.on_screen(proj_pos):
                 self.cubes.remove(cube)
 
         self.cubes += new_cubes
