@@ -5,12 +5,12 @@ cla;
 hold on
 axis equal
 
-scatter3(green(:,3), green(:,2), green(:,1), 'g')
-scatter3(  red(:,3),   red(:,2),   red(:,1), 'r')
-scatter3( blue(:,3),  blue(:,2),  blue(:,1), 'b')
-scatter3(black(:,3), black(:,2), black(:,1), 'k')
-scatter3(white(:,3), white(:,2), white(:,1), 'w')
-scatter3(yellow(:,3), yellow(:,2), yellow(:,1), 'y')
+scatter3(green(:,1), green(:,2), green(:,3), 'g')
+scatter3(  red(:,1),   red(:,2),   red(:,3), 'r')
+scatter3( blue(:,1),  blue(:,2),  blue(:,3), 'b')
+scatter3(black(:,1), black(:,2), black(:,3), 'k')
+scatter3(white(:,1), white(:,2), white(:,3), 'w')
+scatter3(yellow(:,1), yellow(:,2), yellow(:,3), 'y')
 xlim([0 255])
 ylim([0 255])
 zlim([0 255])
