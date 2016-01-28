@@ -1,6 +1,7 @@
 from __future__ import print_function
 import time
 import numpy as np
+from sw import constants
 
 def clamp(value, min, max):
     if value < min: 
@@ -12,6 +13,9 @@ def clamp(value, min, max):
 
 def point_in(point, rect):
     return point[0] > rect[0] and point[0] < (rect[0]+rect[2]) and point[1] > rect[1] and point[1] < (rect[1]+rect[3])
+
+def close_to_wall(robot):
+    return min(robot.left_long_ir.distInches, robot.right_long_ir.distInches) < constants.close_to_wall
 
 class Profiler(object):
     ENABLED = True

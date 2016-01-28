@@ -12,7 +12,7 @@ from sw.hal import *
 from sw.vision.window import Window
 from sw.vision import Camera, Vision, Colors, CameraPanel
 from sw.gui import Window, ControlPanel
-from sw import constants
+from sw import constants, util
 from sw.mapping import Mapper
 from sw.mapping.arena import Arena
 
@@ -156,8 +156,18 @@ def find_cubes(r):
 
                         # this throws if the task threw. Probably
                         yield From(asyncio.wait([task, asyncio.sleep(0.05)], asyncio.FIRST_COMPLETED))
+                except asyncio.TimeoutError:
+                    log.debug("Driving task timed out and we caught it")
+                    if util.close_to_wall(r):
+                        # TODO: Make smarter thing than just moving arbitrarily
+                        Drive.go_distance(r.drive, -1)
+                        yield From(r.drive.turn_angle(np.radians(45)))
                 finally:
                     task.cancel()
+                    
+
+
+>>>>>>> Stashed changes
     finally:
         if search_task:
             search_task.cancel()
@@ -174,7 +184,7 @@ def clean_up(r):
     gap_found = False
     while not gap_found and abs(r.drive.odometer.val.theta - startAngle) <= 2*pi:
         yield asyncio.sleep(0.05)
-        if min(r.left_long_ir.distInches, r.right_long_ir.distInches) < constants.close_to_wall:
+        if util.close_to_wall(r):
             gap_found = True
     r.drive.stop()
     r.silo.open()
