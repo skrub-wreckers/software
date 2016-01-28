@@ -34,7 +34,7 @@ def capture_color(r):
             if c.started:
                 yield From(asyncio.sleep(0.1))
                 colors.append(r.color_sensor.raw_val)
-                breakbeams.append((r.breakbeams.l_beam._recv_pin.val, r.breakbeams.r_beam._recv_pin.val,))
+                breakbeams.append((r.break_beams.l_beam._recv_pin.val, r.break_beams.r_beam._recv_pin.val,))
             yield
     finally:
         print "Saving results..."
