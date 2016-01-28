@@ -104,7 +104,8 @@ class ColorSelector(Window):
             os.mkdir(path)
         for c in self.colors:
             all_data = np.concatenate(c.matches)
-            np.save(os.path.join(path, c.name), all_data)
+            if len(all_data) > 0:
+                np.save(os.path.join(path, c.name), all_data)
 
     def clear(self):
         for c in self.colors:
