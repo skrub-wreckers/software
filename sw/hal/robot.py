@@ -1,4 +1,4 @@
-from . import HardwareDevice, Arms, Drive, RegulatedDrive, ColorSensor, BreakBeams, DigitalIR
+from . import HardwareDevice, Arms, Drive, RegulatedDrive, ColorSensor, BreakBeams, DigitalIR, LimitSwitch
 from tamproxy.devices import LongIR, DigitalInput
 from .. import pins
 from ..import constants
