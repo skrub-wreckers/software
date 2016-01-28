@@ -69,11 +69,12 @@ def pick_up_cubes(r):
 
         yield From(asyncio.sleep(0.05))
 
+# Direction is the direction we want to turn in
 @asyncio.coroutine
-def avoid_wall(r, side, dir):
+def avoid_wall(r, ir, bumper, dir):
     log.info('Avoiding wall to {}'.format('left' if dir == 1 else 'right'))
-    Drive.go_distance(r.drive, 4)
-    while side.val:
+    Drive.go_distance(r.drive, -8)
+    while ir.val and bumper.val:
         r.drive.go(0, dir*0.2)
         yield From(asyncio.sleep(0.05))
         yield From(pick_up_cubes(r))
@@ -101,6 +102,7 @@ def find_cubes(r):
             if cube is None:
                 if search_task is None:
                     log.info('No cubes in view - scanning')
+                    # TODO: Smart turn so turn away from walls
                     search_task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
                 continue
 
@@ -129,13 +131,12 @@ def find_cubes(r):
                     while not task.done():
                         if get_cube(r) != Colors.NONE:
                             task.cancel()
-                        if r.left_short_ir.val:
+                        if r.l_bumper.val:
                             task.cancel()
-                            yield From(avoid_wall(r,r.left_short_ir,-1))
-                        if r.right_short_ir.val:
+                            yield From(avoid_wall(r,r.left_short_ir,r.l_bumper,-1))
+                        if r.r_bumper.val:
                             task.cancel()
-                            yield From(avoid_wall(r,r.right_short_ir,1))
-
+                            yield From(avoid_wall(r,r.right_short_ir,r.r_bumper,1))
                         yield From(asyncio.sleep(0.05))
 
                 finally:
