@@ -69,8 +69,9 @@ def pick_up_cubes(r):
 @asyncio.coroutine
 def avoid_wall(r, ir, bumper, dir):
     log.info('Avoiding wall to {}'.format('left' if dir == 1 else 'right'))
-    Drive.go_distance(r.drive, -2)
-    yield From(r.drive.turn_angle(np.radians(30)))
+    if bumper.val:
+        Drive.go_distance(r.drive, -1)
+    yield From(r.drive.turn_angle(dir * np.radians(30)))
     while ir.val and bumper.val:
         r.drive.go(0, dir*0.2)
         yield From(asyncio.sleep(0.05))
@@ -128,6 +129,13 @@ def find_cubes(r):
                     while not task.done():
                         if get_cube(r) != Colors.NONE:
                             task.cancel()
+                        if r.left_short_ir.val and r.right_short_ir.val and \
+                            min(r.left_long_ir.distInches, r.right_long_ir.distInches) < constants.close_to_wall:
+                            task.cancel()
+                            if r.left_bumper.val:
+                                yield From(r.drive.turn_angle(np.radians(-120)))
+                            else:
+                                yield From(r.drive.turn_angle(np.radians(120)))
                         if r.left_bumper.val or r.left_short_ir.val:
                             task.cancel()
                             yield From(avoid_wall(r,r.left_short_ir,r.left_bumper,-1))
