@@ -46,6 +46,11 @@ class Mapper(object):
         ]
         geom = vision.cam.geom
         for cube in self.cubes:
+            # remove old cubes that are duplicates of the existing reading
+            if any(np.linalg.norm(cube.pos - new.pos) < 2 for new in new_cubes):
+                self.cubes.remove(cube)
+
+            # remove old cubes that should be on screen but aren't
             rel_pos = np.linalg.solve(m, cube.pos)
             proj_pos = geom.projection_matrix.dot(rel_pos)
             if geom.on_screen(proj_pos):
