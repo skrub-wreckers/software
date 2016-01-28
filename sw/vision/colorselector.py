@@ -1,6 +1,5 @@
 import os.path
 
-import cv2
 import numpy as np
 
 from .window import Window
@@ -69,6 +68,8 @@ class ColorSelector(Window):
 
     def _on_mouse(self, event, x, y, flags, param):
         """ clear the current color on right drag, set it on left drag """
+        import cv2
+
         mask = self.colors[self.i].cv_mask
 
         if event == cv2.EVENT_LBUTTONDOWN:

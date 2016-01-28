@@ -1,6 +1,5 @@
 import warnings
 
-import cv2
 import numpy as np
 import threading
 
@@ -9,6 +8,8 @@ from .geometry import Geometry
 
 class Camera(object):
     def __init__(self, w=None, h=None, geom=None, id=1, debug=False):
+        import cv2
+
         # deal with simple arguments
         if h is not None and w is not None:
             geom = Geometry(w, h)

@@ -2,7 +2,6 @@ import logging
 import time
 from math import pi
 
-import cv2
 import numpy as np
 from trollius import From
 import trollius as asyncio
