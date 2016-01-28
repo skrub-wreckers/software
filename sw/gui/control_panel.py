@@ -11,7 +11,7 @@ import pygame
 PANEL_BG = (150, 150, 150)
 
 START_COLORS = {True:[200,0,0], False:[0,200,0]}
-START_RECT = (350,100,100,100)
+START_RECT = (330,100,160,160)
 
 class ControlPanel(object):
     def __init__(self, robot, size = 500):
@@ -89,7 +89,7 @@ class ControlPanel(object):
         pygame.draw.line(surface, (255,0,0), (130+int(105*(self.robot.break_beams.r_beam._thres/65536.0)), 75), (130+int(105*(self.robot.break_beams.r_beam._thres/65536.0)),80))
 
     def draw_time(self, surface):
-        pygame.draw.rect(surface, PANEL_BG, (180, 100, 100, 160))
+        pygame.draw.rect(surface, PANEL_BG, (180, 100, 150, 160))
     
     def update(self, events):
         for event in events:
