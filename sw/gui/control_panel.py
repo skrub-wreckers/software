@@ -7,6 +7,7 @@ import numpy as np
 import os
 
 PANEL_BG = (150, 150, 150)
+START_RECT = (350,350,100,100)
 
 class ControlPanel(object):
     def __init__(self, robot, size = 500):
@@ -22,13 +23,15 @@ class ControlPanel(object):
             raw = np.load(path).reshape((-1, 4))
 
             self.color_data[c] = ColorSensor.project(raw)
+            
+        self.started = False
 
     def set_size(self, size):
         self.size = size
 
     def draw(self, surface):
         surface.fill((50,50,50))
-        pygame.draw.rect(surface, (0,200,0), (350,350,100,100))
+        pygame.draw.rect(surface, (0,200,0), PLAY_RECT)
 
         self.draw_ir(surface)
         self.draw_colorsensor(surface)
@@ -85,4 +88,8 @@ class ControlPanel(object):
         pygame.draw.rect(surface, PANEL_BG, (180, 100, 100, 160))
     
     def update(self, events):
-        pass
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if util.point_in(event.pos, START_RECT):
+                    print "Start button pressed"
+                    self.started = True
