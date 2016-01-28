@@ -88,6 +88,7 @@ if __name__ == "__main__":
         try:
             loop.run_until_complete(main_task)
         except KeyboardInterrupt:
+            print "Interrupted"
             main_task.cancel()
             loop.run_forever()
         finally:
