@@ -1,7 +1,7 @@
 from .window import Window
 from ..hal import ColorSensor, BreakBeams, DigitalIR
 from ..vision import Colors
-import ..util
+from .. import util
 from tamproxy.devices import LongIR, DigitalInput
 import pygame
 import numpy as np
