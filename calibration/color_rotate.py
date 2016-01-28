@@ -52,10 +52,10 @@ def main(r):
             if c.started:
                 if turn_task is None:
                     turn_task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
-                    start_angle = r.drive.odometer.theta
+                    start_angle = r.drive.odometer.val.theta
             elif turn_task is not None:
                 turn_task.cancel()
-            if abs(r.drive.odometer.theta - start_angle):
+            if abs(r.drive.odometer.val.theta - start_angle):
                 turn_task.cancel()
             yield
     finally:
