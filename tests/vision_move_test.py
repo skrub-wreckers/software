@@ -132,6 +132,13 @@ def find_cubes(r):
                     while not task.done():
                         if get_cube(r) != Colors.NONE:
                             task.cancel()
+                        if r.left_short_ir.val and r.right_short_ir.val and \
+                            min(r.left_long_ir.distInches, r.right_long_ir.distInches) < constants.close_to_wall:
+                            task.cancel()
+                            if r.left_bumper.val:
+                                yield From(r.drive.turn_angle(np.radians(-120)))
+                            else:
+                                yield From(r.drive.turn_angle(np.radians(120)))
                         if r.left_bumper.val or r.left_short_ir.val:
                             task.cancel()
                             yield From(avoid_wall(r,r.left_short_ir,r.left_bumper,-1))
