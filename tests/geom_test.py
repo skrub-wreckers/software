@@ -53,9 +53,31 @@ class TestStringMethods(unittest.TestCase):
                 pixel, 0
             )
         )
+        self.assertGreater(point2[-1], 0)
         point2 = point2 / point2[-1]
 
         np.testing.assert_allclose(point, point2, atol=1e-9)
+
+    def test_backwards_proj(self):
+        m = np.eye(4)
+        m[2,3] = 1
+        g = constants.camera_geometry._replace(
+            w=160, h=120, matrix=m
+        )
+
+        pixel = np.array([80, 0, 1])
+
+        with self.assertRaises(ValueError):
+            res = g.project_on(g.ray_at(*pixel[:2]), [0, 0, 1, 0], 0)
+
+        point2 = np.linalg.solve(
+            np.vstack(
+                (g.projection_matrix, [0, 0, 1, 0])
+            ), np.append(
+                pixel, 0
+            )
+        )
+        self.assertLess(point2[-1], 0)
 
 if __name__ == '__main__':
     unittest.main()
