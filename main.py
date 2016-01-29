@@ -130,6 +130,7 @@ def find_cubes(r):
         search_task = None
         while True:
             if r.break_beams.blocked:
+                log.info("break beams were broken")
                 yield From(run_picking_up_cubes(r, run_avoiding_walls(r, r.drive.go_distance(6))))
 
             yield From(pick_up_cubes(r))
