@@ -130,7 +130,7 @@ def find_cubes(r):
         search_task = None
         while True:
             if r.break_beams.blocked:
-                yield From(run_avoiding_walls(run_picking_up_cubes(r.drive.go_distance(6))))
+                yield From(run_picking_up_cubes(run_avoiding_walls(r.drive.go_distance(6))))
 
             yield From(pick_up_cubes(r))
 
@@ -171,7 +171,7 @@ def find_cubes(r):
 
                 try:
                     yield From(
-                        run_avoiding_walls(run_picking_up_cubes(
+                        run_picking_up_cubes(run_avoiding_walls(
                             r.drive.go_to(dest[:2], throw_timeout=True)
                         ))
                     )
