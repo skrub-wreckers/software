@@ -19,7 +19,7 @@ from sw.mapping.arena import Arena
 log = logging.getLogger('sw.test')
 
 OUR_COLOR = Colors.GREEN
-CAMERA_ID = 1
+CAMERA_ID = 2
 
 THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 
