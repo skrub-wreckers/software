@@ -44,20 +44,24 @@ def pick_up_cubes(r):
     while True:
         val = get_cube(r)
 
-        if val == OUR_COLOR:
-            ganked_cube = time.time()
-            r.drive.stop()
-            r.arms.silo.up()
-            log.info('Picked up {} block'.format(Colors.name(val)))
-            r.arms.silo.down()
-        elif val == THEIR_COLOR:
-            ganked_cube = time.time()
-            r.drive.stop()
-            r.arms.dump.up()
-            log.info('Picked up {} block'.format(Colors.name(val)))
-            r.arms.dump.down()
-        else:
-            break
+        if val != Colors.NONE:
+            r.drive.stop()            
+            yield From(asyncio.sleep(0.1))
+            val = get_cube(r)
+
+            if val == OUR_COLOR:
+                ganked_cube = time.time()
+                r.arms.silo.up()
+                log.info('Picked up {} block'.format(Colors.name(val)))
+                r.arms.silo.down()
+            elif val == THEIR_COLOR:
+                ganked_cube = time.time()
+                r.drive.stop()
+                r.arms.dump.up()
+                log.info('Picked up {} block'.format(Colors.name(val)))
+                r.arms.dump.down()
+            else:
+                break
 
         yield From(asyncio.sleep(0.05))
 
