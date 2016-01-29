@@ -80,6 +80,50 @@ def search_for_cubes(r):
         yield From(r.drive.turn_speed(np.radians(30)))
 
 @asyncio.coroutine
+def run_avoiding_walls(r, coro):
+    try:
+        task = asyncio.ensure_future(coro)
+        while not task.done():
+            if r.left_short_ir.val and r.right_short_ir.val and util.close_to_wall(r):
+                task.cancel()
+                log.debug("All sensors hit")
+                if r.left_bumper.val:
+                    yield From(r.drive.turn_angle(np.radians(-120)))
+                else:
+                    yield From(r.drive.turn_angle(np.radians(120)))
+            if r.left_bumper.val or r.left_short_ir.val:
+                log.debug("Left side triggered")
+                task.cancel()
+                yield From(avoid_wall(r,r.left_short_ir,r.left_bumper,-1))
+            if r.right_bumper.val or r.right_short_ir.val:
+                log.debug("Right side triggered")
+                task.cancel()
+                yield From(avoid_wall(r,r.right_short_ir,r.right_bumper,1))
+            yield
+
+        try:
+            task.result()
+        except asyncio.CancelledError:
+            pass
+    finally:
+        task.cancel()
+
+def run_picking_up_cubes(r, coro):
+    try:
+        task = asyncio.ensure_future(coro)
+        while not task.done():
+            if get_cube(r):
+                task.cancel()
+                yield From(pick_up_cubes)
+            yield
+        try:
+            task.result()
+        except asyncio.CancelledError:
+            pass
+    finally:
+        task.cancel()
+
+@asyncio.coroutine
 def find_cubes(r):
     try:
         search_task = None
@@ -87,6 +131,9 @@ def find_cubes(r):
             yield
             # pick up any cubes we have
             # yield From(check_breakbeams(r))
+            if r.break_beams.blocked:
+                r.drive.stop()
+                yield From(r.drive.go_distance(6))
             yield From(pick_up_cubes(r))
 
             try:
@@ -129,21 +176,7 @@ def find_cubes(r):
                     while not task.done():
                         if get_cube(r) != Colors.NONE:
                             task.cancel()
-                        if r.left_short_ir.val and r.right_short_ir.val and util.close_to_wall(r):
-                            task.cancel()
-                            log.debug("All sensors hit")
-                            if r.left_bumper.val:
-                                yield From(r.drive.turn_angle(np.radians(-120)))
-                            else:
-                                yield From(r.drive.turn_angle(np.radians(120)))
-                        if r.left_bumper.val or r.left_short_ir.val:
-                            log.debug("Left side triggered")
-                            task.cancel()
-                            yield From(avoid_wall(r,r.left_short_ir,r.left_bumper,-1))
-                        if r.right_bumper.val or r.right_short_ir.val:
-                            log.debug("Right side triggered")
-                            task.cancel()
-                            yield From(avoid_wall(r,r.right_short_ir,r.right_bumper,1))
+                        
 
                         # this throws if the task threw. Probably
                         yield From(asyncio.sleep(0.05))
