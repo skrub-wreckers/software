@@ -55,12 +55,12 @@ class Drive(HardwareDevice):
     def go_forever(self, throttle=0, steer=0):
         try:
             self.go(throttle, steer)
-            lastPos = self.odometer.pos
+            lastPos = self.odometer.val.pos
 
             # If distance between now and a second ago is less than 4 inches, then cancel the task
             while True:
                 yield From(asyncio.sleep(1))
-                currentPos = self.odometer.pos
+                currentPos = self.odometer.val.pos
                 if np.linalg.norm(lastPos - currentPos) < 4:
                     raise asyncio.TimeoutError
                 lastPos = currentPos
