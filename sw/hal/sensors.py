@@ -73,7 +73,7 @@ class ColorSensor(HardwareDevice):
     def val(self):
         projected = self.project(self.raw_val)
 
-        if projected[0] > 2.5:
+        if projected[0] > 2.2:
             return Colors.NONE
         elif projected[1] < -0.2:
             return Colors.GREEN
