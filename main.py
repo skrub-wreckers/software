@@ -157,7 +157,7 @@ def find_cubes(r):
                         # this throws if the task threw. Probably
                         yield From(asyncio.wait([task, asyncio.sleep(0.05)], return_when=asyncio.FIRST_COMPLETED))
                 except asyncio.TimeoutError:
-                    log.debug("Driving task timed out and we caught it")
+                    log.warn("Driving task timed out and we caught it")
                     if util.close_to_wall(r):
                         # TODO: Make smarter thing than just moving arbitrarily
                         Drive.go_distance(r.drive, -1)
