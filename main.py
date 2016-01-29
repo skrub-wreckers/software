@@ -38,7 +38,7 @@ def get_cube(r):
 @asyncio.coroutine
 def check_breakbeams(r):
     while True:
-        if left_breakbeam.val or right_breakbeam.val:
+        if r.break_beams.blocked:
             r.drive.stop()
             yield From(asyncio.sleep(0.1))
             yield From(r.drive.go_distance(6))
