@@ -80,23 +80,16 @@ class ColorSensor(HardwareDevice):
         else:
             return Colors.RED
 
-
-
-class BreakBeam(HardwareDevice):
-    def __init__(self, tamp, led_pin, recv_pin):
-        self._led_pin = DigitalOutput(tamp, led_pin)
-        self._recv_pin =  AnalogInput(tamp, recv_pin)
-        self._led_pin.write(False)
-        self._thres = 15000
-
+class BreakBeam(DigitalIR):
+    # Secretly just an ultra short range IR
     @property
     def broken(self):
         return self._recv_pin.val > self._thres
 
 class BreakBeams(HardwareDevice):
     def __init__(self, tamp):
-        self.l_beam = BreakBeam(tamp, pins.l_bb_send, pins.l_bb_recv)
-        self.r_beam = BreakBeam(tamp, pins.r_bb_send, pins.r_bb_recv)
+        self.l_beam = BreakBeam(tamp, pins.l_breakbeam)
+        self.r_beam = BreakBeam(tamp, pins.r_breakbeam)
 
     @property
     def dir(self):
