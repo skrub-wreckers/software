@@ -7,6 +7,7 @@ import pygame
 import numpy as np
 import os
 import pygame
+import time
 
 PANEL_BG = (150, 150, 150)
 
@@ -19,7 +20,8 @@ class ControlPanel(object):
         self.size = size
         self.name = "Control"
         pygame.font.init()
-        self.font = pygame.font.Font(None, 20)
+        self.font = pygame.font.Font(None, 60)
+        self.end_time = None
 
         self.color_data = {}
         for c in [Colors.RED, Colors.GREEN, Colors.NONE]:
@@ -36,8 +38,9 @@ class ControlPanel(object):
     def draw(self, surface):
         surface.fill((50,50,50))
         pygame.draw.rect(surface, START_COLORS[self.started], START_RECT)
-        t_surf = self.font.render(str(self.robot.time_remaining), True, (0,0,0))
-        surface.blit(t_surf, (int(START_RECT[0]+(START_RECT[2]/2.0)-(t_surf.get_width()/2.0)),int(START_RECT[1]+(START_RECT[3]/2.0)-(t_surf.get_height()/2.0))))
+        if self.end_time is not None:
+            t_surf = self.font.render(str(int(self.end_time - time.time())), True, (0,0,0))
+            surface.blit(t_surf, (int(START_RECT[0]+(START_RECT[2]/2.0)-(t_surf.get_width()/2.0)),int(START_RECT[1]+(START_RECT[3]/2.0)-(t_surf.get_height()/2.0))))
 
         self.draw_ir(surface)
         self.draw_colorsensor(surface)
@@ -95,3 +98,4 @@ class ControlPanel(object):
                 if util.point_in(event.pos, START_RECT):
                     print "Start button pressed"
                     self.started = not self.started
+                    self.end_time = time.time()+constants.round_time
