@@ -50,8 +50,6 @@ class Arms(HardwareDevice):
             down_traj=[(0, 0.75)]
         )
 
-        self.silo_door = Servo(tamp, pins.stack_door, 1584, 780)
-        self.silo_latch = Servo(tamp, pins.stack_latch, 1830, 1130)
         self.silo_door.write(0)
         self.silo_latch.write(0)
 
