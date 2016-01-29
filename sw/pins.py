@@ -17,10 +17,12 @@ l_bumper = 32
 r_bumper = 31
 
 # breakbeams
-l_bb_recv = A[13]
-r_bb_recv = A[12]
-l_bb_send = 0
-r_bb_send = 3
+# l_bb_recv = A[13]
+# r_bb_recv = A[12]
+# l_bb_send = 0
+# r_bb_send = 3
+l_breakbeam = 0 # placeholder
+r_breakbeam = 0 # placeholder
 
 r_motor_pwm = 23
 r_motor_dir = 22

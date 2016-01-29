@@ -27,22 +27,23 @@ THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 ROUND_TIME = constants.round_time
 SILO_TIME = ROUND_TIME - 20
 
-USE_BREAKBEAM = False
+
+# If the breakbeam is broken, then drive forward straight 6 inches
+# (contingent on getting interrupted by other things)
+
 
 def get_cube(r):
-    val = r.color_sensor.val
-    blocked = r.break_beams.blocked
+    return r.color_sensor.val
 
-    if val == Colors.NONE:
-        if USE_BREAKBEAM and blocked:
-            log.warn('Beam broken, but no color reading')
-        return Colors.NONE
-
-    if USE_BREAKBEAM and not blocked:
-        log.warn('Color is {}, but beam not broken'.format(Colors.name(val)))
-        return Colors.NONE
-
-    return val
+@asyncio.coroutine
+def check_breakbeams(r):
+    while True:
+        if left_breakbeam.val or right_breakbeam.val:
+            r.drive.stop()
+            yield From(asyncio.sleep(0.1))
+            yield From(r.drive.go_distance(6))
+        yield From(pick_up_cubes(r))
+        yield From(asyncio.sleep(0.05))
 
 @asyncio.coroutine
 def pick_up_cubes(r):
@@ -82,7 +83,7 @@ def avoid_wall(r, ir, bumper, dir):
 
 @asyncio.coroutine
 def search_for_cubes(r):
-    # TODO: Replace with wall following soon
+    # TODO: Replace with wall following soon (check out wall_fondle)
     if r.left_short_ir.val:
         yield From(r.drive.turn_speed(np.radians(-30)))
     else:
@@ -95,6 +96,7 @@ def find_cubes(r):
         while True:
             yield
             # pick up any cubes we have
+            yield From(check_breakbeams(r))
             yield From(pick_up_cubes(r))
 
             try:
@@ -137,8 +139,7 @@ def find_cubes(r):
                     while not task.done():
                         if get_cube(r) != Colors.NONE:
                             task.cancel()
-                        if r.left_short_ir.val and r.right_short_ir.val and \
-                            min(r.left_long_ir.distInches, r.right_long_ir.distInches) < constants.close_to_wall:
+                        if r.left_short_ir.val and r.right_short_ir.val and util.close_to_wall(r):
                             task.cancel()
                             log.debug("All sensors hit")
                             if r.left_bumper.val:
