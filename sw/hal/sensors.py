@@ -84,7 +84,7 @@ class BreakBeam(DigitalIR):
     # Secretly just an ultra short range IR
     @property
     def broken(self):
-        return self._recv_pin.val > self._thres
+        return self.val
 
 class BreakBeams(HardwareDevice):
     def __init__(self, tamp):
