@@ -108,6 +108,7 @@ def run_avoiding_walls(r, coro):
     finally:
         task.cancel()
 
+@asyncio.coroutine
 def run_picking_up_cubes(r, coro):
     try:
         task = asyncio.ensure_future(coro)
@@ -128,12 +129,9 @@ def find_cubes(r):
     try:
         search_task = None
         while True:
-            yield
-            # pick up any cubes we have
-            # yield From(check_breakbeams(r))
             if r.break_beams.blocked:
-                r.drive.stop()
-                yield From(r.drive.go_distance(6))
+                yield From(run_avoiding_walls(run_picking_up_cubes(r.drive.go_distance(6))))
+
             yield From(pick_up_cubes(r))
 
             try:
@@ -171,28 +169,18 @@ def find_cubes(r):
                 to_go = np.append(to_go, 1)
                 dest = r.drive.odometer.val.robot_matrix.dot(to_go)
 
-                task = asyncio.ensure_future(r.drive.go_to(dest[:2], throw_timeout=True))
                 try:
-                    while not task.done():
-                        if get_cube(r) != Colors.NONE:
-                            task.cancel()
-                        
-
-                        # this throws if the task threw. Probably
-                        yield From(asyncio.sleep(0.05))
-
-                    try:
-                        task.result()
-                    except asyncio.CancelledError:
-                        pass
-                    except asyncio.TimeoutError:
-                        log.warn("Driving task timed out and we caught it")
-                        if util.close_to_wall(r):
-                            # TODO: Make smarter thing than just moving arbitrarily
-                            Drive.go_distance(r.drive, -1)
-                            yield From(r.drive.turn_angle(np.radians(45)))
-                finally:
-                    task.cancel()
+                    yield From(
+                        run_avoiding_walls(run_picking_up_cubes(
+                            r.drive.go_to(dest[:2], throw_timeout=True)
+                        ))
+                    )
+                except asyncio.TimeoutError:
+                    log.warn("Driving task timed out and we caught it")
+                    if util.close_to_wall(r):
+                        # TODO: Make smarter thing than just moving arbitrarily
+                        Drive.go_distance(r.drive, -1)
+                        yield From(r.drive.turn_angle(np.radians(45)))
 
     finally:
         if search_task:
