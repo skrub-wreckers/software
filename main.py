@@ -173,16 +173,32 @@ def clean_up(r):
     startAngle = r.drive.odometer.val.theta
 
     # Turn until find good direction or if we spin all the way around
-    r.drive.go(0, 0.15)
-    gap_found = False
-    while not gap_found and abs(r.drive.odometer.val.theta - startAngle) <= 2*pi:
-        yield asyncio.sleep(0.05)
-        if util.close_to_wall(r):
+    task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
+    while not task.done():
+        gap_found = False
+        if abs(r.drive.odometer.val.theta - startAngle) >= 2*pi:
+            task.cancel()
+
+        if not util.close_to_wall(r):
+            task.cancel()
             gap_found = True
+
+        yield
+
+    try:
+        task.result()
+    except asyncio.CancelledError:
+        pass
+
+    if not gap_found:
+        log.debug('Rotated 2pi, no gaps')
+
     r.drive.stop()
-    r.silo.open()
     yield asyncio.sleep(0.5)
+    r.silo.open()
+    yield asyncio.sleep(1.5)
     if gap_found:
+        log.debug('Going forward to leave stack, because there\'s space')
         Drive.go_distance(r.drive, 6)
 
 
