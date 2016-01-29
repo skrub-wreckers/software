@@ -31,7 +31,11 @@ class ControlPanel(object):
             self.color_data[c] = ColorSensor.project(raw)
 
         self.started = False
-        self.sound = pygame.mixer.Sound(os.path.join(os.path.dirname(__file__), "pacman.wav"))
+        try:
+            pygame.mixer.init()
+            self.sound = pygame.mixer.Sound(os.path.join(os.path.dirname(__file__), "pacman.wav"))
+        except:
+            self.sound = None
 
     def set_size(self, size):
         self.size = size
@@ -100,4 +104,5 @@ class ControlPanel(object):
                     print "Start button pressed"
                     self.started = not self.started
                     self.end_time = time.time()+constants.round_time
-                    self.sound.play()
+                    if self.sound is not None:
+                        self.sound.play()
