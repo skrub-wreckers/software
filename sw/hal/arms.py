@@ -50,10 +50,6 @@ class Arms(HardwareDevice):
             down_traj=[(0, 0.75)]
         )
 
-        self.silo_door.write(0)
-        self.silo_latch.write(0)
-
-
 class Silo(HardwareDevice):
     def __init__(self, tamp):
         self.door = Servo(tamp, pins.stack_door, 1584, 780)
