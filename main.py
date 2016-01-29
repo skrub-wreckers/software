@@ -192,7 +192,16 @@ def find_cubes(r):
 
             # we found a cube - stop scanning
             if search_task:
+
+                # clean up the old task
                 search_task.cancel()
+                while not search_task.done():
+                    yield
+                try:
+                    search_task.result()
+                except CancelledError:
+                    pass
+
                 search_task = None
                 log.info('Stopped scanning')
 
