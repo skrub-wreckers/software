@@ -27,6 +27,9 @@ THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 ROUND_TIME = constants.round_time
 SILO_TIME = ROUND_TIME - 20
 
+has_spun = 0
+ganked_cube = 0
+
 
 # If the breakbeam is broken, then drive forward straight 6 inches
 # (contingent on getting interrupted by other things)
@@ -37,15 +40,18 @@ def get_cube(r):
 
 @asyncio.coroutine
 def pick_up_cubes(r):
+    global ganked_cube
     while True:
         val = get_cube(r)
 
         if val == OUR_COLOR:
+            ganked_cube = time.time()
             r.drive.stop()
             r.arms.silo.up()
             log.info('Picked up {} block'.format(Colors.name(val)))
             r.arms.silo.down()
         elif val == THEIR_COLOR:
+            ganked_cube = time.time()
             r.drive.stop()
             r.arms.dump.up()
             log.info('Picked up {} block'.format(Colors.name(val)))
@@ -71,13 +77,34 @@ def avoid_wall(r, ir, bumper, dir):
     Drive.turn_angle(r.drive, np.pi/16*dir)
     Drive.go_distance(r.drive, 8)
 
+# First spin 360 then go straight with wall avoidance if we didn't hit anything
+@asyncio.coroutine
+def wall_fondle(r):
+    global has_spun
+    while True:
+        yield
+        if ganked_cube >= has_spun:
+            startAngle = r.drive.odometer.val.theta
+
+            # Turn until find good direction or if we spin all the way around
+            task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
+            while not task.done():
+                gap_found = False
+                if abs(r.drive.odometer.val.theta - startAngle) >= 2*pi:
+                    task.cancel()
+                yield
+
+            try:
+                task.result()
+            except asyncio.CancelledError:
+                pass
+        yield From(run_avoiding_walls(r, r.drive.go_forever(0.2, 0)))
+
+
 @asyncio.coroutine
 def search_for_cubes(r):
-    # TODO: Replace with wall following soon (check out wall_fondle)
-    if r.left_short_ir.val:
-        yield From(r.drive.turn_speed(np.radians(-30)))
-    else:
-        yield From(r.drive.turn_speed(np.radians(30)))
+    while True:
+        yield From(run_picking_up_cubes(r, wall_fondle(r))))
 
 @asyncio.coroutine
 def run_avoiding_walls(r, coro):

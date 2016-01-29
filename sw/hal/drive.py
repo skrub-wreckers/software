@@ -2,6 +2,9 @@ import math
 import time
 import warnings
 
+from trollius import From
+import trollius as asyncio
+
 import numpy as np
 import tamproxy.devices as dev
 
@@ -47,6 +50,15 @@ class Drive(HardwareDevice):
         lPow -= steer
         rPow += steer
         self._set_speeds(lPow, rPow)
+
+    @asyncio.coroutine
+    def go_forever(self, throttle=0, steer=0):
+        try:
+            self.go(throttle, steer)
+            while True:
+                yield
+        finally:
+            self.stop()
 
     def stop(self):
         self.go(throttle=0)
