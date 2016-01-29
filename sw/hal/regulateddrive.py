@@ -82,6 +82,7 @@ class RegulatedDrive(Drive):
                         raise asyncio.TimeoutError
                     else:
                         warnings.warn('Timed out during RegulatedDrive.turn_to')
+                        return
         finally:
             self.stop()
 
@@ -157,6 +158,7 @@ class RegulatedDrive(Drive):
                         raise asyncio.TimeoutError
                     else:
                         warnings.warn('Timed out during RegulatedDrive.drive_to')
+                        return
         finally:
             self.stop()
 
