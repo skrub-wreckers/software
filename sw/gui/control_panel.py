@@ -32,6 +32,7 @@ class ControlPanel(object):
 
         self.started = False
         try:
+            pygame.mixer.init()
             self.sound = pygame.mixer.Sound(os.path.join(os.path.dirname(__file__), "pacman.wav"))
         except:
             self.sound = None
