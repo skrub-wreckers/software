@@ -104,7 +104,7 @@ def wall_fondle(r):
 @asyncio.coroutine
 def search_for_cubes(r):
     while True:
-        yield From(run_picking_up_cubes(r, wall_fondle(r))))
+        yield From(run_picking_up_cubes(r, wall_fondle(r)))
 
 @asyncio.coroutine
 def run_avoiding_walls(r, coro):
