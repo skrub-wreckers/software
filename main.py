@@ -62,6 +62,8 @@ def pick_up_cubes(r):
                 r.arms.dump.down()
             else:
                 break
+        else:
+            break
 
         yield From(asyncio.sleep(0.05))
 
