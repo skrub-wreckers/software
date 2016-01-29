@@ -13,12 +13,12 @@ l_ir_short = 15
 r_ir_short = 14
 back_ir_short = 33
 
-l_bumper = 0
-r_bumper = 3
+l_bumper = 1
+r_bumper = 2
 
 # breakbeams
-l_breakbeam = 32
-r_breakbeam = 31
+l_breakbeam = 33
+r_breakbeam = 32
 
 r_motor_pwm = 23
 r_motor_dir = 22

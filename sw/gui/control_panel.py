@@ -82,12 +82,12 @@ class ControlPanel(object):
         pygame.draw.rect(surface, PANEL_BG, (10,10,230,80))
         if self.robot.break_beams.l_beam.broken:
             pygame.draw.rect(surface, (255,255,255), (15,15,105,50))
-        pygame.draw.rect(surface, (255,255,255), (15,70,int(105*(self.robot.break_beams.l_beam._recv_pin.val/65536.0)),10))
-        pygame.draw.line(surface, (255,0,0), (15+int(105*(self.robot.break_beams.l_beam._thres/65536.0)), 75), (15+int(105*(self.robot.break_beams.l_beam._thres/65536.0)),80))
+        #pygame.draw.rect(surface, (255,255,255), (15,70,int(105*(self.robot.break_beams.l_beam._recv_pin.val/65536.0)),10))
+        #pygame.draw.line(surface, (255,0,0), (15+int(105*(self.robot.break_beams.l_beam._thres/65536.0)), 75), (15+int(105*(self.robot.break_beams.l_beam._thres/65536.0)),80))
         if self.robot.break_beams.r_beam.broken:
             pygame.draw.rect(surface, (255,255,255), (130,15,105,50))
-        pygame.draw.rect(surface, (255,255,255), (130,70,int(105*(self.robot.break_beams.r_beam._recv_pin.val/65536.0)),10))
-        pygame.draw.line(surface, (255,0,0), (130+int(105*(self.robot.break_beams.r_beam._thres/65536.0)), 75), (130+int(105*(self.robot.break_beams.r_beam._thres/65536.0)),80))
+        #pygame.draw.rect(surface, (255,255,255), (130,70,int(105*(self.robot.break_beams.r_beam._recv_pin.val/65536.0)),10))
+        #pygame.draw.line(surface, (255,0,0), (130+int(105*(self.robot.break_beams.r_beam._thres/65536.0)), 75), (130+int(105*(self.robot.break_beams.r_beam._thres/65536.0)),80))
 
     def update(self, events):
         for event in events:

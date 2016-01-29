@@ -21,7 +21,7 @@ class Robot(HardwareDevice):
         self.left_bumper = LimitSwitch(self.tamp, pins.l_bumper, pullup = True)
         self.right_bumper = LimitSwitch(self.tamp, pins.r_bumper, pullup = True)
 
-        self.breakbeams = BreakBeams(self.tamp)
+        self.break_beams = BreakBeams(self.tamp)
 
         
         self.time_remaining = constants.round_time
