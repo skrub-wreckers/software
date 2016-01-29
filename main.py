@@ -67,7 +67,7 @@ def pick_up_cubes(r):
 # Direction is the direction we want to turn in
 @asyncio.coroutine
 def avoid_wall(r, ir, bumper, dir):
-    log.info('Avoiding wall to {}'.format('left' if dir == 1 else 'right'))
+    log.info('Avoiding wall to {}'.format('left' if dir == -1 else 'right'))
     if bumper.val:
         log.info("Bumper was hit; backing up")
         Drive.go_distance(r.drive, -1)
