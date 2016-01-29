@@ -199,7 +199,7 @@ def find_cubes(r):
                     yield
                 try:
                     search_task.result()
-                except CancelledError:
+                except asyncio.CancelledError:
                     pass
 
                 search_task = None
