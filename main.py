@@ -113,7 +113,7 @@ def run_picking_up_cubes(r, coro):
     try:
         task = asyncio.ensure_future(coro)
         while not task.done():
-            if get_cube(r):
+            if get_cube(r) != Colors.NONE:
                 task.cancel()
                 yield From(pick_up_cubes(r))
             yield
