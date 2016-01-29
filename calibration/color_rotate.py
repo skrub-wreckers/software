@@ -22,8 +22,8 @@ from sw.mapping.arena import Arena
 log = logging.getLogger('sw.test')
 
 CAMERA_ID = 2
-FILE_NAME_C = "none"
-FILE_NAME_B = "bb"
+FILE_NAME_C = "green"
+FILE_NAME_B = "bb-green"
 colors = []
 breakbeams = []
 
