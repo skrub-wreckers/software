@@ -3,7 +3,6 @@ import warnings
 import numpy as np
 import threading
 
-from .. import util
 from .geometry import Geometry
 
 class Camera(object):
