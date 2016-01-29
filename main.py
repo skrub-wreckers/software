@@ -25,7 +25,7 @@ THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 
 
 ROUND_TIME = constants.round_time
-SILO_TIME = ROUND_TIME - 20
+SILO_TIME = ROUND_TIME - 15
 
 has_spun = 0
 ganked_cube = 0
