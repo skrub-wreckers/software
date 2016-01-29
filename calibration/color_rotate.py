@@ -65,6 +65,8 @@ def main(r):
                 yield From(ctask)
 
             yield
+            if w.get_key() == ' ':
+                break
     finally:
         print "Finally in main"
         ctask.cancel()
