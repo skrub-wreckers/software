@@ -81,23 +81,29 @@ def avoid_wall(r, ir, bumper, dir):
 @asyncio.coroutine
 def wall_fondle(r):
     global has_spun
+    log.info("Going into wall fondling")
     while True:
         yield
         if ganked_cube >= has_spun:
+            log.info("Spinning")
+            has_spun = time.time()
             startAngle = r.drive.odometer.val.theta
 
             # Turn until find good direction or if we spin all the way around
-            task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
-            while not task.done():
-                gap_found = False
-                if abs(r.drive.odometer.val.theta - startAngle) >= 2*pi:
-                    task.cancel()
-                yield
-
             try:
-                task.result()
-            except asyncio.CancelledError:
-                pass
+                task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
+                while not task.done():
+                    gap_found = False
+                    if abs(r.drive.odometer.val.theta - startAngle) >= 2*pi:
+                        task.cancel()
+                    yield
+                try:
+                    task.result()
+                except asyncio.CancelledError:
+                    pass
+            finally:
+                task.cancel()
+        log.info("Done spinning, going straight now")
         yield From(run_avoiding_walls(r, r.drive.go_forever(0.2, 0)))
 
 
@@ -222,22 +228,25 @@ def clean_up(r):
     startAngle = r.drive.odometer.val.theta
 
     # Turn until find good direction or if we spin all the way around
-    task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
-    while not task.done():
-        gap_found = False
-        if abs(r.drive.odometer.val.theta - startAngle) >= 2*pi:
-            task.cancel()
-
-        if not util.close_to_wall(r):
-            task.cancel()
-            gap_found = True
-
-        yield
-
     try:
-        task.result()
-    except asyncio.CancelledError:
-        pass
+        task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
+        while not task.done():
+            gap_found = False
+            if abs(r.drive.odometer.val.theta - startAngle) >= 2*pi:
+                task.cancel()
+
+            if not util.close_to_wall(r):
+                task.cancel()
+                gap_found = True
+
+            yield
+
+        try:
+            task.result()
+        except asyncio.CancelledError:
+            pass
+    finally:
+        task.cancel()
 
     if not gap_found:
         log.debug('Rotated 2pi, no gaps')
