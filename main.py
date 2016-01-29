@@ -104,7 +104,14 @@ def wall_fondle(r):
             finally:
                 task.cancel()
         log.info("Done spinning, going straight now")
-        yield From(run_avoiding_walls(r, r.drive.go_forever(0.2, 0)))
+        try:
+            yield From(run_avoiding_walls(r, r.drive.go_forever(0.2, 0)))
+        except asyncio.TimeoutError:
+            log.warn("Wall bouncing task timed out and we caught it")
+            # TODO: Make smarter thing than just moving arbitrarily
+            Drive.go_distance(r.drive, -1)
+            yield From(r.drive.turn_angle(np.radians(45)))
+
 
 
 @asyncio.coroutine
