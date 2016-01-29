@@ -36,16 +36,6 @@ def get_cube(r):
     return r.color_sensor.val
 
 @asyncio.coroutine
-def check_breakbeams(r):
-    while True:
-        if r.break_beams.blocked:
-            r.drive.stop()
-            yield From(asyncio.sleep(0.1))
-            yield From(r.drive.go_distance(6))
-        yield From(pick_up_cubes(r))
-        yield From(asyncio.sleep(0.05))
-
-@asyncio.coroutine
 def pick_up_cubes(r):
     while True:
         val = get_cube(r)
@@ -96,7 +86,7 @@ def find_cubes(r):
         while True:
             yield
             # pick up any cubes we have
-            yield From(check_breakbeams(r))
+            # yield From(check_breakbeams(r))
             yield From(pick_up_cubes(r))
 
             try:
