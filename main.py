@@ -185,7 +185,7 @@ def clean_up(r):
             gap_found = True
     r.drive.stop()
     r.silo.open()
-
+    yield asyncio.sleep(0.5)
     if gap_found:
         Drive.go_distance(r.drive, 6)
 
