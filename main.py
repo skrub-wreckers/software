@@ -110,7 +110,9 @@ def wall_fondle(r):
             log.warn("Wall bouncing task timed out and we caught it")
             # TODO: Make smarter thing than just moving arbitrarily
             Drive.go_distance(r.drive, -1)
-            yield From(r.drive.turn_angle(np.radians(45)))
+            # Pick a random direction to turn to
+            side = 1 if int(time.time()) % 2 else -1 # this is apparently in python???
+            yield From(r.drive.turn_angle(side * np.radians(45)))
 
 
 
