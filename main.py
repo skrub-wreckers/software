@@ -155,7 +155,7 @@ def find_cubes(r):
                             yield From(avoid_wall(r,r.right_short_ir,r.right_bumper,1))
 
                         # this throws if the task threw. Probably
-                        yield From(asyncio.wait([task, asyncio.sleep(0.05)], asyncio.FIRST_COMPLETED))
+                        yield From(asyncio.wait([task, asyncio.sleep(0.05)], return_when=asyncio.FIRST_COMPLETED))
                 except asyncio.TimeoutError:
                     log.debug("Driving task timed out and we caught it")
                     if util.close_to_wall(r):
