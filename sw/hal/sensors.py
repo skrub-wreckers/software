@@ -108,7 +108,7 @@ class BreakBeams(HardwareDevice):
 
     @property
     def blocked(self):
-        return self.l_beam.broken and self.r_beam.broken
+        return self.l_beam.broken or self.r_beam.broken
 
     @property
     def sides(self):

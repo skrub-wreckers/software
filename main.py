@@ -27,6 +27,9 @@ THEIR_COLOR = (Colors.RED | Colors.GREEN) & ~OUR_COLOR
 ROUND_TIME = constants.round_time
 SILO_TIME = ROUND_TIME - 20
 
+has_spun = 0
+ganked_cube = 0
+
 
 # If the breakbeam is broken, then drive forward straight 6 inches
 # (contingent on getting interrupted by other things)
@@ -36,26 +39,19 @@ def get_cube(r):
     return r.color_sensor.val
 
 @asyncio.coroutine
-def check_breakbeams(r):
-    while True:
-        if left_breakbeam.val or right_breakbeam.val:
-            r.drive.stop()
-            yield From(asyncio.sleep(0.1))
-            yield From(r.drive.go_distance(6))
-        yield From(pick_up_cubes(r))
-        yield From(asyncio.sleep(0.05))
-
-@asyncio.coroutine
 def pick_up_cubes(r):
+    global ganked_cube
     while True:
         val = get_cube(r)
 
         if val == OUR_COLOR:
+            ganked_cube = time.time()
             r.drive.stop()
             r.arms.silo.up()
             log.info('Picked up {} block'.format(Colors.name(val)))
             r.arms.silo.down()
         elif val == THEIR_COLOR:
+            ganked_cube = time.time()
             r.drive.stop()
             r.arms.dump.up()
             log.info('Picked up {} block'.format(Colors.name(val)))
@@ -81,22 +77,89 @@ def avoid_wall(r, ir, bumper, dir):
     Drive.turn_angle(r.drive, np.pi/16*dir)
     Drive.go_distance(r.drive, 8)
 
+# First spin 360 then go straight with wall avoidance if we didn't hit anything
+@asyncio.coroutine
+def wall_fondle(r):
+    global has_spun
+    while True:
+        yield
+        if ganked_cube >= has_spun:
+            startAngle = r.drive.odometer.val.theta
+
+            # Turn until find good direction or if we spin all the way around
+            task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
+            while not task.done():
+                gap_found = False
+                if abs(r.drive.odometer.val.theta - startAngle) >= 2*pi:
+                    task.cancel()
+                yield
+
+            try:
+                task.result()
+            except asyncio.CancelledError:
+                pass
+        yield From(run_avoiding_walls(r, r.drive.go_forever(0.2, 0)))
+
+
 @asyncio.coroutine
 def search_for_cubes(r):
-    # TODO: Replace with wall following soon (check out wall_fondle)
-    if r.left_short_ir.val:
-        yield From(r.drive.turn_speed(np.radians(-30)))
-    else:
-        yield From(r.drive.turn_speed(np.radians(30)))
+    while True:
+        yield From(run_picking_up_cubes(r, wall_fondle(r))))
+
+@asyncio.coroutine
+def run_avoiding_walls(r, coro):
+    try:
+        task = asyncio.ensure_future(coro)
+        while not task.done():
+            if r.left_short_ir.val and r.right_short_ir.val and util.close_to_wall(r):
+                task.cancel()
+                log.debug("All sensors hit")
+                if r.left_bumper.val:
+                    yield From(r.drive.turn_angle(np.radians(-120)))
+                else:
+                    yield From(r.drive.turn_angle(np.radians(120)))
+            if r.left_bumper.val or r.left_short_ir.val:
+                log.debug("Left side triggered")
+                task.cancel()
+                yield From(avoid_wall(r,r.left_short_ir,r.left_bumper,-1))
+            if r.right_bumper.val or r.right_short_ir.val:
+                log.debug("Right side triggered")
+                task.cancel()
+                yield From(avoid_wall(r,r.right_short_ir,r.right_bumper,1))
+            yield
+
+        try:
+            task.result()
+        except asyncio.CancelledError:
+            pass
+    finally:
+        task.cancel()
+
+@asyncio.coroutine
+def run_picking_up_cubes(r, coro):
+    try:
+        task = asyncio.ensure_future(coro)
+        while not task.done():
+            if get_cube(r) != Colors.NONE:
+                task.cancel()
+                yield From(pick_up_cubes(r))
+            yield
+        try:
+            task.result()
+        except asyncio.CancelledError:
+            pass
+    finally:
+        task.cancel()
 
 @asyncio.coroutine
 def find_cubes(r):
     try:
         search_task = None
         while True:
-            yield
-            # pick up any cubes we have
-            yield From(check_breakbeams(r))
+            if r.break_beams.blocked:
+                log.info("break beams were broken")
+                yield From(run_picking_up_cubes(r, run_avoiding_walls(r, r.drive.go_distance(6))))
+
             yield From(pick_up_cubes(r))
 
             try:
@@ -134,42 +197,18 @@ def find_cubes(r):
                 to_go = np.append(to_go, 1)
                 dest = r.drive.odometer.val.robot_matrix.dot(to_go)
 
-                task = asyncio.ensure_future(r.drive.go_to(dest[:2], throw_timeout=True))
                 try:
-                    while not task.done():
-                        if get_cube(r) != Colors.NONE:
-                            task.cancel()
-                        if r.left_short_ir.val and r.right_short_ir.val and util.close_to_wall(r):
-                            task.cancel()
-                            log.debug("All sensors hit")
-                            if r.left_bumper.val:
-                                yield From(r.drive.turn_angle(np.radians(-120)))
-                            else:
-                                yield From(r.drive.turn_angle(np.radians(120)))
-                        if r.left_bumper.val or r.left_short_ir.val:
-                            log.debug("Left side triggered")
-                            task.cancel()
-                            yield From(avoid_wall(r,r.left_short_ir,r.left_bumper,-1))
-                        if r.right_bumper.val or r.right_short_ir.val:
-                            log.debug("Right side triggered")
-                            task.cancel()
-                            yield From(avoid_wall(r,r.right_short_ir,r.right_bumper,1))
-
-                        # this throws if the task threw. Probably
-                        yield From(asyncio.sleep(0.05))
-
-                    try:
-                        task.result()
-                    except asyncio.CancelledError:
-                        pass
-                    except asyncio.TimeoutError:
-                        log.warn("Driving task timed out and we caught it")
-                        if util.close_to_wall(r):
-                            # TODO: Make smarter thing than just moving arbitrarily
-                            Drive.go_distance(r.drive, -1)
-                            yield From(r.drive.turn_angle(np.radians(45)))
-                finally:
-                    task.cancel()
+                    yield From(
+                        run_picking_up_cubes(r, run_avoiding_walls(r, 
+                            r.drive.go_to(dest[:2], throw_timeout=True)
+                        ))
+                    )
+                except asyncio.TimeoutError:
+                    log.warn("Driving task timed out and we caught it")
+                    if util.close_to_wall(r):
+                        # TODO: Make smarter thing than just moving arbitrarily
+                        Drive.go_distance(r.drive, -1)
+                        yield From(r.drive.turn_angle(np.radians(45)))
 
     finally:
         if search_task:
@@ -183,16 +222,32 @@ def clean_up(r):
     startAngle = r.drive.odometer.val.theta
 
     # Turn until find good direction or if we spin all the way around
-    r.drive.go(0, 0.15)
-    gap_found = False
-    while not gap_found and abs(r.drive.odometer.val.theta - startAngle) <= 2*pi:
-        yield asyncio.sleep(0.05)
-        if util.close_to_wall(r):
+    task = asyncio.ensure_future(r.drive.turn_speed(np.radians(30)))
+    while not task.done():
+        gap_found = False
+        if abs(r.drive.odometer.val.theta - startAngle) >= 2*pi:
+            task.cancel()
+
+        if not util.close_to_wall(r):
+            task.cancel()
             gap_found = True
+
+        yield
+
+    try:
+        task.result()
+    except asyncio.CancelledError:
+        pass
+
+    if not gap_found:
+        log.debug('Rotated 2pi, no gaps')
+
     r.drive.stop()
-    r.silo.open()
     yield asyncio.sleep(0.5)
+    r.silo.open()
+    yield asyncio.sleep(1.5)
     if gap_found:
+        log.debug('Going forward to leave stack, because there\'s space')
         Drive.go_distance(r.drive, 6)
 
 
