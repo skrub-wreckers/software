@@ -34,6 +34,14 @@ class JoystickInterface(object):
     def right_arm(self):
         return self.joy.get_button(5)
 
+    @property
+    def open_silo(self):
+        return self.joy.get_button(3)
+
+    @property
+    def close_silo(self):
+        return self.joy.get_button(0)
+
     def set_bumpers(self, left, right):
     	amt = 32767
         vibration = XINPUT_VIBRATION(left * amt, right * amt)

@@ -40,6 +40,12 @@ if __name__ == "__main__":
                 while j.right_arm: pass
                 r.arms.dump.down()
 
+            elif j.open_silo:
+                r.silo.open()
+
+            elif j.close_silo:
+                r.silo.close()
+
             else:
                 throttle, steer = j.move_cmd
                 r.drive.go(throttle * 0.5, steer * 0.5)
