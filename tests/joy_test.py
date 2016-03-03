@@ -1,5 +1,5 @@
 from sw.hal import *
-from sw.gui import Window, ControlPanel, JoypadInterface
+from sw.gui import Window, ControlPanel, JoystickInterface
 from sw.vision import Camera, Vision, CameraPanel
 from sw.mapping import Mapper
 from sw import constants
