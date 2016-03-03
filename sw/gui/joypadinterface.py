@@ -1,6 +1,7 @@
 import ctypes
 import math
 import time
+import pygame
 
 # Define necessary structures
 class XINPUT_VIBRATION(ctypes.Structure):
