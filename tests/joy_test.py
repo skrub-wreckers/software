@@ -36,6 +36,7 @@ if __name__ == "__main__":
                 r.arms.silo.down()
 
             elif j.right_arm:
+                r.drive.stop()
                 r.arms.dump.up()
                 while j.right_arm: pass
                 r.arms.dump.down()
@@ -48,4 +49,4 @@ if __name__ == "__main__":
 
             else:
                 throttle, steer = j.move_cmd
-                r.drive.go(throttle * 0.5, steer * 0.5)
+                r.drive.go(throttle * 0.25, steer * 0.25)
